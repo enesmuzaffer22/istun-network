@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 const navLinkStyles = "text-gray-500 hover:text-primary transition-colors";
-const navButtonStyles = "bg-primary text-white px-4 py-2 rounded-md";
+const navPrimaryButtonStyles = "bg-primary text-white px-6 py-2 rounded-full";
+const navSecondaryButtonStyles =
+  "bg-white text-primary px-6 py-2 rounded-full border border-primary";
 const mobileNavLinkStyles =
   "text-white text-lg font-medium hover:text-gray-200 transition-colors";
 const mobileNavButtonStyles =
@@ -17,13 +19,15 @@ function Navbar() {
 
   return (
     <>
-      <div className="border-b border-gray-200 px-4 lg:px-4 xl:px-[120px] py-4 flex justify-between items-center relative">
+      <div className="border-b border-gray-200 px-4 lg:px-4 xl:px-[120px] py-5 flex justify-between items-center relative">
         <div className="logo">
-          <span className="md:text-2xl font-bold text-xl">ISTUN NETWORK</span>
+          <span className="md:text-2xl font-bold text-xl text-primary">
+            ISTUNetwork
+          </span>
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-4">
+        <nav className="hidden md:flex items-center gap-6">
           <Link to="/" className={navLinkStyles}>
             Haberler
           </Link>
@@ -36,12 +40,14 @@ function Navbar() {
           <Link to="/forumlar" className={navLinkStyles}>
             Forumlar
           </Link>
-          <Link to="/giris-yap" className={navButtonStyles}>
-            Giriş Yap
-          </Link>
-          <Link to="/kayit-ol" className={navButtonStyles}>
-            Kayıt Ol
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link to="/giris-yap" className={navPrimaryButtonStyles}>
+              Giriş Yap
+            </Link>
+            <Link to="/kayit-ol" className={navSecondaryButtonStyles}>
+              Kayıt Ol
+            </Link>
+          </div>
         </nav>
 
         {/* Mobile Hamburger Button */}
