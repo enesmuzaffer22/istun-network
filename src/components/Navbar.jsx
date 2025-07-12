@@ -19,7 +19,7 @@ function Navbar() {
 
   return (
     <>
-      <div className="border-b border-gray-200 px-4 lg:px-4 xl:px-[120px] py-5 flex justify-between items-center relative">
+      <div className="border-b border-gray-200 px-4 2xl:px-[120px] py-5 flex justify-between items-center relative">
         <div className="logo">
           <span className="md:text-2xl font-bold text-xl text-primary">
             ISTUNetwork
