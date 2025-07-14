@@ -4,13 +4,15 @@ import Hero from "../components/Hero";
 import AboutUsSection from "../components/AboutUsSection";
 import Footer from "../components/Footer";
 import JobSection from "../components/JobSection";
+import NewsSlider from "../components/NewsSlider";
 
 function LandingPage() {
   return (
     <div>
       <Hero />
-      <AboutUsSection />
+      <NewsSlider />
       <JobSection />
+      <AboutUsSection />
     </div>
   );
 }
