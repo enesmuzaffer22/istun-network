@@ -1,5 +1,6 @@
 import JobsPage from "../pages/JobsPage";
 import LandingPage from "../pages/LandingPage";
+import NewsPage from "../pages/NewsPage";
 
 export const RouteList = [
   {
@@ -9,5 +10,9 @@ export const RouteList = [
   {
     path: "/kariyer",
     element: <JobsPage />,
+  },
+  {
+    path: "/haberler",
+    element: <NewsPage />,
   },
 ];
