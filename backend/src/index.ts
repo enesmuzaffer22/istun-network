@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth";
 import newsRoutes from "./routes/news";
 import jobsRoutes from "./routes/jobs";
 import roadmapsRoutes from "./routes/roadmaps";
+import profileRoutes from "./routes/profile";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/jobs", jobsRoutes);
 app.use("/api/roadmaps", roadmapsRoutes);
+app.use("/api/users", profileRoutes);
 
 app.get("/", (req, res) => {
     res.send("ISTUN Mezun Web Backend Çalışıyor!");

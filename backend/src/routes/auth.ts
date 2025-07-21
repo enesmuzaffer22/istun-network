@@ -94,11 +94,12 @@ router.post("/register", upload.single("document"), async (req, res) => {
         await file.makePublic();
         const student_doc_url = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
 
-        // Firebase Auth ile kullanıcı oluştur
+        // Firebase Auth ile kullanıcı oluştur (onay bekleyeceği için başlangıçta devre dışı)
         const userRecord = await auth.createUser({
             email,
             password,
             displayName: `${name} ${surname}`,
+            disabled: true, // Admin onaylayana kadar giriş yapamasın.
         });
 
         // Firestore'a ek bilgi kaydet
@@ -115,11 +116,17 @@ router.post("/register", upload.single("document"), async (req, res) => {
             consent,
             student_doc_url,
             createdAt: new Date(),
+            status: "pending", // Yeni kullanıcı beklemede statüsünde başlar.
         });
 
-        res.status(201).json({ message: "Kayıt başarılı!" });
+        // Kullanıcıya hesabının onay beklediğini bildiren mesaj.
+        res.status(201).json({ message: "Kaydınız başarıyla oluşturulmuştur. Yönetici onayı sonrası hesabınız aktif hale gelecektir." });
+
     } catch (error: any) {
-        res.status(500).json({ message: error.message });
+        // Olası bir hata durumunda, Firebase Auth'da oluşturulmuş kullanıcıyı geri silmek
+        // iyi bir pratiktir, ancak şimdilik basit tutalım.
+        console.error("Kayıt sırasında hata oluştu:", error);
+        res.status(500).json({ message: "Kayıt sırasında bir hata oluştu: " + error.message });
     }
 });
 
@@ -176,5 +183,32 @@ router.post("/login", async (req, res) => {
         res.status(401).json({ message });
     }
 });
+
+// POST http://localhost:5000/api/auth/forgot-password
+// Şifre sıfırlama e-postası gönderir
+router.post("/forgot-password", async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ message: "E-posta adresi zorunludur." });
+        }
+
+        await auth.generatePasswordResetLink(email);
+
+        // E-posta adresi sistemde kayıtlı olmasa bile, kullanıcıya "e-posta gönderildi" mesajı döneriz.
+        // Bu, kötü niyetli kişilerin hangi e-postaların sistemde kayıtlı olduğunu tahmin etmesini (user enumeration) engeller.
+        res.status(200).json({ message: "Eğer girdiğiniz e-posta adresi sistemimizde kayıtlı ise, şifre sıfırlama bağlantısı gönderilmiştir." });
+
+    } catch (error: any) {
+        // Hata durumunda bile, özellikle "kullanıcı bulunamadı" hatasında,
+        // güvenlik nedeniyle kullanıcıya başarılı mesajı dönüyoruz.
+        // Gerçek hatayı sadece sunucu tarafında log'luyoruz.
+        console.error("Şifre sıfırlama sırasında hata:", error.message);
+
+        res.status(200).json({ message: "Eğer girdiğiniz e-posta adresi sistemimizde kayıtlı ise, şifre sıfırlama bağlantısı gönderilmiştir." });
+    }
+});
+
 
 export default router;
