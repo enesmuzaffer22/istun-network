@@ -5,6 +5,7 @@ import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
+import NewsDetailPage from "../pages/NewsDetailPage";
 
 const RoadmapPage = () => <div className="p-8 text-center">Yol Haritaları yakında!</div>;
 
@@ -48,5 +49,9 @@ export const RouteList = [
   {
     path: "/haberler",
     element: <NewsPage />,
+  },
+  {
+    path: "/haberler/:slug",
+    element: <NewsDetailPage />,
   },
 ];

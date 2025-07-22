@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "slug": "itu-yeni-arastirma-merkezi",
+    "news_title": "İstanbul Teknik Üniversitesi Yeni Araştırma Merkezi Açıyor",
+    "news_description": "Üniversitemiz bünyesinde yapay zeka ve makine öğrenmesi alanında yeni bir araştırma merkezi kurulacak. Merkez, öğrencilere ve akademisyenlere modern laboratuvar imkanları sunacak.",
+    "news_content": "İstanbul Teknik Üniversitesi, teknolojik gelişmeleri yakından takip ederek yeni bir araştırma merkezi açıyor. Bu merkezde yapay zeka, makine öğrenmesi ve veri bilimi alanlarında projeler yürütülecek. Öğrenciler ve akademisyenler, modern laboratuvarlarda çalışma fırsatı bulacak."
+  },
+  {
+    "id": 2,
+    "slug": "mezunlar-teknoloji-sirketlerinde-basari",
+    "news_title": "Mezun Öğrencilerimiz Teknoloji Şirketlerinde Başarıya İmza Atıyor",
+    "news_description": "2024 yılında mezun olan öğrencilerimizin %85'i ilk 6 ay içerisinde iş buldu. Özellikle yazılım geliştirme ve veri analizi alanlarında yüksek talep görülüyor.",
+    "news_content": "2024 yılı mezunlarımız, başta yazılım ve veri analitiği olmak üzere birçok alanda önde gelen teknoloji şirketlerinde çalışmaya başladı. Mezunlarımızın başarı hikayeleri üniversitemizin gurur kaynağı oldu."
+  },
+  {
+    "id": 3,
+    "slug": "uluslararasi-degisim-programlari-basvuru",
+    "news_title": "Uluslararası Öğrenci Değişim Programı Başvuruları Açıldı",
+    "news_description": "Erasmus+ ve Mevlana değişim programları kapsamında 2024-2025 akademik yılı için başvurular başladı. Avrupa ve Amerika'daki partner üniversitelerde eğitim fırsatı.",
+    "news_content": "Erasmus+ ve Mevlana programları ile öğrencilerimiz, Avrupa ve Amerika'daki partner üniversitelerde eğitim alabilecek. Başvurular online olarak alınacak ve değerlendirme sonuçları Haziran ayında açıklanacak."
+  },
+  {
+    "id": 4,
+    "slug": "kampuste-yeni-sosyal-tesisler",
+    "news_title": "Kampüste Yeni Sosyal Tesis ve Kafe Alanları",
+    "news_description": "Öğrenci yaşamını desteklemek amacıyla kampüs içerisinde yeni sosyal alanlar ve modern kafe tesisleri hizmete açıldı. 24 saat açık çalışma alanları da mevcut.",
+    "news_content": "Kampüsümüzde öğrencilerin sosyalleşebileceği ve ders çalışabileceği yeni alanlar açıldı. Modern kafeler ve 24 saat açık çalışma salonları büyük ilgi görüyor."
+  },
+  {
+    "id": 5,
+    "slug": "bilgisayar-muhendisligi-akreditasyon",
+    "news_title": "Bilgisayar Mühendisliği Bölümü Akreditasyon Aldı",
+    "news_description": "Bölümümüz MÜDEK (Mühendislik Eğitim Programları Değerlendirme ve Akreditasyon Derneği) tarafından 6 yıl süreyle akredite edildi.",
+    "news_content": "Bilgisayar Mühendisliği Bölümümüz, MÜDEK tarafından 6 yıl süreyle akredite edildi. Bu başarı, eğitim kalitemizin ulusal ve uluslararası düzeyde tescillenmesini sağladı."
+  },
+  {
+    "id": 6,
+    "slug": "startup-yarismasi-2024-sonuclari",
+    "news_title": "Startup Yarışması 2024 Sonuçları Açıklandı",
+    "news_description": "Yıllık girişimcilik yarışmasında öğrencilerimizin geliştirdiği projeler değerlendirildi. Kazanan takımlar 50.000 TL ödül ve mentorluk desteği kazandı.",
+    "news_content": "2024 Startup Yarışması'nda dereceye giren takımlar ödüllerini aldı. Kazanan projeler, inovasyon ve uygulanabilirlik açısından jüri tarafından övgüyle karşılandı."
+  },
+  {
+    "id": 7,
+    "slug": "yaz-staji-programi-2024",
+    "news_title": "Yaz Stajı Programı İçin Şirket Ortaklıkları Genişliyor",
+    "news_description": "2024 yaz dönemi için 150'den fazla şirket ile staj anlaşması imzalandı. Öğrenciler gerçek projelerde deneyim kazanma fırsatı bulacak.",
+    "news_content": "Bu yıl 150'den fazla şirketle yapılan anlaşmalar sayesinde öğrencilerimiz, yaz stajlarını gerçek projelerde yapma imkanı bulacak. Staj programı, iş dünyasına hazırlık açısından büyük önem taşıyor."
+  },
+  {
+    "id": 8,
+    "slug": "akademik-kadro-gucleniyor",
+    "news_title": "Akademik Kadro Güçlendiriliyor: Yeni Öğretim Üyeleri",
+    "news_description": "Bölümümüze yapay zeka, siber güvenlik ve veri bilimi alanlarında uzman 8 yeni öğretim üyesi katıldı. Ders çeşitliliği ve kalitesi artırılıyor.",
+    "news_content": "Yeni katılan öğretim üyeleriyle birlikte bölümümüzdeki ders çeşitliliği ve araştırma olanakları arttı. Özellikle yapay zeka ve veri bilimi alanlarında yeni dersler açıldı."
+  },
+  {
+    "id": 9,
+    "slug": "mezun-agi-etkinligi",
+    "news_title": "Mezun Ağı Etkinliği: Sektör Deneyimleri Paylaşımı",
+    "news_description": "Mezun öğrencilerimiz sektördeki deneyimlerini paylaşmak için kampüse geliyor. Networking ve kariyer gelişimi fırsatları sunulacak.",
+    "news_content": "Mezunlarımızın katılımıyla gerçekleşecek etkinlikte, sektördeki deneyimler ve kariyer fırsatları öğrencilerle paylaşılacak. Etkinlik sonunda networking oturumu düzenlenecek."
+  },
+  {
+    "id": 10,
+    "slug": "yeni-lab-ekipmanlari-ve-teknoloji-yatirimi",
+    "news_title": "Yeni Laboratuvar Ekipmanları ve Teknoloji Yatırımı",
+    "news_description": "Öğrencilerimizin pratik becerilerini geliştirmek için son teknoloji donanımlar ve yazılım lisansları temin edildi. Bulut bilişim ve IoT laboratuvarları kuruldu.",
+    "news_content": "Yeni alınan laboratuvar ekipmanları ve yazılım lisansları sayesinde öğrencilerimiz, güncel teknolojilerle uygulamalı eğitim alabilecek. Bulut bilişim ve IoT laboratuvarları faaliyete geçti."
+  }
+] 
