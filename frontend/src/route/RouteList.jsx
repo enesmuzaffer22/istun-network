@@ -41,7 +41,11 @@ export const RouteList = [
   },
   {
     path: "/kariyer/:slug",
-    element: <JobDetailPage />,
+    element: (
+      <PrivateRoute>
+        <JobDetailPage />
+      </PrivateRoute>
+    ),
   },
   {
     path: "/yol-haritalari",
