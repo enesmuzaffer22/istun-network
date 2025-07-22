@@ -98,9 +98,22 @@ function Navbar() {
               </div>
             )}
           </div>
-          <Link to="/forumlar" className={getNavLinkClass("/forumlar")}>
-            Forumlar
-          </Link>
+          {/* Forumlar */}
+          <div className="relative">
+            <span
+              className={getNavLinkClass("/forumlar") + " cursor-not-allowed opacity-50"}
+              onMouseEnter={() => setShowTooltip("forumlar")}
+              onMouseLeave={() => setShowTooltip(null)}
+            >
+              Forumlar
+            </span>
+            {/* Tooltip */}
+            {showTooltip === "forumlar" && (
+              <div className="absolute left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-gray-800 text-white text-xs rounded shadow z-10 whitespace-nowrap">
+                Şu an geliştirilme aşamasında, çok yakında sizlerle
+              </div>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             {!isAuthenticated ? (
               <>
@@ -221,13 +234,22 @@ function Navbar() {
                   </div>
                 )}
               </div>
-              <Link
-                to="/forumlar"
-                className={getMobileNavLinkClass("/forumlar")}
-                onClick={toggleMenu}
-              >
-                Forumlar
-              </Link>
+              {/* Forumlar */}
+              <div className="relative w-full flex justify-center">
+                <span
+                  className={getMobileNavLinkClass("/forumlar") + " cursor-not-allowed opacity-50"}
+                  onMouseEnter={() => setShowTooltip("forumlar-mobil")}
+                  onMouseLeave={() => setShowTooltip(null)}
+                >
+                  Forumlar
+                </span>
+                {/* Tooltip */}
+                {showTooltip === "forumlar-mobil" && (
+                  <div className="absolute left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-gray-800 text-white text-xs rounded shadow z-10 whitespace-nowrap">
+                    Şu an geliştirilme aşamasında, çok yakında sizlerle
+                  </div>
+                )}
+              </div>
 
               {/* Action Buttons */}
               <div className="flex flex-col gap-4 mt-8 w-full max-w-xs">

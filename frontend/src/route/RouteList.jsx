@@ -7,8 +7,8 @@ import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
 import NewsDetailPage from "../pages/NewsDetailPage";
 import JobDetailPage from "../pages/JobDetailPage";
-
-const RoadmapPage = () => <div className="p-8 text-center">Yol Haritaları yakında!</div>;
+import RoadmapsPage from "../pages/RoadmapsPage";
+import RoadmapDetailPage from "../pages/RoadmapDetailPage";
 
 export const RouteList = [
   {
@@ -51,7 +51,15 @@ export const RouteList = [
     path: "/yol-haritalari",
     element: (
       <PrivateRoute>
-        <RoadmapPage />
+        <RoadmapsPage />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/yol-haritalari/:slug",
+    element: (
+      <PrivateRoute>
+        <RoadmapDetailPage />
       </PrivateRoute>
     ),
   },
