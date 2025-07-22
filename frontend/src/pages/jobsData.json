@@ -1,0 +1,65 @@
+[
+  {
+    "id": 1,
+    "slug": "frontend-developer-tech-solutions",
+    "job_title": "Frontend Developer",
+    "job_employer": "Tech Solutions Ltd.",
+    "job_date": "15 Aralık 2024",
+    "job_description": "**React** ve *modern frontend* teknolojileriyle çalışacak takım arkadaşı arıyoruz.\n\n- Hibrit çalışma\n- Esnek saatler\n\n[Şirketi incele](https://techsolutions.com)",
+    "job_content": "## Pozisyon Detayları\n\nTech Solutions Ltd. olarak, dinamik ekibimize yeni bir **Frontend Developer** arıyoruz.\n\n### Aranan Nitelikler\n- React.js deneyimi\n- Tailwind veya benzeri CSS framework bilgisi\n- Takım çalışmasına yatkınlık\n\n> Başvurular için: hr@techsolutions.com"
+  },
+  {
+    "id": 2,
+    "slug": "backend-developer-digital-innovations",
+    "job_title": "Backend Developer",
+    "job_employer": "Digital Innovations Inc.",
+    "job_date": "12 Aralık 2024",
+    "job_description": "Node.js ve bulut teknolojileriyle ilgilenen **Backend Developer** arıyoruz.\n\n- Uzaktan çalışma\n- Yan haklar\n\n:rocket: Kariyer fırsatları!",
+    "job_content": "### Sorumluluklar\n\n- REST API geliştirme\n- AWS veya Azure deneyimi\n- Takım içi iletişim\n\nBaşvurular için: jobs@digitalinnovations.com"
+  },
+  {
+    "id": 3,
+    "slug": "ui-ux-designer-creative-studio",
+    "job_title": "UI/UX Designer",
+    "job_employer": "Creative Studio",
+    "job_date": "10 Aralık 2024",
+    "job_description": "Kreatif projelerde görev alacak **UI/UX Designer** arıyoruz.\n\n- Yaratıcı ortam\n- Portfolyo zorunlu",
+    "job_content": "#### Görevler\n\n- Kullanıcı arayüzü tasarımı\n- Kullanıcı deneyimi araştırmaları\n- Prototipleme\n\nBaşvuru için: design@creativestudio.com"
+  },
+  {
+    "id": 4,
+    "slug": "devops-engineer-cloud-systems",
+    "job_title": "DevOps Engineer",
+    "job_employer": "Cloud Systems Co.",
+    "job_date": "8 Aralık 2024",
+    "job_description": "Bulut altyapılarını yönetecek **DevOps** uzmanı arıyoruz.\n\n- CI/CD\n- Otomasyon\n\n> Modern altyapı!",
+    "job_content": "### Sorumluluklar\n\n- CI/CD süreçlerinin yönetimi\n- Otomasyon scriptleri\n- Bulut altyapı yönetimi\n\nBaşvuru: devops@cloudsystems.com"
+  },
+  {
+    "id": 5,
+    "slug": "product-manager-startup-hub",
+    "job_title": "Product Manager",
+    "job_employer": "StartUp Hub",
+    "job_date": "5 Aralık 2024",
+    "job_description": "Ürün geliştirme süreçlerinde liderlik edecek **Product Manager** arıyoruz.\n\n- Startup ruhu\n- Hızlı büyüme",
+    "job_content": "## Sorumluluklar\n\n- Ürün yol haritası oluşturma\n- Takım koordinasyonu\n- Müşteri geri bildirimi toplama\n\nBaşvuru: pm@startuphub.com"
+  },
+  {
+    "id": 6,
+    "slug": "data-scientist-analytics-pro",
+    "job_title": "Data Scientist",
+    "job_employer": "Analytics Pro",
+    "job_date": "3 Aralık 2024",
+    "job_description": "Veri analizi ve makine öğrenmesi projelerinde çalışacak **Data Scientist** arıyoruz.\n\n- Büyük veri\n- Model geliştirme",
+    "job_content": "### Aranan Özellikler\n\n- Python ve veri bilimi kütüphaneleri\n- Model geliştirme\n- Takım çalışması\n\nBaşvuru: data@analyticspro.com"
+  },
+  {
+    "id": 7,
+    "slug": "mobile-developer-app-development-corp",
+    "job_title": "Mobile Developer",
+    "job_employer": "App Development Corp.",
+    "job_date": "1 Aralık 2024",
+    "job_description": "iOS ve Android uygulama geliştirecek **Mobile Developer** arıyoruz.\n\n- Hibrit uygulama\n- Modern teknolojiler",
+    "job_content": "#### Sorumluluklar\n\n- Mobil uygulama geliştirme\n- React Native veya Flutter\n- Uygulama yayınlama süreçleri\n\nBaşvuru: mobile@appdevcorp.com"
+  }
+] 
