@@ -6,6 +6,7 @@ import RegisterPage from "../pages/RegisterPage";
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
 import NewsDetailPage from "../pages/NewsDetailPage";
+import JobDetailPage from "../pages/JobDetailPage";
 
 const RoadmapPage = () => <div className="p-8 text-center">Yol Haritaları yakında!</div>;
 
@@ -37,6 +38,10 @@ export const RouteList = [
         <JobsPage />
       </PrivateRoute>
     ),
+  },
+  {
+    path: "/kariyer/:slug",
+    element: <JobDetailPage />,
   },
   {
     path: "/yol-haritalari",
