@@ -1,8 +1,8 @@
 // src/routes/roadmaps.ts
 import express from "express";
-import { db } from "../firebase";
+import { db } from "../firebase/firebase";
 import multer from "multer";
-import { admin } from "../firebase";
+import { admin } from "../firebase/firebase";
 import { v4 as uuidv4 } from "uuid";
 import { protect, isAdmin } from "../middleware/authMiddleware";
 

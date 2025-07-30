@@ -1,45 +1,39 @@
-// src/routes/jobs.ts
-import express from "express";
-import { db, admin } from "../firebase";
-import { protect, isAdmin } from "../middleware/authMiddleware";
+// backend/src/routes/jobs.ts
 
+import express from 'express';
+import { db, admin } from '../firebase/firebase.js'; 
+import { protect, isAdmin } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// POST http://localhost:5000/api/jobs
-// İş ilanı oluştur
+// ---- YENİ İŞ İLANI OLUŞTURMA (POST) ----
+// Bu bölümü, veritabanındaki yapıya uygun hale getirdik.
 router.post("/", protect, isAdmin, async (req, res) => {
     try {
-        const { title, employer, created_at, content, link, submit_count } = req.body;
+        const { title, employer, created_at, content, link } = req.body;
+
         if (!title || !employer || !created_at || !content || !link) {
             return res.status(400).json({ message: "Başlık, işveren, içerik, link ve tarih zorunlu." });
         }
+
         const docRef = await db.collection("jobs").add({
             title,
             employer,
             created_at,
             content,
             link,
-            submit_count: submit_count || 0
+            submit_count: 0 // Başvuru sayacını varsayılan 0 olarak başlat
         });
-        res.status(201).json({ id: docRef.id, message: "İş ilanı eklendi." });
+
+        res.status(201).json({ id: docRef.id, message: "İş ilanı başarıyla eklendi." });
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
 });
-/* İŞ OLUŞTURMA İÇİN ÖRNEK JSON
-  {
-    "title": "Frontend Developer",
-    "employer": "ABC Teknoloji",
-    "created_at": "2024-05-16T12:00:00Z", // ISO tarih formatı olmalı
-    "content": "React bilen, takım çalışmasına yatkın geliştirici aranıyor.",
-    "link": "https://example.com/basvuru-formu",
-    "submit_count": 0 // Göndermesen de olur otomatik 0 başlar
-  }
-*/
 
-// GET http://localhost:5000/api/jobs
-// İş ilanlarını listele
+
+// ---- TÜM İŞ İLANLARINI GETİRME (GET) ----
+// Bu rota veritabanından ne geliyorsa onu gönderir, bu yüzden zaten doğru çalışıyordu.
 router.get("/", async (req, res) => {
     try {
         const snapshot = await db.collection("jobs").orderBy("created_at", "desc").get();
@@ -50,8 +44,8 @@ router.get("/", async (req, res) => {
     }
 });
 
-// GET http://localhost:5000/api/jobs/{id}
-// İş ilanı detayı
+
+// ---- TEK BİR İŞ İLANI GETİRME (GET /:id) ----
 router.get("/:id", async (req, res) => {
     try {
         const doc = await db.collection("jobs").doc(req.params.id).get();
@@ -62,8 +56,8 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-// PUT http://localhost:5000/api/jobs/{id}
-// İş ilanı güncelle
+
+// Diğer rotalar (PUT, DELETE, SUBMIT) zaten doğru çalışıyor.
 router.put("/:id", protect, isAdmin, async (req, res) => {
     try {
         await db.collection("jobs").doc(req.params.id).update(req.body);
@@ -73,8 +67,6 @@ router.put("/:id", protect, isAdmin, async (req, res) => {
     }
 });
 
-// DELETE http://localhost:5000/api/jobs/{id}
-// İş ilanı sil
 router.delete("/:id", protect, isAdmin, async (req, res) => {
     try {
         await db.collection("jobs").doc(req.params.id).delete();
@@ -84,32 +76,22 @@ router.delete("/:id", protect, isAdmin, async (req, res) => {
     }
 });
 
-
-// POST http://localhost:5000/api/jobs/{id}/submit
-// İş ilanına başvuru sayısını artır 
-// KULLANICI SUBMİTE BASTIĞINDA FRONTEND TARAFI SUBMİT BUTONUDA BUNA İSTEK ATMALI
 router.post("/:id/submit", async (req, res) => {
     try {
-        const jobId = req.params.id;
-        const jobRef = db.collection("jobs").doc(jobId);
-
-        // İlanın var olup olmadığını kontrol et
+        const jobRef = db.collection("jobs").doc(req.params.id);
         const doc = await jobRef.get();
-        if (!doc.exists) {
-            return res.status(404).json({ message: "İş ilanı bulunamadı." });
-        }
+        if (!doc.exists) return res.status(404).json({ message: "İş ilanı bulunamadı." });
 
-        // Firebase'in atomik artırma özelliğini kullan
-        // Bu işlem, mevcut değeri okuyup 1 ekleyip yazmayı tek bir atomik işlemde yapar.
         await jobRef.update({
             submit_count: admin.firestore.FieldValue.increment(1)
         });
 
         res.status(200).json({ message: "Başvuru sayısı başarıyla artırıldı." });
-
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
 });
 
-export default router; 
+
+export default router;
+//jobs.ts

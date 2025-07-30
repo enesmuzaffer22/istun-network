@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import { gsap } from "gsap";
 
-function JobsPageCard(props) {
+function JobsPageCard({ title, employer, date }) {
   const cardRef = useRef(null);
   const chevronRef = useRef(null);
 
@@ -9,7 +9,6 @@ function JobsPageCard(props) {
     const card = cardRef.current;
     const chevron = chevronRef.current;
 
-    // Hover animations
     const handleMouseEnter = () => {
       gsap.to(card, {
         scale: 1.02,
@@ -39,7 +38,6 @@ function JobsPageCard(props) {
     card.addEventListener("mouseenter", handleMouseEnter);
     card.addEventListener("mouseleave", handleMouseLeave);
 
-    // Cleanup
     return () => {
       card.removeEventListener("mouseenter", handleMouseEnter);
       card.removeEventListener("mouseleave", handleMouseLeave);
@@ -53,10 +51,12 @@ function JobsPageCard(props) {
     >
       <div className="jobs-page-card-content-container">
         <h3 className="text-xl sm:text-2xl text-primary font-bold">
-          {props.job_title}
+          {title}
         </h3>
-        <h5 className="text-base text-primary">{props.job_employer}</h5>
-        <p className="text-sm text-gray-400">{props.job_date}</p>
+        <h5 className="text-base text-primary">{employer}</h5>
+        <p className="text-sm text-gray-400">
+          {new Date(date).toLocaleDateString("tr-TR")}
+        </p>
       </div>
       <i
         ref={chevronRef}

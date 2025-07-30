@@ -40,7 +40,7 @@ export const RouteList = [
     ),
   },
   {
-    path: "/kariyer/:slug",
+    path: "/kariyer/:id",
     element: (
       <PrivateRoute>
         <JobDetailPage />
@@ -68,7 +68,7 @@ export const RouteList = [
     element: <NewsPage />,
   },
   {
-    path: "/haberler/:slug",
+    path: "/haberler/:id",
     element: <NewsDetailPage />,
   },
 ];

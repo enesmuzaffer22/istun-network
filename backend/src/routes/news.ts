@@ -1,10 +1,10 @@
 // src/routes/news.ts
 import express from "express";
-import { db } from "../firebase";
+import { db } from "../firebase/firebase.js";
 import multer from "multer";
-import { admin } from "../firebase";
+import { admin } from "../firebase/firebase.js";
 import { v4 as uuidv4 } from "uuid";
-import { protect, isAdmin } from "../middleware/authMiddleware";
+import { protect, isAdmin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 

@@ -3,11 +3,11 @@
 // Login   : http://localhost:5000/api/auth/login
 
 import express from "express";
-import { auth, db } from "../firebase";
+import { auth, db } from "../firebase/firebase.js";
 import axios from "axios";
 import * as dotenv from "dotenv";
 import multer from "multer";
-import { admin } from "../firebase";
+import { admin } from "../firebase/firebase.js";
 import { v4 as uuidv4 } from "uuid";
 dotenv.config();
 const router = express.Router();

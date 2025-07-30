@@ -1,84 +1,56 @@
-import React, { useEffect, useRef } from "react";
+// frontend/src/pages/NewsPage.jsx
+
+import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import NewsCard from "../components/NewsCard";
 import { useNavigate } from "react-router-dom";
-import newsDataJson from "./newsData.json";
-
-// ScrollTrigger plugin'ini kaydet
-gsap.registerPlugin(ScrollTrigger);
+import API from "../utils/axios";
 
 function NewsPage() {
   const titleRef = useRef(null);
   const newsContainerRef = useRef(null);
   const navigate = useNavigate();
 
-  // JSON dosyasından haber verisi
-  const newsData = newsDataJson;
+  const [newsData, setNewsData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Sayfa yüklendiğinde animasyonları başlat
-    const tl = gsap.timeline();
-
-    // Başlık animasyonu - kariyer sayfası tarzında
-    tl.fromTo(
-      titleRef.current,
-      {
-        opacity: 0,
-        y: 30,
-      },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: "power2.out",
+    const fetchNews = async () => {
+      try {
+        setLoading(true);
+        const response = await API.get("/news");
+        setNewsData(response.data);
+      } catch (error) {
+        console.error("Haberler yüklenirken hata oluştu:", error);
+      } finally {
+        setLoading(false);
       }
-    );
-
-    // Haber kartları için staggered animasyon - kariyer sayfası tarzında
-    gsap.fromTo(
-      newsContainerRef.current.children,
-      {
-        opacity: 0,
-        y: 100,
-        scale: 0.8,
-      },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.6,
-        stagger: 0.2,
-        ease: "back.out(1.7)",
-        scrollTrigger: {
-          trigger: newsContainerRef.current,
-          start: "top 85%",
-          end: "bottom 20%",
-          toggleActions: "play none none reverse",
-        },
-      }
-    );
-
-    // Cleanup
-    return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
+    fetchNews();
   }, []);
+
+  useEffect(() => {
+    if (!loading && newsData.length > 0) {
+      const tl = gsap.timeline();
+      tl.fromTo(titleRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" });
+      gsap.fromTo(newsContainerRef.current.children, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.2, ease: "power2.out" });
+    }
+  }, [loading, newsData]);
+
+  if (loading) return <div className="text-center p-20">Haberler Yükleniyor...</div>;
 
   return (
     <div className="flex flex-col gap-12 2xl:px-[120px] px-4 py-12 md:py-[90px]">
-      <h1
-        ref={titleRef}
-        className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary"
-      >
+      <h1 ref={titleRef} className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary opacity-0">
         Haberler
       </h1>
       <div ref={newsContainerRef} className="flex flex-col gap-12">
-        {newsData.map((news) => (
-          <div key={news.id} onClick={() => navigate(`/haberler/${news.slug}`)}>
+        {newsData.map((newsItem) => (
+          <div key={newsItem.id} onClick={() => navigate(`/haberler/${newsItem.id}`)} className="opacity-0">
             <NewsCard
-              news_title={news.news_title}
-              news_description={news.news_description}
+              title={newsItem.title}
+              content={newsItem.content}
+              imageUrl={newsItem.thumbnail_img_url}
             />
           </div>
         ))}
