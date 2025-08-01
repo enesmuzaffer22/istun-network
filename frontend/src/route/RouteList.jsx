@@ -40,7 +40,8 @@ export const RouteList = [
     ),
   },
   {
-    path: "/kariyer/:id",
+    // DEĞİŞİKLİK BURADA: :slug yerine :id kullandık.
+    path: "/kariyer/:id", 
     element: (
       <PrivateRoute>
         <JobDetailPage />

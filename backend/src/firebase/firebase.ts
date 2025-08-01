@@ -1,25 +1,51 @@
-// Gerekli olan 'firebase-admin' kütüphanesini import ediyoruz.
-import admin from "firebase-admin";
+// backend/src/firebase/firebase.ts
 
-// serviceAccountKey.json dosyasını projemize dahil ediyoruz.
-import serviceAccount from "./serviceAccountKey.json";
+import admin from 'firebase-admin';
+import * as dotenv from 'dotenv';
 
-// Sunucu her yeniden başlatıldığında Firebase'in tekrar başlatılmasını önlüyoruz.
+// .env dosyasındaki değişkenleri hemen yükle
+dotenv.config();
+
+// Firebase Admin SDK'in zaten başlatılıp başlatılmadığını kontrol et
 if (!admin.apps.length) {
-  // Firebase uygulamasını, indirdiğimiz anahtar dosyasını kullanarak başlatıyoruz.
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount as any),
-    storageBucket: "istunmezunweb.firebasestorage.app",
-  });
-  
-  console.log("Firebase Admin SDK başarıyla başlatıldı.");
+    try {
+        const serviceAccountString = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+
+        let credential;
+
+        // Öncelik 1: Canlı ortam (Production)
+        // Ortam değişkeni varsa, bu JSON string'ini parse ederek kullan.
+        if (serviceAccountString) {
+            const serviceAccount = JSON.parse(serviceAccountString);
+            credential = admin.credential.cert(serviceAccount);
+            console.log("Firebase Admin SDK canlı ortam değişkenleri ile başlatılıyor...");
+        } 
+        // Öncelik 2: Lokal ortam (Development)
+        // Ortam değişkeni yoksa, lokaldeki JSON dosyasını kullan.
+        else {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const serviceAccountJson = require("./serviceAccountKey.json"); // Kodla aynı klasördeki dosyayı kullan
+            credential = admin.credential.cert(serviceAccountJson);
+            console.log("Firebase Admin SDK lokal serviceAccountKey.json dosyası ile başlatılıyor...");
+        }
+
+        // Firebase'i bulunan kimlik bilgileriyle başlat
+        admin.initializeApp({
+            credential,
+            storageBucket: process.env.FIREBASE_STORAGE_BUCKET // .env dosyasından okur
+        });
+
+        console.log("Firebase Admin SDK başarıyla başlatıldı.");
+
+    } catch (error: any) {
+        console.error("Firebase Admin SDK başlatılamadı:", error.message);
+        // Hata durumunda, uygulamanın çökmesi en güvenli yoldur.
+        process.exit(1);
+    }
 }
 
-// Firestore ve Auth servislerini export ediyoruz.
+// Gerekli servisleri export et
 const db = admin.firestore();
 const auth = admin.auth();
 
-// Bu servisleri projenin geri kalanında kullanmak üzere export ediyoruz.
-export { db, auth,admin };
-
-//firebase.ts
+export { db, auth, admin };
