@@ -57,7 +57,7 @@ export const RouteList = [
     ),
   },
   {
-    path: "/yol-haritalari/:slug",
+    path: "/yol-haritalari/:id",
     element: (
       <PrivateRoute>
         <RoadmapDetailPage />

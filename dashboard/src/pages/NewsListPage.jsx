@@ -60,24 +60,28 @@ function NewsListPage() {
     setEditingNews(null);
   };
 
-  // Form verisini backend'e gönderir (Ekleme veya Güncelleme)
-  const handleSaveNews = async (formData, newsId) => {
-    try {
-      if (newsId) {
-        // ID varsa, bu bir GÜNCELLEME işlemidir (PUT).
-        await API.put(`/news/${newsId}`, formData);
-      } else {
-        // ID yoksa, bu bir EKLEME işlemidir (POST).
-        await API.post('/news', { ...formData, created_at: new Date().toISOString() });
-      }
-      alert(newsId ? 'Haber başarıyla güncellendi.' : 'Haber başarıyla eklendi.');
-      handleCloseModal();
-      fetchNews(); // Başarılı işlem sonrası tabloyu yenile
-    } catch (error) {
-      console.error("Haber kaydedilirken hata:", error);
-      alert("Kayıt sırasında bir hata oluştu.");
+// Form verisini backend'e gönderir (Ekleme veya Güncelleme)
+const handleSaveNews = async (formData, newsId) => {
+  try {
+    if (newsId) {
+      // ID varsa, bu bir GÜNCELLEME işlemidir (PUT).
+      // İstek "http://localhost:5000/api/news/:newsId" adresine gider.
+      await API.put(`/news/${newsId}`, formData); 
+    } else {
+      // ID yoksa, bu bir EKLEME işlemidir (POST).
+      // Backend'iniz tarih bekliyorsa, burada ekleyebilirsiniz.
+      const dataToPost = { ...formData, created_at: new Date().toISOString() };
+      // İstek "http://localhost:5000/api/news" adresine gider.
+      await API.post('/news', dataToPost);
     }
-  };
+    alert(newsId ? 'Haber başarıyla güncellendi.' : 'Haber başarıyla eklendi.');
+    handleCloseModal(); // Modal'ı kapat
+    fetchNews(); // Tabloyu yenile
+  } catch (error) {
+    console.error("Haber kaydedilirken hata:", error);
+    alert("Kayıt sırasında bir hata oluştu.");
+  }
+};
 
   // --- BİTİŞ ---
 
