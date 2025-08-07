@@ -25,7 +25,7 @@ const LoginPage = () => {
             <label className="block mb-1 font-medium">Şifre</label>
             <input type="password" className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Şifreniz" />
           </div>
-          <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">Giriş Yap</button>
+          <button type="submit" className="w-full bg-red-600 text-white py-2 rounded hover:bg-blue-700 transition">Giriş Yap</button>
         </form>
       </div>
     </div>
