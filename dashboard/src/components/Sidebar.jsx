@@ -12,6 +12,9 @@ const menu = [
   { name: "Haberler", icon: "bi-newspaper", path: "/news" }, // Yeni eklendi
   { name: "Duyurular", icon: "bi-megaphone", path: "/announcements" },
   { name: "Ayarlar", icon: "bi-gear", path: "/settings" },
+  { name: "Yol Haritaları", icon: "bi-map", path: "/roadmaps" },
+  { name: "Bekleyen Talepler", icon: "bi-hourglass-split", path: "/pendingrequests" }, // ⏳ ikon
+  { name: "Kullanıcılar", icon: "bi-person-lines-fill", path: "/userlist" }, // 👤 liste ikon
 ];
 
 const Sidebar = () => {

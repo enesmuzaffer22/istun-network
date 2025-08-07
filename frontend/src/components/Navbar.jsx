@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 
+
 const navPrimaryButtonStyles = "bg-primary text-white px-6 py-2 rounded-full";
 const navSecondaryButtonStyles =
   "bg-white text-primary px-6 py-2 rounded-full border border-primary";

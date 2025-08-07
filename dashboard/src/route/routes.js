@@ -22,6 +22,23 @@ const routes = [
         isPrivate: true,
       },
       {
+  path: "roadmaps",
+  component: () => import("../pages/RoadMap.jsx"),
+  isPrivate: true,
+},
+
+ {
+  path: "pendingrequests",
+  component: () => import("../pages/pendingrequests.jsx"),
+  isPrivate: true,
+},
+ {
+  path: "userlist",
+  component: () => import("../pages/userlist.jsx"),
+  isPrivate: true,
+},
+
+      {
         // Mevcut rotalarınız
         path: "alumni",
         component: () => import("../pages/Alumni.jsx"),
