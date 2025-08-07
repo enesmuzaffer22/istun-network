@@ -10,6 +10,7 @@ const menu = [
   { name: "Mezunlar", icon: "bi-people", path: "/alumni" },
   { name: "İş İlanları", icon: "bi-briefcase", path: "/jobs" }, // Yeni eklendi
   { name: "Haberler", icon: "bi-newspaper", path: "/news" }, // Yeni eklendi
+  { name: "Yol Haritaları", icon: "bi-signpost-split", path: "/roadmaps" }, // Yeni eklendi
   { name: "Duyurular", icon: "bi-megaphone", path: "/announcements" },
   { name: "Ayarlar", icon: "bi-gear", path: "/settings" },
   { name: "Yol Haritaları", icon: "bi-map", path: "/roadmaps" },

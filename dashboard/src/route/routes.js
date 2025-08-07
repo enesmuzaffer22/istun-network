@@ -56,6 +56,12 @@ const routes = [
         component: () => import("../pages/NewsListPage.jsx"),
         isPrivate: true,
       },
+            {
+        
+        path: "roadmaps",
+        component: () => import("../pages/RoadmapsListPage.jsx"),
+        isPrivate: true,
+      },
       {
         path: "announcements",
         component: () => import("../pages/Announcements.jsx"),
