@@ -1,72 +1,64 @@
 // dashboard/src/route/routes.js
 
-import Layout from "../components/Layout"; // Layout component'inizin doğru yolda olduğundan emin olun
+import Layout from "../components/Layout";
 
 const routes = [
-  // --- Public Route: Giriş Sayfası ---
+  // === PUBLIC ROUTES ===
   {
     path: "/login",
     component: () => import("../pages/Login.jsx"),
     isPrivate: false,
   },
 
-  // --- Private Routes (Layout İçinde) ---
+  // === PRIVATE ROUTES (Layout İçinde) ===
   {
     path: "/",
-    element: Layout, // Ana layout'u render edecek element
+    element: Layout,
     isPrivate: true,
     children: [
+      // Ana Sayfa - Dashboard yerine RoadMap'i ana sayfa olarak kullanıyoruz
       {
-        path: "", // / yolunun kendisi, yani Dashboard
-        component: () => import("../pages/Dashboard.jsx"),
+        path: "",
+        component: () => import("../pages/RoadMap.jsx"),
         isPrivate: true,
       },
-      {
-  path: "roadmaps",
-  component: () => import("../pages/RoadMap.jsx"),
-  isPrivate: true,
-},
 
- {
-  path: "pendingrequests",
-  component: () => import("../pages/pendingrequests.jsx"),
-  isPrivate: true,
-},
- {
-  path: "userlist",
-  component: () => import("../pages/userlist.jsx"),
-  isPrivate: true,
-},
-
+      // Yol Haritası
       {
-        // Mevcut rotalarınız
-        path: "alumni",
-        component: () => import("../pages/Alumni.jsx"),
+        path: "roadmaps",
+        component: () => import("../pages/RoadMap.jsx"),
         isPrivate: true,
       },
+
+      // Bekleyen İstekler
       {
-        // YENİ ROTA: İş İlanları
+        path: "pendingrequests",
+        component: () => import("../pages/PendingRequests.jsx"),
+        isPrivate: true,
+      },
+
+      // Kullanıcı Listesi
+      {
+        path: "userlist",
+        component: () => import("../pages/UserList.jsx"),
+        isPrivate: true,
+      },
+
+      // İş İlanları
+      {
         path: "jobs",
         component: () => import("../pages/JobsListPage.jsx"),
         isPrivate: true,
       },
+
+      // Haberler
       {
-        // YENİ ROTA: Haberler
         path: "news",
         component: () => import("../pages/NewsListPage.jsx"),
         isPrivate: true,
       },
-            {
-        
-        path: "roadmaps",
-        component: () => import("../pages/RoadmapsListPage.jsx"),
-        isPrivate: true,
-      },
-      {
-        path: "announcements",
-        component: () => import("../pages/Announcements.jsx"),
-        isPrivate: true,
-      },
+
+      // Ayarlar
       {
         path: "settings",
         component: () => import("../pages/Settings.jsx"),
