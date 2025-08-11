@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useAuthStore from "../store/authStore";
 import axios from "../utils/axios";
 
 const RegisterPage = () => {
-  const login = useAuthStore((state) => state.login);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -103,9 +101,8 @@ const RegisterPage = () => {
 
       // 201 başarılı kayıt
       if (response.status === 201) {
-        alert("Kayıt başarılı! Hoş geldiniz!");
-        login();
-        navigate("/kariyer");
+        alert("Kayıt başarılı! Lütfen giriş yapın.");
+        navigate("/giris-yap");
       }
     } catch (err) {
       console.error("Kayıt hatası:", err);

@@ -1,9 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { RouteList } from "./route/RouteList";
 import MainLayout from "./layout/MainLayout.jsx";
+import useAuthStore from "./store/authStore";
 
 function App() {
+  const checkAuth = useAuthStore((state) => state.checkAuth);
+
+  useEffect(() => {
+    // Uygulama başladığında token kontrolü yap
+    checkAuth();
+  }, [checkAuth]);
+
   return (
     <div>
       <Router>
