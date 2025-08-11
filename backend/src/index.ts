@@ -3,7 +3,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 // Firebase konfigürasyonunu en başta import ederek sunucu başlarken çalışmasını sağlıyoruz.
-import "./firebase/firebase"; 
+import "./firebase/firebase";
+
+// Swagger importları
+import { specs, swaggerUi } from "./swagger/swagger";
 
 // Rota importları
 import authRoutes from "./routes/auth";
@@ -17,9 +20,34 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Sadece frontend uygulamanızdan (http://localhost:5173) gelen isteklere izin veriyoruz.
-app.use(cors({ origin: "http://localhost:5173",
-    credentials: true }));  // <-- BU SATIRI EKLEYİN
+app.use(cors({ origin: "http://localhost:5173", credentials: true })); // <-- BU SATIRI EKLEYİN
 app.use(express.json());
+
+// Ana sayfa
+app.get("/", (req, res) => {
+  res.json({
+    message: "İSTÜN Mezunlar Ağı API",
+    version: "1.0.0",
+    documentation: "/api-docs",
+    endpoints: {
+      auth: "/api/auth",
+      news: "/api/news",
+      jobs: "/api/jobs",
+      roadmaps: "/api/roadmaps",
+    },
+  });
+});
+
+// Swagger UI
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(specs, {
+    explorer: true,
+    customCss: ".swagger-ui .topbar { display: none }",
+    customSiteTitle: "İstun Network API Docs",
+  })
+);
 
 // Rotalar
 app.use("/api/auth", authRoutes);
@@ -29,6 +57,6 @@ app.use("/api/roadmaps", roadmapsRoutes);
 
 // Sunucuyu dinlemeye başlıyoruz.
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
 //index.ts
