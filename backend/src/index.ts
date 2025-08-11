@@ -13,6 +13,7 @@ import authRoutes from "./routes/auth";
 import newsRoutes from "./routes/news";
 import jobsRoutes from "./routes/jobs";
 import roadmapsRoutes from "./routes/roadmaps";
+import profileRoutes from "./routes/profile";
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.get("/", (req, res) => {
       news: "/api/news",
       jobs: "/api/jobs",
       roadmaps: "/api/roadmaps",
+      users: "/api/users",
     },
   });
 });
@@ -54,6 +56,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/news", newsRoutes);
 app.use("/api/jobs", jobsRoutes);
 app.use("/api/roadmaps", roadmapsRoutes);
+app.use("/api/users", profileRoutes);
 
 // Sunucuyu dinlemeye başlıyoruz.
 app.listen(PORT, () => {

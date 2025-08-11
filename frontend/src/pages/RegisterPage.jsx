@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
+import axios from "../utils/axios";
 
 const RegisterPage = () => {
   const login = useAuthStore((state) => state.login);
@@ -22,6 +23,7 @@ const RegisterPage = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
@@ -73,6 +75,7 @@ const RegisterPage = () => {
     e.preventDefault();
     if (!validate()) return;
 
+    setIsLoading(true);
     const payload = new FormData();
     payload.append("name", formData.firstName);
     payload.append("surname", formData.lastName);
@@ -83,28 +86,56 @@ const RegisterPage = () => {
     payload.append("phone", formData.phone);
     payload.append("workStatus", formData.employmentStatus);
     payload.append("classStatus", formData.graduationStatus);
-    payload.append("graduationDate", formData.graduationDate);
+    payload.append("consent", formData.consent);
     payload.append("document", formData.studentDocument);
-    payload.append("consent", formData.consent ? "true" : "false");
+
+    // Opsiyonel alanlar
+    if (formData.graduationDate) {
+      payload.append("graduationDate", formData.graduationDate);
+    }
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        body: payload,
+      const response = await axios.post("/auth/register", payload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-      const result = await response.json();
-
-      if (response.ok) {
-        alert(result.message || "Kayıt başarılı!");
+      // 201 başarılı kayıt
+      if (response.status === 201) {
+        alert("Kayıt başarılı! Hoş geldiniz!");
         login();
         navigate("/kariyer");
-      } else {
-        alert(result.message || "Kayıt sırasında hata oluştu.");
       }
     } catch (err) {
       console.error("Kayıt hatası:", err);
-      alert("Sunucuya bağlanırken hata oluştu.");
+
+      if (err.response) {
+        // Sunucu hata yanıtı
+        switch (err.response.status) {
+          case 400:
+            alert(
+              err.response.data?.message ||
+                "Geçersiz veri veya kullanıcı adı zaten kullanılıyor."
+            );
+            break;
+          case 500:
+            alert("Sunucu hatası. Lütfen daha sonra tekrar deneyin.");
+            break;
+          default:
+            alert("Kayıt sırasında bir hata oluştu.");
+        }
+      } else if (err.request) {
+        // Ağ hatası
+        alert(
+          "Sunucuya bağlanırken hata oluştu. İnternet bağlantınızı kontrol edin."
+        );
+      } else {
+        // Diğer hatalar
+        alert("Beklenmeyen bir hata oluştu.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -120,7 +151,7 @@ const RegisterPage = () => {
               </div>
               <h2 className="text-3xl font-bold text-white">Kayıt Ol</h2>
               <p className="text-red-100 mt-2">
-                İstanbul Üniversitesi Kariyer Ağı'na katılın
+                İstanbul Sağlık ve Teknoloji Üniversitesi Kariyer Ağı'na katılın
               </p>
             </div>
           </div>
@@ -433,10 +464,24 @@ const RegisterPage = () => {
               <div className="pt-6">
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-primary to-red-600 text-white py-4 px-6 rounded-lg hover:from-red-700 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transform transition-all duration-200 hover:scale-105 font-semibold text-lg shadow-lg flex items-center justify-center"
+                  disabled={isLoading}
+                  className={`w-full py-4 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 font-semibold text-lg shadow-lg flex items-center justify-center transition-all duration-200 ${
+                    isLoading
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-gradient-to-r from-primary to-red-600 text-white hover:from-red-700 hover:to-red-700 transform hover:scale-105"
+                  }`}
                 >
-                  <i className="bi bi-person-plus-fill mr-2"></i>
-                  Kayıt Ol
+                  {isLoading ? (
+                    <>
+                      <i className="bi bi-arrow-clockwise mr-2 animate-spin"></i>
+                      Kayıt Ediliyor...
+                    </>
+                  ) : (
+                    <>
+                      <i className="bi bi-person-plus-fill mr-2"></i>
+                      Kayıt Ol
+                    </>
+                  )}
                 </button>
               </div>
             </form>

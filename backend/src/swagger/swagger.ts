@@ -262,6 +262,149 @@ const options = {
             },
           },
         },
+        UserProfile: {
+          type: "object",
+          properties: {
+            id: {
+              type: "string",
+              description: "Kullanıcı ID'si",
+            },
+            name: {
+              type: "string",
+              description: "Kullanıcının adı",
+            },
+            surname: {
+              type: "string",
+              description: "Kullanıcının soyadı",
+            },
+            username: {
+              type: "string",
+              description: "Kullanıcı adı",
+            },
+            email: {
+              type: "string",
+              format: "email",
+              description: "E-posta adresi",
+            },
+            phone: {
+              type: "string",
+              description: "Telefon numarası",
+            },
+            workStatus: {
+              type: "string",
+              description: "Çalışma durumu",
+            },
+            classStatus: {
+              type: "string",
+              description: "Sınıf durumu",
+            },
+            about: {
+              type: "string",
+              description: "Hakkında bilgisi",
+            },
+            status: {
+              type: "string",
+              enum: ["pending", "approved", "rejected"],
+              description: "Kullanıcı onay durumu",
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "Hesap oluşturma tarihi",
+            },
+          },
+        },
+        PublicProfile: {
+          type: "object",
+          properties: {
+            name: {
+              type: "string",
+              description: "Kullanıcının adı",
+            },
+            surname: {
+              type: "string",
+              description: "Kullanıcının soyadı",
+            },
+            username: {
+              type: "string",
+              description: "Kullanıcı adı",
+            },
+            workStatus: {
+              type: "string",
+              description: "Çalışma durumu",
+            },
+            classStatus: {
+              type: "string",
+              description: "Sınıf durumu",
+            },
+            about: {
+              type: "string",
+              description: "Hakkında bilgisi",
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "Hesap oluşturma tarihi",
+            },
+          },
+        },
+        UserUpdate: {
+          type: "object",
+          properties: {
+            name: {
+              type: "string",
+              description: "Kullanıcının adı",
+            },
+            surname: {
+              type: "string",
+              description: "Kullanıcının soyadı",
+            },
+            phone: {
+              type: "string",
+              description: "Telefon numarası",
+            },
+            workStatus: {
+              type: "string",
+              description: "Çalışma durumu",
+            },
+            classStatus: {
+              type: "string",
+              description: "Sınıf durumu",
+            },
+            about: {
+              type: "string",
+              description: "Hakkında bilgisi",
+            },
+          },
+        },
+        UsersList: {
+          type: "object",
+          properties: {
+            data: {
+              type: "array",
+              items: {
+                $ref: "#/components/schemas/UserProfile",
+              },
+              description: "Kullanıcı listesi",
+            },
+            page: {
+              type: "integer",
+              description: "Mevcut sayfa numarası",
+            },
+            limit: {
+              type: "integer",
+              description: "Sayfa başına öğe sayısı",
+            },
+            hasMore: {
+              type: "boolean",
+              description: "Daha fazla veri var mı?",
+            },
+            status: {
+              type: "string",
+              description: "Filtrelenen durum",
+            },
+          },
+        },
       },
     },
   },

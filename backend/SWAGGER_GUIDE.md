@@ -49,6 +49,15 @@ Swagger UI üzerinden aşağıdaki endpoint gruplarını test edebilirsiniz:
 - `PUT /api/roadmaps/{id}` - Yol haritasını güncelle (Admin)
 - `DELETE /api/roadmaps/{id}` - Yol haritasını sil (Admin)
 
+#### 👤 Users (Kullanıcı Profilleri)
+
+- `GET /api/users/me` - Kendi profilimi getir
+- `PUT /api/users/me` - Kendi profilimi güncelle
+- `GET /api/users` - Tüm kullanıcıları listele (Admin) - sayfalama ve filtreleme destekli
+- `GET /api/users/{username}` - Kullanıcının herkese açık profilini getir
+- `POST /api/users/{id}/approve` - Kullanıcı kaydını onayla (Admin)
+- `POST /api/users/{id}/reject` - Kullanıcı kaydını reddet (Admin)
+
 ### 3. Yetkilendirme (Authentication)
 
 Admin işlemleri için JWT token gereklidir:
