@@ -14,6 +14,7 @@ import newsRoutes from "./routes/news";
 import jobsRoutes from "./routes/jobs";
 import roadmapsRoutes from "./routes/roadmaps";
 import profileRoutes from "./routes/profile";
+import adminAuthRoutes from "./routes/adminAuth";
 
 dotenv.config();
 
@@ -57,6 +58,7 @@ app.use("/api/news", newsRoutes);
 app.use("/api/jobs", jobsRoutes);
 app.use("/api/roadmaps", roadmapsRoutes);
 app.use("/api/users", profileRoutes);
+app.use("/api/admin/auth", adminAuthRoutes);
 
 // Sunucuyu dinlemeye başlıyoruz.
 app.listen(PORT, () => {
