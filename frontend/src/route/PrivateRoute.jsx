@@ -7,4 +7,4 @@ const PrivateRoute = ({ children }) => {
   return isAuthenticated ? children : <Navigate to="/giris-yap" replace />;
 };
 
-export default PrivateRoute; 
+export default PrivateRoute;

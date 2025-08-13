@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 
-
 const navPrimaryButtonStyles = "bg-primary text-white px-6 py-2 rounded-full";
 const navSecondaryButtonStyles =
   "bg-white text-primary px-6 py-2 rounded-full border border-primary";
@@ -63,14 +62,18 @@ function Navbar() {
           <div className="relative">
             {!isAuthenticated ? (
               <span
-                className={getNavLinkClass("/kariyer") + " cursor-not-allowed opacity-50"}
+                className={
+                  getNavLinkClass("/kariyer") + " cursor-not-allowed opacity-50"
+                }
                 onMouseEnter={() => setShowTooltip("kariyer")}
                 onMouseLeave={() => setShowTooltip(null)}
               >
                 İş-Staj İlanları
               </span>
             ) : (
-              <Link to="/kariyer" className={getNavLinkClass("/kariyer")}>İş-Staj İlanları</Link>
+              <Link to="/kariyer" className={getNavLinkClass("/kariyer")}>
+                İş-Staj İlanları
+              </Link>
             )}
             {/* Tooltip */}
             {showTooltip === "kariyer" && (
@@ -83,14 +86,22 @@ function Navbar() {
           <div className="relative">
             {!isAuthenticated ? (
               <span
-                className={getNavLinkClass("/yol-haritalari") + " cursor-not-allowed opacity-50"}
+                className={
+                  getNavLinkClass("/yol-haritalari") +
+                  " cursor-not-allowed opacity-50"
+                }
                 onMouseEnter={() => setShowTooltip("yol-haritalari")}
                 onMouseLeave={() => setShowTooltip(null)}
               >
                 Yol Haritaları
               </span>
             ) : (
-              <Link to="/yol-haritalari" className={getNavLinkClass("/yol-haritalari")}>Yol Haritaları</Link>
+              <Link
+                to="/yol-haritalari"
+                className={getNavLinkClass("/yol-haritalari")}
+              >
+                Yol Haritaları
+              </Link>
             )}
             {/* Tooltip */}
             {showTooltip === "yol-haritalari" && (
@@ -102,7 +113,9 @@ function Navbar() {
           {/* Forumlar */}
           <div className="relative">
             <span
-              className={getNavLinkClass("/forumlar") + " cursor-not-allowed opacity-50"}
+              className={
+                getNavLinkClass("/forumlar") + " cursor-not-allowed opacity-50"
+              }
               onMouseEnter={() => setShowTooltip("forumlar")}
               onMouseLeave={() => setShowTooltip(null)}
             >
@@ -199,14 +212,23 @@ function Navbar() {
               <div className="relative w-full flex justify-center">
                 {!isAuthenticated ? (
                   <span
-                    className={getMobileNavLinkClass("/kariyer") + " cursor-not-allowed opacity-50"}
+                    className={
+                      getMobileNavLinkClass("/kariyer") +
+                      " cursor-not-allowed opacity-50"
+                    }
                     onMouseEnter={() => setShowTooltip("kariyer-mobil")}
                     onMouseLeave={() => setShowTooltip(null)}
                   >
                     İş-Staj İlanları
                   </span>
                 ) : (
-                  <Link to="/kariyer" className={getMobileNavLinkClass("/kariyer")} onClick={toggleMenu}>İş-Staj İlanları</Link>
+                  <Link
+                    to="/kariyer"
+                    className={getMobileNavLinkClass("/kariyer")}
+                    onClick={toggleMenu}
+                  >
+                    İş-Staj İlanları
+                  </Link>
                 )}
                 {/* Tooltip */}
                 {showTooltip === "kariyer-mobil" && (
@@ -219,14 +241,23 @@ function Navbar() {
               <div className="relative w-full flex justify-center">
                 {!isAuthenticated ? (
                   <span
-                    className={getMobileNavLinkClass("/yol-haritalari") + " cursor-not-allowed opacity-50"}
+                    className={
+                      getMobileNavLinkClass("/yol-haritalari") +
+                      " cursor-not-allowed opacity-50"
+                    }
                     onMouseEnter={() => setShowTooltip("yol-haritalari-mobil")}
                     onMouseLeave={() => setShowTooltip(null)}
                   >
                     Yol Haritaları
                   </span>
                 ) : (
-                  <Link to="/yol-haritalari" className={getMobileNavLinkClass("/yol-haritalari")} onClick={toggleMenu}>Yol Haritaları</Link>
+                  <Link
+                    to="/yol-haritalari"
+                    className={getMobileNavLinkClass("/yol-haritalari")}
+                    onClick={toggleMenu}
+                  >
+                    Yol Haritaları
+                  </Link>
                 )}
                 {/* Tooltip */}
                 {showTooltip === "yol-haritalari-mobil" && (
@@ -238,7 +269,10 @@ function Navbar() {
               {/* Forumlar */}
               <div className="relative w-full flex justify-center">
                 <span
-                  className={getMobileNavLinkClass("/forumlar") + " cursor-not-allowed opacity-50"}
+                  className={
+                    getMobileNavLinkClass("/forumlar") +
+                    " cursor-not-allowed opacity-50"
+                  }
                   onMouseEnter={() => setShowTooltip("forumlar-mobil")}
                   onMouseLeave={() => setShowTooltip(null)}
                 >
