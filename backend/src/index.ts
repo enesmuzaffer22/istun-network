@@ -1,8 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import rateLimit from "express-rate-limit";
 
-// Firebase konfigürasyonunu en başta import ederek sunucu başlarken çalışmasını sağlıyoruz.
+// Firebase konfigürasyonu
 import "./firebase/firebase";
 
 // Swagger importları
@@ -21,9 +22,25 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Sadece frontend uygulamanızdan (http://localhost:5173) gelen isteklere izin veriyoruz.
-app.use(cors({ origin: "http://localhost:5173", credentials: true })); // <-- BU SATIRI EKLEYİN
+// Rate limit sabitleri
+const RATE_LIMIT_WINDOW_MS = 60_000; // 60 saniye
+const RATE_LIMIT_MAX = 20; // dakika başına 20 istek
+
+// CORS ayarı
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json());
+
+// Rate limit ayarı
+app.set("trust proxy", 1);
+const limiter = rateLimit({
+    windowMs: RATE_LIMIT_WINDOW_MS,
+    max: RATE_LIMIT_MAX,
+    standardHeaders: true,
+    legacyHeaders: true,
+    message: { message: "Çok fazla istek gönderdiniz. Lütfen daha sonra tekrar deneyin." },
+    skip: () => process.env.NODE_ENV === "test",
+});
+app.use(limiter);
 
 // Ana sayfa
 app.get("/", (req, res) => {
@@ -60,8 +77,7 @@ app.use("/api/roadmaps", roadmapsRoutes);
 app.use("/api/users", profileRoutes);
 app.use("/api/admin/auth", adminAuthRoutes);
 
-// Sunucuyu dinlemeye başlıyoruz.
+// Sunucu başlat
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-//index.ts
