@@ -1,103 +1,243 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import MDEditor from "@uiw/react-md-editor";
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
+import ImageCropper from "./ImageCropper";
+import API from "../utils/axios";
 
 function RoadmapFormModal({ isOpen, onClose, onSave, roadmapItem }) {
-  // Form alanları için state'ler
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  // Seçilen resim dosyasını tutmak için yeni state
-  const [imageFile, setImageFile] = useState(null);
-  // Mevcut resmin URL'sini göstermek için state
-  const [currentImageUrl, setCurrentImageUrl] = useState('');
+  const isEditing = Boolean(roadmapItem);
 
-  // 'roadmapItem' prop'u değiştiğinde (yani düzenleme modu açıldığında)
-  // form alanlarını mevcut verilerle doldurur.
+  const [formData, setFormData] = useState({
+    title: "",
+    content: "",
+    image_url: "",
+  });
+
+  const [roadmapImage, setRoadmapImage] = useState(null);
+  const [isImageCropperOpen, setIsImageCropperOpen] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
   useEffect(() => {
-    if (roadmapItem) {
-      setTitle(roadmapItem.title || '');
-      setContent(roadmapItem.content || '');
-      setCurrentImageUrl(roadmapItem.image_url || '');
-      setImageFile(null); // Düzenleme modunda dosyayı sıfırla
+    if (isEditing) {
+      setFormData({
+        title: roadmapItem.title || "",
+        content: roadmapItem.content || "",
+        image_url: roadmapItem.image_url || "",
+      });
     } else {
-      // Ekleme modunda (roadmapItem null ise) formu sıfırla
-      setTitle('');
-      setContent('');
-      setCurrentImageUrl('');
-      setImageFile(null);
+      setFormData({
+        title: "",
+        content: "",
+        image_url: "",
+      });
+      setRoadmapImage(null);
     }
-  }, [roadmapItem, isOpen]);
+  }, [roadmapItem, isEditing]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleContentChange = (value) => {
+    setFormData((prev) => ({ ...prev, content: value || "" }));
+  };
+
+  const uploadImage = async (imageBlob) => {
+    try {
+      const formData = new FormData();
+      formData.append("image", imageBlob, "image.jpg");
+
+      const response = await API.post("/news/upload-image", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      return response.data.url; // Backend'den dönen resim URL'si
+    } catch (error) {
+      console.error("Image upload error:", error);
+      throw error;
+    }
+  };
+
+  const handleImageCropComplete = async (croppedImageBlob) => {
+    setRoadmapImage(croppedImageBlob);
+
+    // Düzenleme modundaysa resmi hemen yükle
+    if (isEditing) {
+      setUploadingImage(true);
+      try {
+        const imageUrl = await uploadImage(croppedImageBlob);
+        setFormData((prev) => ({ ...prev, image_url: imageUrl }));
+      } catch (error) {
+        console.error("Image upload failed:", error);
+        alert("Resim yüklenirken hata oluştu.");
+      } finally {
+        setUploadingImage(false);
+      }
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (isEditing) {
+      // Düzenleme modunda JSON olarak gönder
+      onSave(formData, roadmapItem.id);
+    } else {
+      // Yeni oluşturma modunda FormData olarak gönder
+      const formDataToSend = new FormData();
+      formDataToSend.append("title", formData.title);
+      formDataToSend.append("content", formData.content);
+      formDataToSend.append("created_at", new Date().toISOString());
+
+      if (roadmapImage) {
+        formDataToSend.append("image", roadmapImage, "roadmap.jpg");
+      }
+
+      onSave(formDataToSend, null);
+    }
+  };
 
   if (!isOpen) {
     return null;
   }
 
-  // Form gönderildiğinde çalışacak fonksiyon
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // onSave fonksiyonuna form verilerini ve ID'yi gönder
-    onSave({ title, content, imageFile }, roadmapItem ? roadmapItem.id : null);
-  };
-
-  // Resim seçildiğinde state'i güncelle
-  const handleFileChange = (e) => {
-    if (e.target.files[0]) {
-      setImageFile(e.target.files[0]);
-      setCurrentImageUrl(URL.createObjectURL(e.target.files[0])); // Önizleme için geçici URL oluştur
-    }
-  };
-
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl">
-        <h2 className="text-2xl font-bold mb-6">{roadmapItem ? 'Yol Haritasını Düzenle' : 'Yeni Yol Haritası Ekle'}</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="title" className="block text-gray-700 text-sm font-bold mb-2">Başlık</label>
-            <input
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+        <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+          <h2 className="text-2xl font-bold mb-6">
+            {isEditing ? "Yol Haritasını Düzenle" : "Yeni Yol Haritası Ekle"}
+          </h2>
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Sol Kolon */}
+              <div className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="title"
+                    className="block text-gray-700 font-semibold mb-2"
+                  >
+                    Başlık *
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    id="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-lg"
+                    required
+                  />
+                </div>
 
-          <div className="mb-4">
-            <label htmlFor="content" className="block text-gray-700 text-sm font-bold mb-2">İçerik (Markdown Destekler)</label>
-            <textarea
-              id="content"
-              rows="10"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            ></textarea>
-          </div>
+                {/* Roadmap Image */}
+                <div>
+                  <label className="block text-gray-700 font-semibold mb-2">
+                    Kapak Resmi (16:9 oranı)
+                  </label>
 
-          <div className="mb-6">
-            <label htmlFor="image" className="block text-gray-700 text-sm font-bold mb-2">Kapak Resmi</label>
-            <input
-              id="image"
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-            {currentImageUrl && <img src={currentImageUrl} alt="Önizleme" className="mt-4 w-40 h-auto rounded" />}
-          </div>
+                  {/* Mevcut resim gösterimi */}
+                  {formData.image_url && (
+                    <div className="mb-3">
+                      <img
+                        src={formData.image_url}
+                        alt="Mevcut kapak resmi"
+                        className="h-20 w-auto rounded-lg border object-cover"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Mevcut kapak resmi
+                      </p>
+                    </div>
+                  )}
 
-          <div className="flex items-center justify-end">
-            <button type="button" onClick={onClose} className="bg-gray-500 text-white font-bold py-2 px-4 rounded hover:bg-gray-600 focus:outline-none focus:shadow-outline mr-2">
-              İptal
-            </button>
-            <button type="submit" className="bg-primary text-white font-bold py-2 px-4 rounded hover:bg-primary/90 focus:outline-none focus:shadow-outline">
-              Kaydet
-            </button>
-          </div>
-        </form>
+                  <div className="flex items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setIsImageCropperOpen(true)}
+                      disabled={uploadingImage}
+                      className={`px-4 py-2 rounded-lg ${
+                        uploadingImage
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-blue-600 hover:bg-blue-700"
+                      } text-white`}
+                    >
+                      {uploadingImage
+                        ? "Yükleniyor..."
+                        : roadmapImage || formData.image_url
+                        ? "Resmi Değiştir"
+                        : "Resim Seç"}
+                    </button>
+
+                    {uploadingImage && (
+                      <span className="text-sm text-blue-600">
+                        <i className="bi bi-arrow-clockwise animate-spin mr-1"></i>
+                        Yükleniyor...
+                      </span>
+                    )}
+
+                    {roadmapImage && !uploadingImage && (
+                      <span className="text-sm text-green-600">
+                        ✓{" "}
+                        {isEditing
+                          ? "Kapak resmi güncellendi"
+                          : "Kapak resmi seçildi"}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Sağ Kolon - İçerik */}
+              <div>
+                <label
+                  htmlFor="content"
+                  className="block text-gray-700 font-semibold mb-2"
+                >
+                  İçerik (Markdown) *
+                </label>
+                <div className="border rounded-lg overflow-hidden">
+                  <MDEditor
+                    value={formData.content}
+                    onChange={handleContentChange}
+                    preview="edit"
+                    height={400}
+                    data-color-mode="light"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-4 mt-8">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg"
+              >
+                İptal
+              </button>
+              <button
+                type="submit"
+                className="px-6 py-2 bg-primary text-white rounded-lg"
+              >
+                {isEditing ? "Güncelle" : "Kaydet"}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+
+      <ImageCropper
+        isOpen={isImageCropperOpen}
+        onClose={() => setIsImageCropperOpen(false)}
+        onCropComplete={handleImageCropComplete}
+        aspectRatio={16 / 9}
+        title="Kapak Resmi Kırp (16:9)"
+      />
+    </>
   );
 }
 

@@ -1,22 +1,48 @@
 // dashboard/src/utils/axios.js
 
-import axios from 'axios';
+import axios from "axios";
 
 // Bu instance, backend API'mize bağlanmak için kullanılacak.
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api', // Backend'inizin adresi
+  baseURL: "http://localhost:5000/api", // Backend'inizin adresi
   withCredentials: true, // Oturum (cookie) bilgilerini göndermek için
 });
 
-// Token'ı her isteğe otomatik eklemek için bir interceptor ekleyelim.
-// Bu, "protect" middleware'ini kullanan rotalara erişim için gereklidir.
-API.interceptors.request.use((config) => {
-  // Token'ı localStorage'dan alıyoruz (veya nereden saklıyorsanız).
-  const token = localStorage.getItem('authToken'); // 'authToken' anahtarını kendi projenize göre değiştirin.
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+// Request interceptor - Token'ı her isteğe otomatik ekler
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
+
+// Response interceptor - 401 hatalarında logout yapar
+API.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    // 401 Unauthorized hatası alındığında kullanıcıyı logout yap
+    if (error.response?.status === 401) {
+      // Store'u import etmek yerine, localStorage'ı temizleyip sayfayı yenile
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("userData");
+
+      // Login sayfasına yönlendir
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export default API;

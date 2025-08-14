@@ -3,22 +3,17 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-import API from '../utils/axios'; // Merkezi Axios'u import ediyoruz
-
-// Markdown component'leriniz aynı kalıyor, bu harika.
-const markdownComponents = {
-  h1: ({node, ...props}) => <h1 className="text-3xl font-bold mt-6 mb-2 text-primary" {...props} />,
-  h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-5 mb-2 text-primary" {...props} />,
-  p: ({node, ...props}) => <p className="mb-4 leading-relaxed" {...props} />, // Paragraflara biraz daha boşluk ekleyelim
-  // ... diğer markdown stilleriniz
-  ul: ({node, ...props}) => <ul className="list-disc ml-6 my-4" {...props} />,
-  a: ({node, ...props}) => <a className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer" {...props} />,
-};
+import API from "../utils/axios"; // Merkezi Axios'u import ediyoruz
+import {
+  markdownComponents,
+  MarkdownWrapper,
+  remarkPlugins,
+} from "../components/MarkdownComponents";
 
 function JobDetailPage() {
   // DEĞİŞİKLİK: URL'den 'slug' yerine 'id'yi alıyoruz.
-  const { id } = useParams(); 
-  
+  const { id } = useParams();
+
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -49,19 +44,38 @@ function JobDetailPage() {
     fetchJobDetail();
   }, [id]); // Bu useEffect, URL'deki 'id' değiştiğinde tekrar çalışır.
 
+  // Başvuru fonksiyonu - Önce linke git, API'yi arka planda çalıştır
+  const handleApply = () => {
+    if (!job.link) return;
+
+    // Öncelik linke gitmek - hemen aç
+    window.open(job.link, "_blank");
+
+    // API'yi arka planda sessizce çalıştır
+    if (id) {
+      API.post(`/jobs/${id}/submit`).catch((err) => {
+        console.error("Başvuru kaydı oluşturulurken hata (arka plan):", err);
+      });
+    }
+  };
+
   if (loading) {
     return <div className="text-center p-20">Yükleniyor...</div>;
   }
 
   if (error || !job) {
-    return <div className="text-center p-20 text-red-500">{error || "İş ilanı bulunamadı."}</div>;
+    return (
+      <div className="text-center p-20 text-red-500">
+        {error || "İş ilanı bulunamadı."}
+      </div>
+    );
   }
 
   // Tarihi daha okunabilir bir formata çevirelim
-  const formattedDate = new Date(job.created_at).toLocaleDateString('tr-TR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+  const formattedDate = new Date(job.created_at).toLocaleDateString("tr-TR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   return (
@@ -72,26 +86,30 @@ function JobDetailPage() {
       </h1>
       <div className="text-gray-700 text-lg font-semibold">{job.employer}</div>
       <div className="text-gray-400 text-base mb-4">{formattedDate}</div>
-      
+
       {/* 
         Veritabanında 'job_description' ve 'job_content' diye iki ayrı alan yok.
         Sadece 'content' var. Bu yüzden onu kullanıyoruz.
       */}
-      <div className="prose lg:prose-xl max-w-none text-gray-800">
-        <ReactMarkdown components={markdownComponents}>{job.content}</ReactMarkdown>
-      </div>
+      <MarkdownWrapper>
+        <ReactMarkdown
+          components={markdownComponents}
+          remarkPlugins={remarkPlugins}
+        >
+          {job.content}
+        </ReactMarkdown>
+      </MarkdownWrapper>
 
-      {/* Başvuru linki varsa, bunu bir buton olarak gösterelim */}
+      {/* Başvuru bölümü */}
       {job.link && (
         <div className="mt-8">
-          <a
-            href={job.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-primary text-white px-8 py-3 rounded-full hover:bg-primary/90 transition-colors cursor-pointer"
+          <button
+            onClick={handleApply}
+            className="inline-flex items-center px-8 py-3 rounded-full font-medium bg-primary text-white hover:bg-primary/90 transition-colors cursor-pointer"
           >
+            <i className="bi bi-send-fill mr-2"></i>
             Hemen Başvur
-          </a>
+          </button>
         </div>
       )}
     </div>

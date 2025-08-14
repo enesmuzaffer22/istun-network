@@ -3,9 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-import API from '../utils/axios';
-
-const markdownComponents = { /* ... (stilleriniz aynı kalabilir) ... */ };
+import API from "../utils/axios";
+import {
+  markdownComponents,
+  MarkdownWrapper,
+  remarkPlugins,
+} from "../components/MarkdownComponents";
 
 function NewsDetailPage() {
   const { id } = useParams(); // Artık :id kullanıyoruz
@@ -34,14 +37,23 @@ function NewsDetailPage() {
   return (
     <div className="flex flex-col gap-8 2xl:px-[120px] px-4 py-12 md:py-[90px]">
       {news.banner_img_url && (
-        <img src={news.banner_img_url} alt={news.title} className="w-full h-auto max-h-[500px] object-cover rounded-lg mb-4" />
+        <img
+          src={news.banner_img_url}
+          alt={news.title}
+          className="w-full h-auto max-h-[500px] object-cover rounded-lg mb-4"
+        />
       )}
       <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-4">
         {news.title}
       </h1>
-      <div className="prose lg:prose-xl max-w-none text-gray-800">
-        <ReactMarkdown components={markdownComponents}>{news.content}</ReactMarkdown>
-      </div>
+      <MarkdownWrapper>
+        <ReactMarkdown
+          components={markdownComponents}
+          remarkPlugins={remarkPlugins}
+        >
+          {news.content}
+        </ReactMarkdown>
+      </MarkdownWrapper>
     </div>
   );
 }

@@ -1,28 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-import axios from "axios";
-
-// Markdown bileşenleri için stil tanımlamaları (değişiklik yok)
-const markdownComponents = {
-  h1: ({ node, ...props }) => (
-    <h1 className="text-3xl font-bold mt-6 mb-2 text-primary" {...props} />
-  ),
-  h2: ({ node, ...props }) => (
-    <h2 className="text-2xl font-bold mt-5 mb-2 text-primary" {...props} />
-  ),
-  ul: ({ node, ...props }) => <ul className="list-disc ml-6 my-2" {...props} />,
-  a: ({ node, ...props }) => (
-    <a
-      className="text-primary underline"
-      target="_blank"
-      rel="noopener noreferrer"
-      {...props}
-    />
-  ),
-  p: ({ node, ...props }) => <p className="mb-4 leading-relaxed" {...props} />,
-  // ... diğer markdown stilleri
-};
+import API from "../utils/axios";
+import {
+  markdownComponents,
+  MarkdownWrapper,
+  remarkPlugins,
+} from "../components/MarkdownComponents";
 
 function RoadmapDetailPage() {
   const { id } = useParams(); // URL'den 'slug' yerine 'id'yi alıyoruz
@@ -38,9 +22,7 @@ function RoadmapDetailPage() {
       try {
         setLoading(true);
         // Backend'e id ile istek atıyoruz
-        const response = await axios.get(
-          `http://localhost:5000/api/roadmaps/${id}`
-        );
+        const response = await API.get(`/roadmaps/${id}`);
         setRoadmap(response.data);
         setError(null);
       } catch (err) {
@@ -81,11 +63,14 @@ function RoadmapDetailPage() {
       )}
 
       {/* Backend'den gelen 'content' alanını ReactMarkdown ile render et */}
-      <div className="text-base sm:text-lg text-gray-800 prose lg:prose-lg max-w-none">
-        <ReactMarkdown components={markdownComponents}>
+      <MarkdownWrapper>
+        <ReactMarkdown
+          components={markdownComponents}
+          remarkPlugins={remarkPlugins}
+        >
           {roadmap.content}
         </ReactMarkdown>
-      </div>
+      </MarkdownWrapper>
     </div>
   );
 }

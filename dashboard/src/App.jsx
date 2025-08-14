@@ -1,16 +1,21 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import routes from "./route/routes";
 import { useAuthStore } from "./store";
 
 const PrivateRoute = ({ element: Element }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  return isAuthenticated ? <Element /> : <Navigate to="/login" />;
+  return isAuthenticated ? <Element /> : <Navigate to="/login" replace />;
 };
 
 const PublicRoute = ({ element: Element }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  return !isAuthenticated ? <Element /> : <Navigate to="/" />;
+  return !isAuthenticated ? <Element /> : <Navigate to="/" replace />;
 };
 
 const App = () => {
@@ -21,11 +26,7 @@ const App = () => {
           if (route.isPrivate && route.children) {
             // Layout ve children'lı private route
             return (
-              <Route
-                key={idx}
-                path={route.path}
-                element={<route.element />}
-              >
+              <Route key={idx} path={route.path} element={<route.element />}>
                 {route.children.map((child, cidx) => {
                   const Element = React.lazy(child.component);
                   return (

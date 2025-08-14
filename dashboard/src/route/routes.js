@@ -19,7 +19,7 @@ const routes = [
       // Ana Sayfa - Dashboard yerine RoadMap'i ana sayfa olarak kullanıyoruz
       {
         path: "",
-        component: () => import("../pages/RoadMap.jsx"),
+        component: () => import("../pages/JobsListPage.jsx"),
         isPrivate: true,
       },
 

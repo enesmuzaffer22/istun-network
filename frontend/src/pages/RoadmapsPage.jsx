@@ -3,7 +3,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import RoadmapCard from "../components/RoadmapCard";
 import { useNavigate } from "react-router-dom";
-import axios from "axios"; // axios'u import et
+import axios from "../utils/axios"; // axios'u import et
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,7 +22,7 @@ function RoadmapsPage() {
     const fetchRoadmaps = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:5000/api/roadmaps");
+        const response = await axios.get("/roadmaps");
         setRoadmaps(response.data); // Gelen veriyi state'e ata
         setError(null);
       } catch (err) {
@@ -71,24 +71,37 @@ function RoadmapsPage() {
 
   return (
     <div className="flex flex-col gap-12 2xl:px-[120px] px-4 py-12 md:py-[90px]">
-      <h1 ref={titleRef} className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary">
+      <h1
+        ref={titleRef}
+        className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary"
+      >
         Yol Haritaları
       </h1>
-      <div ref={cardsContainerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div
+        ref={cardsContainerRef}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+      >
         {loading && <p className="col-span-full text-center">Yükleniyor...</p>}
-        {error && <p className="col-span-full text-center text-red-500">{error}</p>}
-        {!loading && !error && roadmaps.map((roadmap) => (
-          // slug yerine backend'den gelen 'id' ile yönlendirme yapıyoruz
-          <div key={roadmap.id} onClick={() => navigate(`/yol-haritalari/${roadmap.id}`)}>
-            <RoadmapCard
-              // Propları backend'den gelen verilere göre eşleştiriyoruz
-              title={roadmap.title}
-              description={roadmap.content} // Backend 'content' gönderiyor
-              date={new Date(roadmap.created_at).toLocaleDateString("tr-TR")} // Tarihi formatlıyoruz
-              image={roadmap.image_url} // Backend 'image_url' gönderiyor
-            />
-          </div>
-        ))}
+        {error && (
+          <p className="col-span-full text-center text-red-500">{error}</p>
+        )}
+        {!loading &&
+          !error &&
+          roadmaps.map((roadmap) => (
+            // slug yerine backend'den gelen 'id' ile yönlendirme yapıyoruz
+            <div
+              key={roadmap.id}
+              onClick={() => navigate(`/yol-haritalari/${roadmap.id}`)}
+            >
+              <RoadmapCard
+                // Propları backend'den gelen verilere göre eşleştiriyoruz
+                title={roadmap.title}
+                description={roadmap.content} // Backend 'content' gönderiyor
+                date={new Date(roadmap.created_at).toLocaleDateString("tr-TR")} // Tarihi formatlıyoruz
+                image={roadmap.image_url} // Backend 'image_url' gönderiyor
+              />
+            </div>
+          ))}
       </div>
     </div>
   );
