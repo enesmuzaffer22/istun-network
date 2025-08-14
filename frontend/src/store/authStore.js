@@ -32,11 +32,10 @@ const getStoredUser = () => {
   }
 };
 
-// LocalStorage'ı temizle
+// LocalStorage'ı tamamen temizle
 const clearStorage = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("refreshToken");
-  localStorage.removeItem("user");
+  // Tüm localStorage'ı temizle
+  localStorage.clear();
 };
 
 // İlk yükleme sırasında token kontrolü
@@ -44,6 +43,7 @@ const initializeAuth = () => {
   const token = localStorage.getItem("token");
   const user = getStoredUser();
 
+  // Token ve user bilgisi varsa ve token geçerliyse
   if (token && isTokenValid(token) && user) {
     return {
       isAuthenticated: true,
@@ -51,7 +51,7 @@ const initializeAuth = () => {
       token: token,
     };
   } else {
-    // Geçersiz token varsa temizle
+    // Token yoksa, geçersizse veya user bilgisi yoksa local storage'ı temizle
     clearStorage();
     return {
       isAuthenticated: false,
@@ -70,7 +70,8 @@ const useAuthStore = create((set, get) => ({
     const storedToken = token || localStorage.getItem("token");
     const storedUser = userData || getStoredUser();
 
-    if (storedToken && isTokenValid(storedToken)) {
+    // Token ve user verisi mevcutsa ve token geçerliyse giriş yap
+    if (storedToken && isTokenValid(storedToken) && storedUser) {
       set({
         isAuthenticated: true,
         user: storedUser,
@@ -78,6 +79,7 @@ const useAuthStore = create((set, get) => ({
       });
       return true;
     } else {
+      // Herhangi bir koşul sağlanmazsa local storage'ı temizle
       clearStorage();
       set({
         isAuthenticated: false,
@@ -102,12 +104,15 @@ const useAuthStore = create((set, get) => ({
   checkAuth: async () => {
     const token = localStorage.getItem("token");
     const refreshToken = localStorage.getItem("refreshToken");
+    const user = getStoredUser();
 
-    if (!token) {
+    // Token, user bilgisi yoksa veya token geçersizse logout yap
+    if (!token || !user || !isTokenValid(token)) {
       get().logout();
       return false;
     }
 
+    // Token geçerliyse true döndür
     if (isTokenValid(token)) {
       return true;
     }

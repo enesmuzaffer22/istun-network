@@ -64,7 +64,9 @@ const LoginPage = () => {
 
         // Token'ları localStorage'a kaydet
         localStorage.setItem("token", token);
-        localStorage.setItem("refreshToken", refreshToken);
+        if (refreshToken) {
+          localStorage.setItem("refreshToken", refreshToken);
+        }
         localStorage.setItem("user", JSON.stringify(user));
 
         alert(message || "Giriş başarılı! Hoş geldiniz!");
@@ -73,6 +75,9 @@ const LoginPage = () => {
       }
     } catch (err) {
       console.error("Giriş hatası:", err);
+
+      // Giriş başarısız olduğunda local storage'ı tamamen temizle
+      localStorage.clear();
 
       if (err.response) {
         // Sunucu hata yanıtı
