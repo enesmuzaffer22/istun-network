@@ -1,6 +1,7 @@
 import express from "express";
 import axios from "axios";
-import { auth } from "../firebase/firebase";
+import { auth, db } from "../firebase/firebase";
+import { protect, isAdmin } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
@@ -132,6 +133,156 @@ router.post("/login", async (req, res) => {
             }
         }
         res.status(401).json({ message });
+    }
+});
+
+/**
+ * @swagger
+ * /api/admin/auth/pending-users:
+ *   get:
+ *     summary: Bekleyen kullanıcıları listele
+ *     tags: [AdminAuth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Bekleyen kullanıcılar
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       403:
+ *         description: Yetkisiz erişim
+ *       500:
+ *         description: Sunucu hatası
+ */
+router.get("/pending-users", protect, isAdmin, async (req, res) => {
+    try {
+        const pendingUsersSnap = await db
+            .collection("users")
+            .where("status", "==", "pending")
+            .get();
+
+        const users = pendingUsersSnap.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+
+        res.json({ users });
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+/**
+ * @swagger
+ * /api/admin/auth/approve-user/{userId}:
+ *   post:
+ *     summary: Kullanıcıyı onayla
+ *     tags: [AdminAuth]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Onaylanacak kullanıcının ID'si
+ *     responses:
+ *       200:
+ *         description: Kullanıcı onaylandı
+ *       403:
+ *         description: Yetkisiz erişim
+ *       404:
+ *         description: Kullanıcı bulunamadı
+ *       500:
+ *         description: Sunucu hatası
+ */
+router.post("/approve-user/:userId", protect, isAdmin, async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        // Kullanıcının var olup olmadığını kontrol et
+        const userDoc = await db.collection("users").doc(userId).get();
+        if (!userDoc.exists) {
+            return res.status(404).json({ message: "Kullanıcı bulunamadı." });
+        }
+
+        // Status'u approved olarak güncelle
+        await db.collection("users").doc(userId).update({
+            status: "approved",
+            approvedAt: new Date(),
+            approvedBy: req.user?.uid
+        });
+
+        res.json({ message: "Kullanıcı başarıyla onaylandı." });
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+/**
+ * @swagger
+ * /api/admin/auth/reject-user/{userId}:
+ *   post:
+ *     summary: Kullanıcıyı reddet
+ *     tags: [AdminAuth]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Reddedilecek kullanıcının ID'si
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               reason:
+ *                 type: string
+ *                 description: Red nedeni
+ *     responses:
+ *       200:
+ *         description: Kullanıcı reddedildi
+ *       403:
+ *         description: Yetkisiz erişim
+ *       404:
+ *         description: Kullanıcı bulunamadı
+ *       500:
+ *         description: Sunucu hatası
+ */
+router.post("/reject-user/:userId", protect, isAdmin, async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { reason } = req.body;
+
+        // Kullanıcının var olup olmadığını kontrol et
+        const userDoc = await db.collection("users").doc(userId).get();
+        if (!userDoc.exists) {
+            return res.status(404).json({ message: "Kullanıcı bulunamadı." });
+        }
+
+        // Status'u rejected olarak güncelle
+        await db.collection("users").doc(userId).update({
+            status: "rejected",
+            rejectedAt: new Date(),
+            rejectedBy: req.user?.uid,
+            rejectionReason: reason || "Belirtilmemiş"
+        });
+
+        res.json({ message: "Kullanıcı başarıyla reddedildi." });
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
     }
 });
 

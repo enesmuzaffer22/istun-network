@@ -150,11 +150,15 @@ router.post("/upload-document", upload.single("document"), async (req, res) => {
  *                 description: Öğrenci belgesi dosyası
  *     responses:
  *       201:
- *         description: Kayıt başarılı
+ *         description: Kayıt başarılı (kullanıcı pending durumunda, admin onayı bekleniyor)
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Success'
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Kayıt başarılı! Hesabınız admin onayına gönderildi."
  *       400:
  *         description: Geçersiz veri veya kullanıcı adı zaten kullanılıyor
  *         content:
@@ -256,10 +260,11 @@ router.post("/register", upload.single("document"), async (req, res) => {
         about: about || "",
         consent,
         student_doc_url,
+        status: "pending", // Yeni kullanıcılar pending durumunda başlar
         createdAt: new Date(),
       });
 
-    res.status(201).json({ message: "Kayıt başarılı!" });
+    res.status(201).json({ message: "Kayıt başarılı! Hesabınız admin onayına gönderildi." });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -296,6 +301,16 @@ router.post("/register", upload.single("document"), async (req, res) => {
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Error'
+ *       403:
+ *         description: Hesap onaylanmamış veya reddedilmiş
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Hesabınız henüz onaylanmadı. Lütfen admin onayını bekleyin."
  *       404:
  *         description: Kullanıcı bulunamadı
  *         content:
@@ -320,6 +335,7 @@ router.post("/login", async (req, res) => {
     }
 
     let email = identifier;
+    let userDoc: any = null;
 
     // Eğer identifier email değilse, Firestore'dan email'i bul
     if (!identifier.includes("@")) {
@@ -331,7 +347,33 @@ router.post("/login", async (req, res) => {
       if (userSnap.empty) {
         return res.status(404).json({ message: "Kullanıcı bulunamadı." });
       }
-      email = userSnap.docs[0].data().email;
+      userDoc = userSnap.docs[0];
+      email = userDoc.data().email;
+    } else {
+      // Email ile giriş yapılıyorsa, Firestore'dan kullanıcıyı bul
+      const userSnap = await db
+        .collection("users")
+        .where("email", "==", email)
+        .limit(1)
+        .get();
+      if (!userSnap.empty) {
+        userDoc = userSnap.docs[0];
+      }
+    }
+
+    // Kullanıcının status kontrolü
+    if (userDoc) {
+      const userData = userDoc.data();
+      if (userData.status === "pending") {
+        return res.status(403).json({
+          message: "Hesabınız henüz onaylanmadı. Lütfen admin onayını bekleyin."
+        });
+      }
+      if (userData.status === "rejected") {
+        return res.status(403).json({
+          message: "Hesabınız reddedildi. Lütfen yönetici ile iletişime geçin."
+        });
+      }
     }
 
     // Firebase Auth REST API ile giriş yap
