@@ -83,7 +83,7 @@ function Navbar() {
               </div>
             )}
           </div>
-          {/* Yol Haritaları */}
+          {/* Kariyer Rotaları */}
           <div className="relative">
             {!isAuthenticated ? (
               <span
@@ -94,14 +94,14 @@ function Navbar() {
                 onMouseEnter={() => setShowTooltip("yol-haritalari")}
                 onMouseLeave={() => setShowTooltip(null)}
               >
-                Yol Haritaları
+                Kariyer Rotaları
               </span>
             ) : (
               <Link
                 to="/yol-haritalari"
                 className={getNavLinkClass("/yol-haritalari")}
               >
-                Yol Haritaları
+                Kariyer Rotaları
               </Link>
             )}
             {/* Tooltip */}
@@ -255,7 +255,7 @@ function Navbar() {
                   </div>
                 )}
               </div>
-              {/* Yol Haritaları */}
+              {/* Kariyer Rotaları */}
               <div className="relative w-full flex justify-center">
                 {!isAuthenticated ? (
                   <span
@@ -266,7 +266,7 @@ function Navbar() {
                     onMouseEnter={() => setShowTooltip("yol-haritalari-mobil")}
                     onMouseLeave={() => setShowTooltip(null)}
                   >
-                    Yol Haritaları
+                    Kariyer Rotaları
                   </span>
                 ) : (
                   <Link
@@ -274,7 +274,7 @@ function Navbar() {
                     className={getMobileNavLinkClass("/yol-haritalari")}
                     onClick={toggleMenu}
                   >
-                    Yol Haritaları
+                    Kariyer Rotaları
                   </Link>
                 )}
                 {/* Tooltip */}

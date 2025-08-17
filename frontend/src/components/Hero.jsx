@@ -74,9 +74,8 @@ function Hero() {
           </h2>
           <p className="text-center text-sm sm:text-base md:text-xl text-gray-500 md:w-4/5">
             Öğrenci topluluğumuzda güncel iş ilanları, staj fırsatları ve
-            kariyer yol haritalarını keşfet. Deneyimli profesyonellerden
-            rehberlik al, forumlarımızda sorularını sor ve kariyerinde bir adım
-            öne geç.
+            kariyer rotaları keşfet. Deneyimli profesyonellerden rehberlik al,
+            forumlarımızda sorularını sor ve kariyerinde bir adım öne geç.
           </p>
         </div>
         <div className="hero-buttons-container flex flex-col sm:flex-row gap-4 w-full md:w-auto">
