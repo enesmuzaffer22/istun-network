@@ -3,6 +3,7 @@ import LandingPage from "../pages/LandingPage";
 import NewsPage from "../pages/NewsPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
+import ProfilePage from "../pages/ProfilePage";
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
 import NewsDetailPage from "../pages/NewsDetailPage";
@@ -41,7 +42,7 @@ export const RouteList = [
   },
   {
     // DEĞİŞİKLİK BURADA: :slug yerine :id kullandık.
-    path: "/kariyer/:id", 
+    path: "/kariyer/:id",
     element: (
       <PrivateRoute>
         <JobDetailPage />
@@ -71,5 +72,13 @@ export const RouteList = [
   {
     path: "/haberler/:id",
     element: <NewsDetailPage />,
+  },
+  {
+    path: "/profil",
+    element: (
+      <PrivateRoute>
+        <ProfilePage />
+      </PrivateRoute>
+    ),
   },
 ];

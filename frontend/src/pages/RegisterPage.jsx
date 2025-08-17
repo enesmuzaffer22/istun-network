@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import axios from "../utils/axios";
 
 const RegisterPage = () => {
@@ -28,6 +29,42 @@ const RegisterPage = () => {
     number: false,
     special: false,
   });
+
+  // Türkçe karakterleri İngilizce karakterlere çevir
+  const turkishToEnglish = (text) => {
+    const turkishChars = {
+      ç: "c",
+      Ç: "C",
+      ğ: "g",
+      Ğ: "G",
+      ı: "i",
+      I: "I",
+      İ: "I",
+      i: "i",
+      ö: "o",
+      Ö: "O",
+      ş: "s",
+      Ş: "S",
+      ü: "u",
+      Ü: "U",
+    };
+
+    return text.replace(
+      /[çÇğĞıIİiöÖşŞüÜ]/g,
+      (match) => turkishChars[match] || match
+    );
+  };
+
+  // Kullanıcı adını otomatik oluştur: ad.soyad formatında (İngilizce karakterlerle)
+  const generateUsername = (firstName, lastName) => {
+    const englishFirstName = turkishToEnglish(
+      firstName.trim().toLowerCase().replace(/\s+/g, "")
+    );
+    const englishLastName = turkishToEnglish(
+      lastName.trim().toLowerCase().replace(/\s+/g, "")
+    );
+    return `${englishFirstName}.${englishLastName}`;
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
@@ -127,13 +164,6 @@ const RegisterPage = () => {
 
     setIsLoading(true);
 
-    // Kullanıcı adını otomatik oluştur: ad.soyad formatında
-    const generateUsername = (firstName, lastName) => {
-      const cleanFirstName = firstName.trim().toLowerCase().replace(/\s+/g, "");
-      const cleanLastName = lastName.trim().toLowerCase().replace(/\s+/g, "");
-      return `${cleanFirstName}.${cleanLastName}`;
-    };
-
     const username = generateUsername(formData.firstName, formData.lastName);
 
     const payload = new FormData();
@@ -163,7 +193,7 @@ const RegisterPage = () => {
 
       // 201 başarılı kayıt
       if (response.status === 201) {
-        alert(
+        toast.success(
           "Kayıt başarılı! Öğrenciliğiniz doğrulandıktan sonra giriş yapabileceksiniz. Sizi bilgilendireceğiz."
         );
         navigate("/giris-yap");
@@ -175,25 +205,25 @@ const RegisterPage = () => {
         // Sunucu hata yanıtı
         switch (err.response.status) {
           case 400:
-            alert(
+            toast.error(
               err.response.data?.message ||
                 "Geçersiz veri veya kullanıcı adı zaten kullanılıyor."
             );
             break;
           case 500:
-            alert("Sunucu hatası. Lütfen daha sonra tekrar deneyin.");
+            toast.error("Sunucu hatası. Lütfen daha sonra tekrar deneyin.");
             break;
           default:
-            alert("Kayıt sırasında bir hata oluştu.");
+            toast.error("Kayıt sırasında bir hata oluştu.");
         }
       } else if (err.request) {
         // Ağ hatası
-        alert(
+        toast.error(
           "Sunucuya bağlanırken hata oluştu. İnternet bağlantınızı kontrol edin."
         );
       } else {
         // Diğer hatalar
-        alert("Beklenmeyen bir hata oluştu.");
+        toast.error("Beklenmeyen bir hata oluştu.");
       }
     } finally {
       setIsLoading(false);
@@ -434,8 +464,23 @@ const RegisterPage = () => {
                   <p className="text-sm text-blue-700 flex items-center">
                     <i className="bi bi-info-circle mr-2"></i>
                     Kullanıcı adınız otomatik olarak ad.soyad formatında
-                    oluşturulacaktır.
+                    oluşturulacaktır. (Türkçe karakterler İngilizce karakterlere
+                    çevrilir)
                   </p>
+                  {formData.firstName && formData.lastName && (
+                    <div className="mt-2 p-2 bg-white rounded border border-blue-300">
+                      <p className="text-xs text-gray-600">
+                        <strong>Örnek:</strong> {formData.firstName}{" "}
+                        {formData.lastName} →
+                        <span className="text-blue-600 font-mono ml-1">
+                          {generateUsername(
+                            formData.firstName,
+                            formData.lastName
+                          )}
+                        </span>
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 

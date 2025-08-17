@@ -13,6 +13,7 @@ function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
 
   // Tooltip için state
@@ -139,9 +140,26 @@ function Navbar() {
                 </Link>
               </>
             ) : (
-              <button onClick={handleLogout} className={navPrimaryButtonStyles}>
-                Çıkış Yap
-              </button>
+              <>
+                {/* Profil Avatar/Butonu */}
+                <Link
+                  to="/profil"
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
+                >
+                  <div className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">
+                    {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+                  </div>
+                  <span className="text-gray-700 font-medium">
+                    {user?.name || "Profil"}
+                  </span>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className={navPrimaryButtonStyles}
+                >
+                  Çıkış Yap
+                </button>
+              </>
             )}
           </div>
         </nav>
@@ -306,15 +324,37 @@ function Navbar() {
                     </Link>
                   </>
                 ) : (
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      toggleMenu();
-                    }}
-                    className={`${mobileNavButtonStyles} text-center`}
-                  >
-                    Çıkış Yap
-                  </button>
+                  <>
+                    {/* Profil Butonu */}
+                    <Link
+                      to="/profil"
+                      className="flex items-center justify-center gap-3 bg-white/10 text-white px-6 py-4 rounded-lg border border-white/20 hover:bg-white/20 transition-colors"
+                      onClick={toggleMenu}
+                    >
+                      <div className="w-10 h-10 bg-white text-primary rounded-full flex items-center justify-center text-lg font-bold">
+                        {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+                      </div>
+                      <div className="flex flex-col items-start">
+                        <span className="font-medium">
+                          {user?.name && user?.surname
+                            ? `${user.name} ${user.surname}`
+                            : "Profilim"}
+                        </span>
+                        <span className="text-sm text-white/70">
+                          Profili görüntüle
+                        </span>
+                      </div>
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        toggleMenu();
+                      }}
+                      className={`${mobileNavButtonStyles} text-center`}
+                    >
+                      Çıkış Yap
+                    </button>
+                  </>
                 )}
               </div>
             </nav>

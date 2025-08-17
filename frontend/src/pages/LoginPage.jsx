@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import useAuthStore from "../store/authStore";
 import axios from "../utils/axios";
 
@@ -77,11 +78,11 @@ const LoginPage = () => {
 
         if (!statusCheck.success) {
           // Status uygun değilse hata mesajı göster ve çıkış yap
-          alert(statusCheck.message);
+          toast.error(statusCheck.message);
           return; // Login işlemini durdur
         }
 
-        alert(message || "Giriş başarılı! Hoş geldiniz!");
+        toast.success(message || "Giriş başarılı! Hoş geldiniz!");
         navigate("/kariyer");
       }
     } catch (err) {
@@ -94,46 +95,46 @@ const LoginPage = () => {
         // Sunucu hata yanıtı
         switch (err.response.status) {
           case 400:
-            alert("Geçersiz veri. Lütfen bilgilerinizi kontrol edin.");
+            toast.error("Geçersiz veri. Lütfen bilgilerinizi kontrol edin.");
             break;
           case 401:
-            alert("Yanlış kullanıcı adı veya şifre.");
+            toast.error("Yanlış kullanıcı adı veya şifre.");
             break;
           case 403: {
             // Kullanıcı hesabı onaylanmamış veya reddedilmiş
             const errorMessage = err.response.data?.message;
             if (errorMessage && errorMessage.includes("pending")) {
-              alert(
+              toast.warning(
                 "Hesabınız henüz onaylanmamış. Öğrenciliğiniz doğrulandıktan sonra giriş yapabileceksiniz. Sizi bilgilendireceğiz."
               );
             } else if (errorMessage && errorMessage.includes("rejected")) {
-              alert(
+              toast.error(
                 "Hesabınız reddedilmiş. Lütfen yönetici ile iletişime geçin."
               );
             } else {
-              alert(
+              toast.warning(
                 "Hesabınız henüz onaylanmamış veya erişim yetkiniz bulunmuyor. Lütfen hesap durumunuzu kontrol edin."
               );
             }
             break;
           }
           case 404:
-            alert("Kullanıcı bulunamadı.");
+            toast.error("Kullanıcı bulunamadı.");
             break;
           case 500:
-            alert("Sunucu hatası. Lütfen daha sonra tekrar deneyin.");
+            toast.error("Sunucu hatası. Lütfen daha sonra tekrar deneyin.");
             break;
           default:
-            alert("Giriş sırasında bir hata oluştu.");
+            toast.error("Giriş sırasında bir hata oluştu.");
         }
       } else if (err.request) {
         // Ağ hatası
-        alert(
+        toast.error(
           "Sunucuya bağlanırken hata oluştu. İnternet bağlantınızı kontrol edin."
         );
       } else {
         // Diğer hatalar
-        alert("Beklenmeyen bir hata oluştu.");
+        toast.error("Beklenmeyen bir hata oluştu.");
       }
     } finally {
       setIsLoading(false);
