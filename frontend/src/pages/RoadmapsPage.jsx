@@ -19,20 +19,36 @@ function RoadmapsPage() {
 
   // Veri çekme useEffect'i
   useEffect(() => {
+    let isCancelled = false; // Cleanup için flag
+
     const fetchRoadmaps = async () => {
       try {
         setLoading(true);
         const response = await axios.get("/roadmaps");
-        setRoadmaps(response.data); // Gelen veriyi state'e ata
-        setError(null);
+
+        // Component unmount olmamışsa state'i güncelle
+        if (!isCancelled) {
+          setRoadmaps(response.data);
+          setError(null);
+        }
       } catch (err) {
-        console.error("Yol haritaları çekilirken hata:", err);
-        setError("Veriler yüklenirken bir sorun oluştu.");
+        if (!isCancelled) {
+          console.error("Yol haritaları çekilirken hata:", err);
+          setError("Veriler yüklenirken bir sorun oluştu.");
+        }
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
+
     fetchRoadmaps();
+
+    // Cleanup function
+    return () => {
+      isCancelled = true;
+    };
   }, []); // Sadece component yüklendiğinde bir kez çalışır
 
   // Animasyon useEffect'i

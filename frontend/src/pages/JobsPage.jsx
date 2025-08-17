@@ -13,27 +13,50 @@ function JobsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isCancelled = false; // Cleanup için flag
+
     const fetchJobs = async () => {
       try {
         setLoading(true);
         const response = await API.get("/jobs");
-        // Konsolda verinin gelip gelmediğini ve formatını kontrol et
-        console.log("JobsPage Gelen Veri:", response.data); 
-        setJobsData(response.data);
+
+        // Component unmount olmamışsa state'i güncelle
+        if (!isCancelled) {
+          setJobsData(response.data);
+        }
       } catch (error) {
-        console.error("JobsPage Hata:", error);
+        if (!isCancelled) {
+          console.error("JobsPage Hata:", error);
+        }
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
+
     fetchJobs();
+
+    // Cleanup function
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   useEffect(() => {
     if (!loading && jobsData.length > 0) {
       const tl = gsap.timeline();
-      tl.fromTo(titleRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" });
-      tl.fromTo(".job-card-wrapper", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: "power2.out" }, "-=0.3");
+      tl.fromTo(
+        titleRef.current,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
+      );
+      tl.fromTo(
+        ".job-card-wrapper",
+        { opacity: 0, y: 50 },
+        { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: "power2.out" },
+        "-=0.3"
+      );
     }
   }, [loading, jobsData]);
 
@@ -43,7 +66,10 @@ function JobsPage() {
 
   return (
     <div className="flex flex-col gap-12 2xl:px-[120px] px-4 py-12 md:py-[90px]">
-      <h1 ref={titleRef} className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary opacity-0">
+      <h1
+        ref={titleRef}
+        className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary opacity-0"
+      >
         Kariyer Fırsatları
       </h1>
       <div className="jobs-page-cards-container flex flex-col gap-y-12">

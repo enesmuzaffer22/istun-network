@@ -162,7 +162,7 @@ function RoadmapFormModal({ isOpen, onClose, onSave, roadmapItem }) {
                       className={`px-4 py-2 rounded-lg ${
                         uploadingImage
                           ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-blue-600 hover:bg-blue-700"
+                          : "bg-primary hover:bg-primary/70"
                       } text-white`}
                     >
                       {uploadingImage

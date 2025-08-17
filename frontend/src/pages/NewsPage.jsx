@@ -15,38 +15,70 @@ function NewsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isCancelled = false; // Cleanup için flag
+
     const fetchNews = async () => {
       try {
         setLoading(true);
         const response = await API.get("/news");
-        setNewsData(response.data);
+
+        // Component unmount olmamışsa state'i güncelle
+        if (!isCancelled) {
+          setNewsData(response.data);
+        }
       } catch (error) {
-        console.error("Haberler yüklenirken hata oluştu:", error);
+        if (!isCancelled) {
+          console.error("Haberler yüklenirken hata oluştu:", error);
+        }
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
+
     fetchNews();
+
+    // Cleanup function
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   useEffect(() => {
     if (!loading && newsData.length > 0) {
       const tl = gsap.timeline();
-      tl.fromTo(titleRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" });
-      gsap.fromTo(newsContainerRef.current.children, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.2, ease: "power2.out" });
+      tl.fromTo(
+        titleRef.current,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
+      );
+      gsap.fromTo(
+        newsContainerRef.current.children,
+        { opacity: 0, y: 50 },
+        { opacity: 1, y: 0, duration: 0.6, stagger: 0.2, ease: "power2.out" }
+      );
     }
   }, [loading, newsData]);
 
-  if (loading) return <div className="text-center p-20">Haberler Yükleniyor...</div>;
+  if (loading)
+    return <div className="text-center p-20">Haberler Yükleniyor...</div>;
 
   return (
     <div className="flex flex-col gap-12 2xl:px-[120px] px-4 py-12 md:py-[90px]">
-      <h1 ref={titleRef} className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary opacity-0">
+      <h1
+        ref={titleRef}
+        className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary opacity-0"
+      >
         Haberler
       </h1>
       <div ref={newsContainerRef} className="flex flex-col gap-12">
         {newsData.map((newsItem) => (
-          <div key={newsItem.id} onClick={() => navigate(`/haberler/${newsItem.id}`)} className="opacity-0">
+          <div
+            key={newsItem.id}
+            onClick={() => navigate(`/haberler/${newsItem.id}`)}
+            className="opacity-0"
+          >
             <NewsCard
               title={newsItem.title}
               content={newsItem.content}

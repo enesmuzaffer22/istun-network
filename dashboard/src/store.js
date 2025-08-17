@@ -5,12 +5,12 @@ const getInitialAuthState = () => {
   try {
     const token = localStorage.getItem("authToken");
     const userData = localStorage.getItem("userData");
-    
+
     if (token && userData) {
       return {
         user: JSON.parse(userData),
         isAuthenticated: true,
-        token: token
+        token: token,
       };
     }
   } catch (error) {
@@ -20,35 +20,33 @@ const getInitialAuthState = () => {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("userData");
   }
-  
+
   return {
     user: null,
     isAuthenticated: false,
-    token: null
+    token: null,
   };
 };
 
 export const useAuthStore = create((set) => ({
   ...getInitialAuthState(),
-  
+
   login: (user) => {
     const token = localStorage.getItem("authToken");
     set({ user, isAuthenticated: true, token });
   },
-  
+
   logout: () => {
-    // localStorage'dan tüm auth verilerini temizle
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("userData");
-    
+    // localStorage'daki TÜM verileri temizle
+    localStorage.clear();
+
     // Store'u sıfırla
     set({ user: null, isAuthenticated: false, token: null });
   },
-  
+
   // Token'ı güncelle (refresh token işlemleri için)
   updateToken: (newToken) => {
     localStorage.setItem("authToken", newToken);
     set({ token: newToken });
-  }
-})); 
+  },
+}));

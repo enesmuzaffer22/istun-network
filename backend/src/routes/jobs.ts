@@ -8,8 +8,8 @@
 // backend/src/routes/jobs.ts
 
 import express from "express";
-import { db, admin } from "../firebase/firebase.js";
-import { protect, isAdmin } from "../middleware/authMiddleware.js";
+import { db, admin } from "../firebase/firebase";
+import { protect, isAdmin } from "../middleware/authMiddleware";
 
 const router = express.Router();
 

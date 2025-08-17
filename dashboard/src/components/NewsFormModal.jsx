@@ -232,7 +232,7 @@ function NewsFormModal({ isOpen, onClose, onSave, newsItem }) {
                       className={`px-4 py-2 rounded-lg ${
                         uploadingBanner
                           ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-blue-600 hover:bg-blue-700"
+                          : "bg-primary hover:bg-primary/70"
                       } text-white`}
                     >
                       {uploadingBanner
@@ -288,7 +288,7 @@ function NewsFormModal({ isOpen, onClose, onSave, newsItem }) {
                       className={`px-4 py-2 rounded-lg ${
                         uploadingThumbnail
                           ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-blue-600 hover:bg-blue-700"
+                          : "bg-primary hover:bg-primary/70"
                       } text-white`}
                     >
                       {uploadingThumbnail

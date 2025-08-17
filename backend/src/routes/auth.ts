@@ -10,11 +10,11 @@
 // Login   : http://localhost:5000/api/auth/login
 
 import express from "express";
-import { auth, db } from "../firebase/firebase.js";
+import { auth, db } from "../firebase/firebase";
 import axios from "axios";
 import * as dotenv from "dotenv";
 import multer from "multer";
-import { admin } from "../firebase/firebase.js";
+import { admin } from "../firebase/firebase";
 import { v4 as uuidv4 } from "uuid";
 dotenv.config();
 const router = express.Router();
@@ -264,7 +264,9 @@ router.post("/register", upload.single("document"), async (req, res) => {
         createdAt: new Date(),
       });
 
-    res.status(201).json({ message: "Kayıt başarılı! Hesabınız admin onayına gönderildi." });
+    res
+      .status(201)
+      .json({ message: "Kayıt başarılı! Hesabınız admin onayına gönderildi." });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -366,12 +368,13 @@ router.post("/login", async (req, res) => {
       const userData = userDoc.data();
       if (userData.status === "pending") {
         return res.status(403).json({
-          message: "Hesabınız henüz onaylanmadı. Lütfen admin onayını bekleyin."
+          message:
+            "Hesabınız henüz onaylanmadı. Lütfen admin onayını bekleyin.",
         });
       }
       if (userData.status === "rejected") {
         return res.status(403).json({
-          message: "Hesabınız reddedildi. Lütfen yönetici ile iletişime geçin."
+          message: "Hesabınız reddedildi. Lütfen yönetici ile iletişime geçin.",
         });
       }
     }

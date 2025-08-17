@@ -30,10 +30,8 @@ API.interceptors.response.use(
   (error) => {
     // 401 Unauthorized hatası alındığında kullanıcıyı logout yap
     if (error.response?.status === 401) {
-      // Store'u import etmek yerine, localStorage'ı temizleyip sayfayı yenile
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("userData");
+      // localStorage'daki TÜM verileri temizle
+      localStorage.clear();
 
       // Login sayfasına yönlendir
       if (window.location.pathname !== "/login") {

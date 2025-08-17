@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import axios from "../utils/axios";
 
 // Token'ın geçerliliğini kontrol et
 const isTokenValid = (token) => {
@@ -142,6 +143,41 @@ const useAuthStore = create((set, get) => ({
   updateUser: (userData) => {
     localStorage.setItem("user", JSON.stringify(userData));
     set({ user: userData });
+  },
+
+  // Kullanıcı status kontrolü yap
+  checkUserStatus: async () => {
+    try {
+      const response = await axios.get("/users/me");
+      const userData = response.data;
+
+      // Kullanıcı status'unu kontrol et
+      if (userData.status !== "approved") {
+        // Status approved değilse logout yap
+        get().logout();
+        return {
+          success: false,
+          message:
+            userData.status === "pending"
+              ? "Hesabınız henüz onaylanmamış. Onaylandıktan sonra giriş yapabileceksiniz."
+              : "Hesabınız reddedilmiş. Lütfen yönetici ile iletişime geçin.",
+        };
+      }
+
+      // Status approved ise kullanıcı bilgilerini güncelle
+      get().updateUser(userData);
+      return {
+        success: true,
+        user: userData,
+      };
+    } catch (error) {
+      console.error("Status kontrol hatası:", error);
+      get().logout();
+      return {
+        success: false,
+        message: "Kullanıcı bilgileri alınamadı. Lütfen tekrar giriş yapın.",
+      };
+    }
   },
 }));
 

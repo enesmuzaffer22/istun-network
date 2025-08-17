@@ -7,6 +7,12 @@ serviceAccountKey.json
 /dist
 /build
 
+# Compiled TypeScript files
+**/*.js
+**/*.js.map
+!jest.config.js
+!*.config.js
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

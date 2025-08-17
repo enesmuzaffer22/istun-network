@@ -113,7 +113,7 @@ function NewsListPage() {
         <h1 className="text-3xl font-bold text-gray-800">Haberler</h1>
         <button
           onClick={handleCreateNews}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          className="bg-primary hover:bg-primary/70 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <i className="bi bi-plus-lg"></i>
           Yeni Haber Oluştur

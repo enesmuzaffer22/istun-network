@@ -8,7 +8,6 @@ const RegisterPage = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    username: "",
     email: "",
     password: "",
     tc: "",
@@ -22,6 +21,13 @@ const RegisterPage = () => {
 
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordRequirements, setPasswordRequirements] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false,
+  });
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
@@ -29,6 +35,22 @@ const RegisterPage = () => {
       ...formData,
       [name]:
         type === "checkbox" ? checked : type === "file" ? files[0] : value,
+    });
+
+    // Şifre alanı için canlı kontrol
+    if (name === "password") {
+      checkPasswordRequirements(value);
+    }
+  };
+
+  // Şifre gereksinimlerini canlı kontrol et
+  const checkPasswordRequirements = (password) => {
+    setPasswordRequirements({
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password),
     });
   };
 
@@ -39,24 +61,32 @@ const RegisterPage = () => {
     if (!formData.firstName.trim()) newErrors.firstName = "Ad zorunludur";
     if (!formData.lastName.trim()) newErrors.lastName = "Soyad zorunludur";
 
-    // E-mail
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-      newErrors.email = "Geçerli bir e-posta adresi girin";
+    // E-mail - Gelişmiş syntax kontrolü
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(formData.email.trim()))
+      newErrors.email =
+        "Geçerli bir e-posta adresi girin (örn: ornek@email.com)";
 
-    // Şifre
-    if (formData.password.length < 6)
-      newErrors.password = "Şifre en az 6 karakter olmalı";
+    // Şifre - En az 8 karakter, büyük harf, küçük harf, sayı ve özel karakter
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+    if (!passwordRegex.test(formData.password)) {
+      newErrors.password =
+        "Şifre en az 8 karakter olmalı ve büyük harf, küçük harf, sayı ve özel karakter içermelidir";
+    }
 
-    // TC Kimlik No: 11 haneli ve sadece rakam
-    if (!/^[0-9]{11}$/.test(formData.tc))
-      newErrors.tc = "TC Kimlik No 11 haneli olmalıdır";
+    // TC Kimlik No: 11 haneli, sadece rakam ve TC kimlik algoritması kontrolü
+    if (!isValidTCKimlik(formData.tc)) {
+      newErrors.tc = "Geçerli bir TC Kimlik No girin";
+    }
 
-    // Telefon: En az 10 haneli rakamlar
-    if (!/^[0-9]{10,11}$/.test(formData.phone.replace(/\D/g, "")))
-      newErrors.phone = "Geçerli bir telefon numarası girin";
+    // Telefon: 05xxxxxxxxx formatında
+    const phoneRegex = /^05\d{9}$/;
+    if (!phoneRegex.test(formData.phone.replace(/\D/g, ""))) {
+      newErrors.phone = "Telefon numarası 05xxxxxxxxx formatında olmalıdır";
+    }
 
     // Diğer zorunlu alanlar
-    if (!formData.username) newErrors.username = "Kullanıcı adı zorunludur";
     if (!formData.employmentStatus)
       newErrors.employmentStatus = "Çalışma durumu seçilmelidir";
     if (!formData.graduationStatus)
@@ -69,15 +99,47 @@ const RegisterPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // TC Kimlik No doğrulama algoritması
+  const isValidTCKimlik = (tcKimlik) => {
+    if (!tcKimlik || tcKimlik.length !== 11) return false;
+    if (!/^[0-9]+$/.test(tcKimlik)) return false;
+    if (tcKimlik[0] === "0") return false;
+
+    const digits = tcKimlik.split("").map(Number);
+
+    // 10. hane kontrolü
+    const oddSum = digits[0] + digits[2] + digits[4] + digits[6] + digits[8];
+    const evenSum = digits[1] + digits[3] + digits[5] + digits[7];
+    const tenthDigit = (oddSum * 7 - evenSum) % 10;
+
+    if (tenthDigit !== digits[9]) return false;
+
+    // 11. hane kontrolü
+    const sum = digits.slice(0, 10).reduce((acc, digit) => acc + digit, 0);
+    const eleventhDigit = sum % 10;
+
+    return eleventhDigit === digits[10];
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
     setIsLoading(true);
+
+    // Kullanıcı adını otomatik oluştur: ad.soyad formatında
+    const generateUsername = (firstName, lastName) => {
+      const cleanFirstName = firstName.trim().toLowerCase().replace(/\s+/g, "");
+      const cleanLastName = lastName.trim().toLowerCase().replace(/\s+/g, "");
+      return `${cleanFirstName}.${cleanLastName}`;
+    };
+
+    const username = generateUsername(formData.firstName, formData.lastName);
+
     const payload = new FormData();
     payload.append("name", formData.firstName);
     payload.append("surname", formData.lastName);
-    payload.append("username", formData.username);
+    payload.append("username", username);
     payload.append("email", formData.email);
     payload.append("password", formData.password);
     payload.append("tc", formData.tc);
@@ -101,7 +163,9 @@ const RegisterPage = () => {
 
       // 201 başarılı kayıt
       if (response.status === 201) {
-        alert("Kayıt başarılı! Lütfen giriş yapın.");
+        alert(
+          "Kayıt başarılı! Öğrenciliğiniz doğrulandıktan sonra giriş yapabileceksiniz. Sizi bilgilendireceğiz."
+        );
         navigate("/giris-yap");
       }
     } catch (err) {
@@ -210,26 +274,7 @@ const RegisterPage = () => {
                   <i className="bi bi-shield-lock mr-2 text-primary"></i>
                   Hesap Bilgileri
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      <i className="bi bi-at mr-1"></i>Kullanıcı Adı *
-                    </label>
-                    <input
-                      name="username"
-                      value={formData.username}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-white"
-                      placeholder="Kullanıcı adı"
-                    />
-                    {errors.username && (
-                      <p className="text-red-500 text-sm mt-1 flex items-center">
-                        <i className="bi bi-exclamation-circle mr-1"></i>
-                        {errors.username}
-                      </p>
-                    )}
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <i className="bi bi-envelope mr-1"></i>E-posta *
@@ -261,8 +306,122 @@ const RegisterPage = () => {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-white"
-                      placeholder="En az 6 karakter"
+                      placeholder="En az 8 karakter, büyük/küçük harf, sayı ve özel karakter"
                     />
+
+                    {/* Şifre Gereksinimleri Göstergesi */}
+                    {formData.password && (
+                      <div className="mt-3 p-3 bg-gray-50 rounded-lg border">
+                        <p className="text-xs font-medium text-gray-600 mb-2">
+                          Şifre Gereksinimleri:
+                        </p>
+                        <div className="space-y-1">
+                          <div
+                            className={`flex items-center text-xs ${
+                              passwordRequirements.length
+                                ? "text-green-600"
+                                : "text-gray-500"
+                            }`}
+                          >
+                            <i
+                              className={`mr-2 ${
+                                passwordRequirements.length
+                                  ? "bi bi-check-circle-fill"
+                                  : "bi bi-circle"
+                              }`}
+                            ></i>
+                            En az 8 karakter
+                          </div>
+                          <div
+                            className={`flex items-center text-xs ${
+                              passwordRequirements.uppercase
+                                ? "text-green-600"
+                                : "text-gray-500"
+                            }`}
+                          >
+                            <i
+                              className={`mr-2 ${
+                                passwordRequirements.uppercase
+                                  ? "bi bi-check-circle-fill"
+                                  : "bi bi-circle"
+                              }`}
+                            ></i>
+                            En az bir büyük harf (A-Z)
+                          </div>
+                          <div
+                            className={`flex items-center text-xs ${
+                              passwordRequirements.lowercase
+                                ? "text-green-600"
+                                : "text-gray-500"
+                            }`}
+                          >
+                            <i
+                              className={`mr-2 ${
+                                passwordRequirements.lowercase
+                                  ? "bi bi-check-circle-fill"
+                                  : "bi bi-circle"
+                              }`}
+                            ></i>
+                            En az bir küçük harf (a-z)
+                          </div>
+                          <div
+                            className={`flex items-center text-xs ${
+                              passwordRequirements.number
+                                ? "text-green-600"
+                                : "text-gray-500"
+                            }`}
+                          >
+                            <i
+                              className={`mr-2 ${
+                                passwordRequirements.number
+                                  ? "bi bi-check-circle-fill"
+                                  : "bi bi-circle"
+                              }`}
+                            ></i>
+                            En az bir sayı (0-9)
+                          </div>
+                          <div
+                            className={`flex items-center text-xs ${
+                              passwordRequirements.special
+                                ? "text-green-600"
+                                : "text-gray-500"
+                            }`}
+                          >
+                            <i
+                              className={`mr-2 ${
+                                passwordRequirements.special
+                                  ? "bi bi-check-circle-fill"
+                                  : "bi bi-circle"
+                              }`}
+                            ></i>
+                            En az bir özel karakter (!@#$%...)
+                          </div>
+                        </div>
+
+                        {/* Genel Durum */}
+                        <div className="mt-2 pt-2 border-t border-gray-200">
+                          {Object.values(passwordRequirements).every(
+                            (req) => req
+                          ) ? (
+                            <p className="text-xs text-green-600 font-medium flex items-center">
+                              <i className="bi bi-shield-check mr-1"></i>
+                              Şifre gereksinimlerini karşılıyor!
+                            </p>
+                          ) : (
+                            <p className="text-xs text-amber-600 flex items-center">
+                              <i className="bi bi-exclamation-triangle mr-1"></i>
+                              {
+                                Object.values(passwordRequirements).filter(
+                                  (req) => req
+                                ).length
+                              }
+                              /5 gereksinim karşılandı
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     {errors.password && (
                       <p className="text-red-500 text-sm mt-1 flex items-center">
                         <i className="bi bi-exclamation-circle mr-1"></i>
@@ -270,6 +429,13 @@ const RegisterPage = () => {
                       </p>
                     )}
                   </div>
+                </div>
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <p className="text-sm text-blue-700 flex items-center">
+                    <i className="bi bi-info-circle mr-2"></i>
+                    Kullanıcı adınız otomatik olarak ad.soyad formatında
+                    oluşturulacaktır.
+                  </p>
                 </div>
               </div>
 
@@ -310,7 +476,8 @@ const RegisterPage = () => {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200 bg-white"
-                      placeholder="05xx xxx xx xx"
+                      placeholder="05xxxxxxxxx"
+                      maxLength="11"
                     />
                     {errors.phone && (
                       <p className="text-red-500 text-sm mt-1 flex items-center">

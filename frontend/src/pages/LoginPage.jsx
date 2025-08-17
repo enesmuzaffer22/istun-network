@@ -69,8 +69,19 @@ const LoginPage = () => {
         }
         localStorage.setItem("user", JSON.stringify(user));
 
-        alert(message || "Giriş başarılı! Hoş geldiniz!");
+        // Login işlemini yap
         login(user, token);
+
+        // Kullanıcı status kontrolü yap
+        const statusCheck = await useAuthStore.getState().checkUserStatus();
+
+        if (!statusCheck.success) {
+          // Status uygun değilse hata mesajı göster ve çıkış yap
+          alert(statusCheck.message);
+          return; // Login işlemini durdur
+        }
+
+        alert(message || "Giriş başarılı! Hoş geldiniz!");
         navigate("/kariyer");
       }
     } catch (err) {
@@ -88,6 +99,24 @@ const LoginPage = () => {
           case 401:
             alert("Yanlış kullanıcı adı veya şifre.");
             break;
+          case 403: {
+            // Kullanıcı hesabı onaylanmamış veya reddedilmiş
+            const errorMessage = err.response.data?.message;
+            if (errorMessage && errorMessage.includes("pending")) {
+              alert(
+                "Hesabınız henüz onaylanmamış. Öğrenciliğiniz doğrulandıktan sonra giriş yapabileceksiniz. Sizi bilgilendireceğiz."
+              );
+            } else if (errorMessage && errorMessage.includes("rejected")) {
+              alert(
+                "Hesabınız reddedilmiş. Lütfen yönetici ile iletişime geçin."
+              );
+            } else {
+              alert(
+                "Hesabınız henüz onaylanmamış veya erişim yetkiniz bulunmuyor. Lütfen hesap durumunuzu kontrol edin."
+              );
+            }
+            break;
+          }
           case 404:
             alert("Kullanıcı bulunamadı.");
             break;
