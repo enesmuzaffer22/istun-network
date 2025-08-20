@@ -33,7 +33,7 @@ function RoadmapsPage() {
         }
       } catch (err) {
         if (!isCancelled) {
-          console.error("Yol haritaları çekilirken hata:", err);
+          console.error("Kariyer Rotaları çekilirken hata:", err);
           setError("Veriler yüklenirken bir sorun oluştu.");
         }
       } finally {
@@ -91,7 +91,7 @@ function RoadmapsPage() {
         ref={titleRef}
         className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary"
       >
-        Yol Haritaları
+        Kariyer Rotaları
       </h1>
       <div
         ref={cardsContainerRef}

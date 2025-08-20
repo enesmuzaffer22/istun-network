@@ -31,8 +31,8 @@ function Navbar() {
   const getNavLinkClass = (path) => {
     const isActive = location.pathname === path;
     return isActive
-      ? "text-primary font-bold transition-colors"
-      : "text-gray-500 hover:text-primary transition-colors";
+      ? "text-primary font-bold transition-colors relative after:content-[''] after:absolute after:bottom-[-8px] after:left-0 after:w-full after:h-0.5 after:bg-primary after:transition-all after:duration-300"
+      : "text-gray-500 hover:text-primary transition-colors relative after:content-[''] after:absolute after:bottom-[-8px] after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full";
   };
 
   const getMobileNavLinkClass = (path) => {
@@ -155,7 +155,7 @@ function Navbar() {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className={navPrimaryButtonStyles}
+                  className={`${navPrimaryButtonStyles} cursor-pointer`}
                 >
                   Çıkış Yap
                 </button>
@@ -350,7 +350,7 @@ function Navbar() {
                         handleLogout();
                         toggleMenu();
                       }}
-                      className={`${mobileNavButtonStyles} text-center`}
+                      className={`${mobileNavButtonStyles} text-center cursor-pointer`}
                     >
                       Çıkış Yap
                     </button>
