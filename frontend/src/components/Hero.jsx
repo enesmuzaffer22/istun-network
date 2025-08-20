@@ -1,26 +1,34 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import HeroCard from "./HeroCard";
-import career from "../assets/img/career.jpg";
-import graduate from "../assets/img/graduate.jpg";
-import speaking from "../assets/img/speaking.jpg";
+import heroVideo from "../assets/video/hero_video.mp4";
+
+// Navbar yüksekliği (border dahil) - yaklaşık 80px
+const NAVBAR_HEIGHT = 80;
 
 const heroPrimaryButtonStyles =
-  "bg-primary text-white px-8 py-3 rounded-full hover:bg-primary/90 transition-colors cursor-pointer md:w-auto w-full";
+  "bg-white text-black px-8 py-3 rounded-full hover:bg-white/90 transition-colors cursor-pointer md:w-auto w-full font-medium flex items-center justify-center gap-2";
 const heroSecondaryButtonStyles =
-  "bg-white text-primary px-8 py-3 rounded-full border border-primary hover:bg-primary hover:text-white transition-colors cursor-pointer md:w-auto w-full";
+  "bg-transparent text-white px-8 py-3 rounded-full border border-white hover:bg-white/10 transition-colors cursor-pointer md:w-auto w-full font-medium";
 
 function Hero() {
   const heroRef = useRef(null);
   const contentRef = useRef(null);
-  const cardsRef = useRef(null);
+  const videoRef = useRef(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const scrollToContent = () => {
+    window.scrollTo({
+      top: window.innerHeight - NAVBAR_HEIGHT,
+      behavior: "smooth",
+    });
+  };
 
   useEffect(() => {
     const ctx = gsap.context(() => {
       // Timeline oluştur
       const tl = gsap.timeline();
 
-      // Hero content container animasyonu
+      // Hero content animasyonu
       tl.fromTo(
         contentRef.current,
         {
@@ -30,28 +38,9 @@ function Hero() {
         {
           opacity: 1,
           y: 0,
-          duration: 0.6,
+          duration: 1,
           ease: "power3.out",
         }
-      );
-
-      // Kartlar animasyonu
-      tl.fromTo(
-        cardsRef.current.children,
-        {
-          opacity: 0,
-          y: 60,
-          scale: 0.9,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.6,
-          ease: "power3.out",
-          stagger: 0.2,
-        },
-        "-=0.3"
       );
     }, heroRef);
 
@@ -61,47 +50,97 @@ function Hero() {
   return (
     <div
       ref={heroRef}
-      className="px-4 2xl:px-[120px] pt-8 md:pt-[120px] w-full flex justify-center flex-col gap-12 md:gap-[90px]"
+      className="relative w-full overflow-hidden"
+      style={{ height: `calc(100vh - ${NAVBAR_HEIGHT}px)` }}
     >
+      {/* Video Background */}
+      <video
+        ref={videoRef}
+        className="absolute inset-0 w-full h-full object-cover"
+        autoPlay
+        muted
+        loop
+        playsInline
+      >
+        <source src={heroVideo} type="video/mp4" />
+      </video>
+
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-black/50"></div>
+
+      {/* Content Container */}
       <div
         ref={contentRef}
-        className="hero-content-container flex flex-col gap-6 justify-center items-center w-full"
+        className="relative z-10 h-full px-4 2xl:px-[120px] flex flex-col justify-between py-8 md:py-12"
       >
-        <div className="hero-content-text-container justify-center items-center flex flex-col gap-4 md:gap-6">
-          <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center xl:w-3/4">
-            İş fırsatları, staj imkanları ve kariyer rehberliği tek platformda.
-            Geleceğine bugünden başla.
-          </h2>
-          <p className="text-center text-sm sm:text-base md:text-xl text-gray-500 md:w-4/5">
-            Öğrenci topluluğumuzda güncel iş ilanları, staj fırsatları ve
-            kariyer rotaları keşfet. Deneyimli profesyonellerden rehberlik al,
-            forumlarımızda sorularını sor ve kariyerinde bir adım öne geç.
-          </p>
+        {/* Top Left - Paragraph */}
+        <div className="w-full md:w-1/2 lg:w-2/5">
+          <div
+            className="relative overflow-hidden cursor-pointer"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <p
+              className={`text-white text-lg md:text-xl leading-relaxed transition-all duration-500 ease-in-out transform ${
+                isHovered
+                  ? "opacity-0 -translate-y-4"
+                  : "opacity-100 translate-y-0"
+              }`}
+            >
+              Burada birlikte büyüyor, birlikte öğreniyor ve mezuniyet sonrası
+              da bağlarımızı koparmadan kariyer yolculuğumuza devam ediyoruz.
+            </p>
+            <p
+              className={`text-white text-lg md:text-xl leading-relaxed absolute top-0 left-0 w-full transition-all duration-500 ease-in-out transform ${
+                isHovered
+                  ? "opacity-100 translate-y-0"
+                  : "opacity-0 translate-y-4"
+              }`}
+            >
+              İş ve staj fırsatlarından mentorluk desteğine, sosyal sorumluluk
+              projelerinden kişisel gelişim etkinliklerine kadar birçok
+              ayrıcalık bizi bir araya getiriyor.
+            </p>
+          </div>
         </div>
-        <div className="hero-buttons-container flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-          <button className={heroPrimaryButtonStyles}>Keşfetmeye Başla!</button>
-          <button className={heroSecondaryButtonStyles}>Hakkımızda</button>
+
+        {/* Bottom Content */}
+        <div className="flex flex-col md:flex-row justify-between items-end gap-8">
+          {/* Bottom Left - Title */}
+          <div className="w-full md:w-1/2 lg:w-3/5">
+            <h1 className="text-white font-bold text-left leading-tight text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[72px]">
+              Aynı yoldan geçenlerin,
+              <br />
+              aynı çatı altında buluşmaya
+              <br />
+              devam ettiği adres…
+            </h1>
+          </div>
+
+          {/* Bottom Right - Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+            <button
+              className={heroPrimaryButtonStyles}
+              onClick={scrollToContent}
+            >
+              Keşfetmeye Başla!
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                />
+              </svg>
+            </button>
+            <button className={heroSecondaryButtonStyles}>Hakkımızda</button>
+          </div>
         </div>
-      </div>
-      <div
-        ref={cardsRef}
-        className="hero-cards-container flex w-full gap-4 flex-col md:flex-row"
-      >
-        <HeroCard
-          image={graduate}
-          title="Küresel Network"
-          description="Mezunlarımızı bir araya getirerek küresel çapta bağlantılar kurmayı hedefliyoruz."
-        />
-        <HeroCard
-          image={career}
-          title="Kariyer Fırsatları"
-          description="Topluluğumuz, iş ve staj fırsatlarına erişim sağlayarak kariyerinizde size rehberlik eder."
-        />
-        <HeroCard
-          image={speaking}
-          title="Kişisel Gelişim"
-          description="Seminerler, atölyeler ve mentorluk programlarıyla sürekli gelişim fırsatları sunuyoruz."
-        />
       </div>
     </div>
   );
