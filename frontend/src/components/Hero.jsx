@@ -109,10 +109,11 @@ function Hero() {
           {/* Bottom Left - Title */}
           <div className="w-full lg:w-1/2 xl:w-3/5">
             <h1 className="text-white font-bold text-left leading-tight text-3xl sm:text-4xl lg:text-5xl xl:text-6xl 2xl:text-[72px]">
-              Aynı yoldan geçenlerin,
-              <br />
-              aynı çatı altında buluşmaya
-              <br />
+              <span className="font-extralight italic">
+                Aynı yoldan geçenlerin,
+              </span>{" "}
+              <br className="lg:block hidden" />
+              aynı çatı altında buluşmaya <br className="lg:block hidden" />
               devam ettiği adres…
             </h1>
           </div>
