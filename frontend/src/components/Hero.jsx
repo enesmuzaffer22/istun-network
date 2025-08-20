@@ -6,9 +6,9 @@ import heroVideo from "../assets/video/hero_video.mp4";
 const NAVBAR_HEIGHT = 80;
 
 const heroPrimaryButtonStyles =
-  "bg-white text-black px-8 py-3 rounded-full hover:bg-white/90 transition-colors cursor-pointer md:w-auto w-full font-medium flex items-center justify-center gap-2";
+  "bg-white text-black px-8 py-3 rounded-full hover:bg-white/90 transition-colors cursor-pointer lg:w-auto w-full font-medium flex items-center justify-center gap-2";
 const heroSecondaryButtonStyles =
-  "bg-transparent text-white px-8 py-3 rounded-full border border-white hover:bg-white/10 transition-colors cursor-pointer md:w-auto w-full font-medium";
+  "bg-transparent text-white px-8 py-3 rounded-full border border-white hover:bg-white/10 transition-colors cursor-pointer lg:w-auto w-full font-medium";
 
 function Hero() {
   const heroRef = useRef(null);
@@ -71,17 +71,17 @@ function Hero() {
       {/* Content Container */}
       <div
         ref={contentRef}
-        className="relative z-10 h-full px-4 2xl:px-[120px] flex flex-col justify-between py-8 md:py-12"
+        className="relative z-10 h-full px-4 2xl:px-[120px] flex flex-col justify-between py-8 lg:py-12"
       >
         {/* Top Left - Paragraph */}
-        <div className="w-full md:w-1/2 lg:w-2/5">
+        <div className="w-full lg:w-1/2 xl:w-2/5">
           <div
             className="relative overflow-hidden cursor-pointer"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
             <p
-              className={`text-white text-lg md:text-xl leading-relaxed transition-all duration-500 ease-in-out transform ${
+              className={`text-white text-lg lg:text-xl leading-relaxed transition-all duration-500 ease-in-out transform ${
                 isHovered
                   ? "opacity-0 -translate-y-4"
                   : "opacity-100 translate-y-0"
@@ -91,7 +91,7 @@ function Hero() {
               da bağlarımızı koparmadan kariyer yolculuğumuza devam ediyoruz.
             </p>
             <p
-              className={`text-white text-lg md:text-xl leading-relaxed absolute top-0 left-0 w-full transition-all duration-500 ease-in-out transform ${
+              className={`text-white text-lg lg:text-xl leading-relaxed absolute top-0 left-0 w-full transition-all duration-500 ease-in-out transform ${
                 isHovered
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-4"
@@ -105,10 +105,10 @@ function Hero() {
         </div>
 
         {/* Bottom Content */}
-        <div className="flex flex-col md:flex-row justify-between items-end gap-8">
+        <div className="flex flex-col lg:flex-row justify-between items-end gap-8">
           {/* Bottom Left - Title */}
-          <div className="w-full md:w-1/2 lg:w-3/5">
-            <h1 className="text-white font-bold text-left leading-tight text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[72px]">
+          <div className="w-full lg:w-1/2 xl:w-3/5">
+            <h1 className="text-white font-bold text-left leading-tight text-3xl sm:text-4xl lg:text-5xl xl:text-6xl 2xl:text-[72px]">
               Aynı yoldan geçenlerin,
               <br />
               aynı çatı altında buluşmaya
@@ -118,7 +118,7 @@ function Hero() {
           </div>
 
           {/* Bottom Right - Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
             <button
               className={heroPrimaryButtonStyles}
               onClick={scrollToContent}
