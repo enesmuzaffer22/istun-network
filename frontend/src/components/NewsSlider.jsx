@@ -6,6 +6,18 @@ import API from "../utils/axios";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Tarih formatlama fonksiyonu
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "Europe/Istanbul",
+  };
+  return date.toLocaleDateString("tr-TR", options);
+};
+
 function NewsSlider() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [newsData, setNewsData] = useState([]);
@@ -243,9 +255,15 @@ function NewsSlider() {
                   <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
                     {newsItem.title}
                   </h3>
-                  <p className="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto line-clamp-3 leading-relaxed">
+                  <p className="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto line-clamp-3 leading-relaxed mb-4">
                     {newsItem.content}
                   </p>
+                  {newsItem.created_at && (
+                    <div className="flex items-center justify-center gap-2 text-gray-300 text-sm md:text-base mb-6">
+                      <i className="bi bi-calendar3"></i>
+                      <span>{formatDate(newsItem.created_at)}</span>
+                    </div>
+                  )}
                   <button className="mt-6 bg-primary hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
                     Devamını Oku
                   </button>
