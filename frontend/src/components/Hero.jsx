@@ -2,9 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import heroVideo from "../assets/video/hero_video.mp4";
 
-// Navbar yüksekliği (border dahil) - yaklaşık 80px
-const NAVBAR_HEIGHT = 80;
-
 const heroPrimaryButtonStyles =
   "bg-white text-black px-8 py-3 rounded-full hover:bg-white/90 transition-colors cursor-pointer lg:w-auto w-full font-medium flex items-center justify-center gap-2";
 const heroSecondaryButtonStyles =
@@ -18,7 +15,7 @@ function Hero() {
 
   const scrollToContent = () => {
     window.scrollTo({
-      top: window.innerHeight - NAVBAR_HEIGHT,
+      top: window.innerHeight,
       behavior: "smooth",
     });
   };
@@ -48,11 +45,7 @@ function Hero() {
   }, []);
 
   return (
-    <div
-      ref={heroRef}
-      className="relative w-full overflow-hidden"
-      style={{ height: `calc(100vh - ${NAVBAR_HEIGHT}px)` }}
-    >
+    <div ref={heroRef} className="relative w-full overflow-hidden h-screen">
       {/* Video Background */}
       <video
         ref={videoRef}
@@ -74,7 +67,7 @@ function Hero() {
         className="relative z-10 h-full px-4 2xl:px-[120px] flex flex-col justify-between py-8 lg:py-12"
       >
         {/* Top Left - Paragraph */}
-        <div className="w-full lg:w-1/2 xl:w-2/5">
+        <div className="w-full lg:w-1/2 xl:w-2/5 pt-20">
           <div
             className="relative overflow-hidden cursor-pointer"
             onMouseEnter={() => setIsHovered(true)}

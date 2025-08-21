@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 
@@ -10,6 +10,7 @@ const mobileNavButtonStyles =
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -28,11 +29,28 @@ function Navbar() {
     navigate("/");
   };
 
+  // Scroll event listener
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 50);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const getNavLinkClass = (path) => {
     const isActive = location.pathname === path;
+    const textColor = isScrolled ? "text-primary" : "text-white";
+    const textColorInactive = isScrolled
+      ? "text-gray-500 hover:text-primary"
+      : "text-white/80 hover:text-white";
+    const underlineColor = isScrolled ? "after:bg-primary" : "after:bg-white";
+
     return isActive
-      ? "text-primary font-bold transition-colors relative after:content-[''] after:absolute after:bottom-[-8px] after:left-0 after:w-full after:h-0.5 after:bg-primary after:transition-all after:duration-300"
-      : "text-gray-500 hover:text-primary transition-colors relative after:content-[''] after:absolute after:bottom-[-8px] after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full";
+      ? `${textColor} font-bold transition-colors relative after:content-[''] after:absolute after:bottom-[-8px] after:left-0 after:w-full after:h-0.5 ${underlineColor} after:transition-all after:duration-300`
+      : `${textColorInactive} transition-colors relative after:content-[''] after:absolute after:bottom-[-8px] after:left-0 after:w-0 after:h-0.5 ${underlineColor} after:transition-all after:duration-300 hover:after:w-full`;
   };
 
   const getMobileNavLinkClass = (path) => {
@@ -44,9 +62,19 @@ function Navbar() {
 
   return (
     <>
-      <div className="border-b border-gray-200 px-4 2xl:px-[120px] py-5 flex justify-between items-center relative">
+      <div
+        className={`fixed top-0 left-0 right-0 z-50 px-4 2xl:px-[120px] py-5 flex justify-between items-center transition-all duration-300 ${
+          isScrolled
+            ? "bg-white border-b border-gray-200 shadow-sm"
+            : "bg-transparent border-b border-white/20"
+        }`}
+      >
         <div className="logo">
-          <span className="md:text-2xl font-bold text-xl text-primary">
+          <span
+            className={`md:text-2xl font-bold text-xl transition-colors duration-300 ${
+              isScrolled ? "text-primary" : "text-white"
+            }`}
+          >
             ISTUNetwork
           </span>
         </div>
@@ -111,24 +139,7 @@ function Navbar() {
               </div>
             )}
           </div>
-          {/* Forumlar */}
-          <div className="relative">
-            <span
-              className={
-                getNavLinkClass("/forumlar") + " cursor-not-allowed opacity-50"
-              }
-              onMouseEnter={() => setShowTooltip("forumlar")}
-              onMouseLeave={() => setShowTooltip(null)}
-            >
-              Forumlar
-            </span>
-            {/* Tooltip */}
-            {showTooltip === "forumlar" && (
-              <div className="absolute left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-gray-800 text-white text-xs rounded shadow z-10 whitespace-nowrap">
-                Şu an geliştirilme aşamasında, çok yakında sizlerle
-              </div>
-            )}
-          </div>
+
           <div className="flex items-center gap-2">
             {!isAuthenticated ? (
               <>
@@ -171,19 +182,19 @@ function Navbar() {
           aria-label="Toggle menu"
         >
           <span
-            className={`block w-6 h-0.5 bg-gray-700 transition-transform duration-300 ${
-              isMenuOpen ? "rotate-45 translate-y-1.5" : ""
-            }`}
+            className={`block w-6 h-0.5 transition-all duration-300 ${
+              isScrolled ? "bg-primary" : "bg-white"
+            } ${isMenuOpen ? "rotate-45 translate-y-1.5" : ""}`}
           ></span>
           <span
-            className={`block w-6 h-0.5 bg-gray-700 transition-opacity duration-300 ${
-              isMenuOpen ? "opacity-0" : ""
-            }`}
+            className={`block w-6 h-0.5 transition-all duration-300 ${
+              isScrolled ? "bg-primary" : "bg-white"
+            } ${isMenuOpen ? "opacity-0" : ""}`}
           ></span>
           <span
-            className={`block w-6 h-0.5 bg-gray-700 transition-transform duration-300 ${
-              isMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
-            }`}
+            className={`block w-6 h-0.5 transition-all duration-300 ${
+              isScrolled ? "bg-primary" : "bg-white"
+            } ${isMenuOpen ? "-rotate-45 -translate-y-1.5" : ""}`}
           ></span>
         </button>
       </div>
@@ -281,25 +292,6 @@ function Navbar() {
                 {showTooltip === "yol-haritalari-mobil" && (
                   <div className="absolute left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-gray-800 text-white text-xs rounded shadow z-10 whitespace-nowrap">
                     Giriş yapmalısınız
-                  </div>
-                )}
-              </div>
-              {/* Forumlar */}
-              <div className="relative w-full flex justify-center">
-                <span
-                  className={
-                    getMobileNavLinkClass("/forumlar") +
-                    " cursor-not-allowed opacity-50"
-                  }
-                  onMouseEnter={() => setShowTooltip("forumlar-mobil")}
-                  onMouseLeave={() => setShowTooltip(null)}
-                >
-                  Forumlar
-                </span>
-                {/* Tooltip */}
-                {showTooltip === "forumlar-mobil" && (
-                  <div className="absolute left-1/2 -translate-x-1/2 mt-2 px-3 py-1 bg-gray-800 text-white text-xs rounded shadow z-10 whitespace-nowrap">
-                    Şu an geliştirilme aşamasında, çok yakında sizlerle
                   </div>
                 )}
               </div>
