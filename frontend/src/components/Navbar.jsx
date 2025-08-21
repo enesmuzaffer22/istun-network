@@ -17,6 +17,9 @@ function Navbar() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
 
+  // Landing page tespiti
+  const isLandingPage = location.pathname === "/";
+
   // Tooltip için state
   const [showTooltip, setShowTooltip] = useState(null);
 
@@ -29,8 +32,13 @@ function Navbar() {
     navigate("/");
   };
 
-  // Scroll event listener
+  // Scroll event listener - sadece landing page'de
   useEffect(() => {
+    if (!isLandingPage) {
+      setIsScrolled(false);
+      return;
+    }
+
     const handleScroll = () => {
       const scrollTop = window.scrollY;
       setIsScrolled(scrollTop > 50);
@@ -38,15 +46,27 @@ function Navbar() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isLandingPage]);
 
   const getNavLinkClass = (path) => {
     const isActive = location.pathname === path;
-    const textColor = isScrolled ? "text-primary" : "text-white";
-    const textColorInactive = isScrolled
-      ? "text-gray-500 hover:text-primary"
-      : "text-white/80 hover:text-white";
-    const underlineColor = isScrolled ? "after:bg-primary" : "after:bg-white";
+
+    // Landing page'de scroll durumuna göre, diğer sayfalarda her zaman normal renkler
+    const textColor = isLandingPage
+      ? isScrolled
+        ? "text-primary"
+        : "text-white"
+      : "text-primary";
+    const textColorInactive = isLandingPage
+      ? isScrolled
+        ? "text-gray-500 hover:text-primary"
+        : "text-white/80 hover:text-white"
+      : "text-gray-500 hover:text-primary";
+    const underlineColor = isLandingPage
+      ? isScrolled
+        ? "after:bg-primary"
+        : "after:bg-white"
+      : "after:bg-primary";
 
     return isActive
       ? `${textColor} font-bold transition-colors relative after:content-[''] after:absolute after:bottom-[-8px] after:left-0 after:w-full after:h-0.5 ${underlineColor} after:transition-all after:duration-300`
@@ -64,15 +84,21 @@ function Navbar() {
     <>
       <div
         className={`fixed top-0 left-0 right-0 z-50 px-4 2xl:px-[120px] py-5 flex justify-between items-center transition-all duration-300 ${
-          isScrolled
-            ? "bg-white border-b border-gray-200 shadow-sm"
-            : "bg-transparent border-b border-white/20"
+          isLandingPage
+            ? isScrolled
+              ? "bg-white border-b border-gray-200 shadow-sm"
+              : "bg-transparent border-b border-white/20"
+            : "bg-white border-b border-gray-200 shadow-sm"
         }`}
       >
         <div className="logo">
           <span
             className={`md:text-2xl font-bold text-xl transition-colors duration-300 ${
-              isScrolled ? "text-primary" : "text-white"
+              isLandingPage
+                ? isScrolled
+                  ? "text-primary"
+                  : "text-white"
+                : "text-primary"
             }`}
           >
             ISTUNetwork
@@ -183,17 +209,29 @@ function Navbar() {
         >
           <span
             className={`block w-6 h-0.5 transition-all duration-300 ${
-              isScrolled ? "bg-primary" : "bg-white"
+              isLandingPage
+                ? isScrolled
+                  ? "bg-primary"
+                  : "bg-white"
+                : "bg-primary"
             } ${isMenuOpen ? "rotate-45 translate-y-1.5" : ""}`}
           ></span>
           <span
             className={`block w-6 h-0.5 transition-all duration-300 ${
-              isScrolled ? "bg-primary" : "bg-white"
+              isLandingPage
+                ? isScrolled
+                  ? "bg-primary"
+                  : "bg-white"
+                : "bg-primary"
             } ${isMenuOpen ? "opacity-0" : ""}`}
           ></span>
           <span
             className={`block w-6 h-0.5 transition-all duration-300 ${
-              isScrolled ? "bg-primary" : "bg-white"
+              isLandingPage
+                ? isScrolled
+                  ? "bg-primary"
+                  : "bg-white"
+                : "bg-primary"
             } ${isMenuOpen ? "-rotate-45 -translate-y-1.5" : ""}`}
           ></span>
         </button>
