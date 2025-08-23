@@ -4,6 +4,10 @@ import NewsPage from "../pages/NewsPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import ProfilePage from "../pages/ProfilePage";
+import AboutUsPage from "../pages/AboutUsPage";
+import SocialImpactPage from "../pages/SocialImpactPage";
+import BridgeProjectsPage from "../pages/BridgeProjectsPage";
+import AchievementsPage from "../pages/AchievementsPage";
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
 import NewsDetailPage from "../pages/NewsDetailPage";
@@ -80,5 +84,21 @@ export const RouteList = [
         <ProfilePage />
       </PrivateRoute>
     ),
+  },
+  {
+    path: "/hakkimizda",
+    element: <AboutUsPage />,
+  },
+  {
+    path: "/sosyal-etki",
+    element: <SocialImpactPage />,
+  },
+  {
+    path: "/kopru-projeleri",
+    element: <BridgeProjectsPage />,
+  },
+  {
+    path: "/basarilarimiz",
+    element: <AchievementsPage />,
   },
 ];

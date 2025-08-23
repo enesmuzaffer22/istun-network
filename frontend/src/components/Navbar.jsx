@@ -11,6 +11,7 @@ const mobileNavButtonStyles =
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isAboutDropdownOpen, setIsAboutDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -49,7 +50,15 @@ function Navbar() {
   }, [isLandingPage]);
 
   const getNavLinkClass = (path) => {
-    const isActive = location.pathname === path;
+    const isActive =
+      location.pathname === path ||
+      (path === "/hakkimizda" &&
+        [
+          "/hakkimizda",
+          "/sosyal-etki",
+          "/kopru-projeleri",
+          "/basarilarimiz",
+        ].includes(location.pathname));
 
     // Landing page'de scroll durumuna göre, diğer sayfalarda her zaman normal renkler
     const textColor = isLandingPage
@@ -74,7 +83,15 @@ function Navbar() {
   };
 
   const getMobileNavLinkClass = (path) => {
-    const isActive = location.pathname === path;
+    const isActive =
+      location.pathname === path ||
+      (path === "/hakkimizda" &&
+        [
+          "/hakkimizda",
+          "/sosyal-etki",
+          "/kopru-projeleri",
+          "/basarilarimiz",
+        ].includes(location.pathname));
     return isActive
       ? "text-white font-bold text-lg transition-colors"
       : "text-white text-lg font-medium hover:text-gray-200 transition-colors";
@@ -113,6 +130,54 @@ function Navbar() {
           <Link to="/haberler" className={getNavLinkClass("/haberler")}>
             Haberler
           </Link>
+          {/* Hakkımızda Dropdown */}
+          <div
+            className="relative"
+            onMouseEnter={() => setIsAboutDropdownOpen(true)}
+            onMouseLeave={() => setIsAboutDropdownOpen(false)}
+          >
+            <div
+              className={`${getNavLinkClass(
+                "/hakkimizda"
+              )} cursor-pointer flex items-center gap-1`}
+            >
+              Hakkımızda
+              <i
+                className={`bi bi-chevron-down text-sm transition-transform ${
+                  isAboutDropdownOpen ? "rotate-180" : ""
+                }`}
+              ></i>
+            </div>
+            {/* Dropdown Menu */}
+            {isAboutDropdownOpen && (
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
+                <Link
+                  to="/hakkimizda"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                >
+                  Hakkımızda
+                </Link>
+                <Link
+                  to="/sosyal-etki"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                >
+                  Sosyal Etki
+                </Link>
+                <Link
+                  to="/kopru-projeleri"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                >
+                  Köprü Projeleri
+                </Link>
+                <Link
+                  to="/basarilarimiz"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                >
+                  Başarılarımız
+                </Link>
+              </div>
+            )}
+          </div>
           {/* İş-Staj İlanları */}
           <div className="relative">
             {!isAuthenticated ? (
@@ -275,6 +340,55 @@ function Navbar() {
               >
                 Haberler
               </Link>
+              {/* Hakkımızda Mobile Dropdown */}
+              <div className="flex flex-col items-center gap-4">
+                <div
+                  className={`${getMobileNavLinkClass(
+                    "/hakkimizda"
+                  )} cursor-pointer flex items-center gap-2`}
+                  onClick={() => setIsAboutDropdownOpen(!isAboutDropdownOpen)}
+                >
+                  Hakkımızda
+                  <i
+                    className={`bi bi-chevron-down text-sm transition-transform ${
+                      isAboutDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  ></i>
+                </div>
+                {/* Mobile Dropdown Menu */}
+                {isAboutDropdownOpen && (
+                  <div className="flex flex-col gap-3 pl-4">
+                    <Link
+                      to="/hakkimizda"
+                      className="text-white/80 text-base hover:text-white transition-colors"
+                      onClick={toggleMenu}
+                    >
+                      • Hakkımızda
+                    </Link>
+                    <Link
+                      to="/sosyal-etki"
+                      className="text-white/80 text-base hover:text-white transition-colors"
+                      onClick={toggleMenu}
+                    >
+                      • Sosyal Etki
+                    </Link>
+                    <Link
+                      to="/kopru-projeleri"
+                      className="text-white/80 text-base hover:text-white transition-colors"
+                      onClick={toggleMenu}
+                    >
+                      • Köprü Projeleri
+                    </Link>
+                    <Link
+                      to="/basarilarimiz"
+                      className="text-white/80 text-base hover:text-white transition-colors"
+                      onClick={toggleMenu}
+                    >
+                      • Başarılarımız
+                    </Link>
+                  </div>
+                )}
+              </div>
               {/* İş-Staj İlanları */}
               <div className="relative w-full flex justify-center">
                 {!isAuthenticated ? (
