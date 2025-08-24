@@ -45,7 +45,10 @@ function Hero() {
   }, []);
 
   return (
-    <div ref={heroRef} className="relative w-full overflow-hidden h-screen">
+    <div
+      ref={heroRef}
+      className="relative w-full overflow-hidden h-screen bg-gradient-to-br from-red-600 via-red-700 to-red-900"
+    >
       {/* Video Background */}
       <video
         ref={videoRef}
