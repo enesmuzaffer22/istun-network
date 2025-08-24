@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 
@@ -18,6 +18,9 @@ function Navbar() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
 
+  // Dropdown delay için timeout ref
+  const dropdownTimeoutRef = useRef(null);
+
   // Landing page tespiti
   const isLandingPage = location.pathname === "/";
 
@@ -32,6 +35,32 @@ function Navbar() {
     logout();
     navigate("/");
   };
+
+  // Dropdown hover handlers
+  const handleDropdownEnter = () => {
+    // Clear any existing timeout
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+      dropdownTimeoutRef.current = null;
+    }
+    setIsAboutDropdownOpen(true);
+  };
+
+  const handleDropdownLeave = () => {
+    // Set timeout to close dropdown after 500ms
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setIsAboutDropdownOpen(false);
+    }, 300);
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (dropdownTimeoutRef.current) {
+        clearTimeout(dropdownTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Scroll event listener - sadece landing page'de
   useEffect(() => {
@@ -133,8 +162,8 @@ function Navbar() {
           {/* Hakkımızda Dropdown */}
           <div
             className="relative"
-            onMouseEnter={() => setIsAboutDropdownOpen(true)}
-            onMouseLeave={() => setIsAboutDropdownOpen(false)}
+            onMouseEnter={handleDropdownEnter}
+            onMouseLeave={handleDropdownLeave}
           >
             <div
               className={`${getNavLinkClass(
