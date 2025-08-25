@@ -92,7 +92,7 @@ function AboutUsSection() {
   return (
     <div
       ref={sectionRef}
-      className="bg-gray-50 flex gap-8 xl:gap-24 py-12 md:py-[90px] justify-between px-4 2xl:px-[120px] xl:flex-row flex-col"
+      className="bg-white flex gap-8 xl:gap-24 py-12 md:py-[90px] justify-between px-4 2xl:px-[120px] xl:flex-row flex-col"
     >
       <div className="about-us-content-container flex-2/5 flex flex-col gap-8">
         <h3

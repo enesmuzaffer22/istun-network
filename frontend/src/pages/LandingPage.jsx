@@ -6,6 +6,8 @@ import AboutUsSection from "../components/AboutUsSection";
 import Footer from "../components/Footer";
 import JobSection from "../components/JobSection";
 import NewsSlider from "../components/NewsSlider";
+import AnnouncementsSection from "../components/AnnouncementsSection";
+import EventsSection from "../components/EventsSection";
 
 function LandingPage() {
   return (
@@ -13,6 +15,8 @@ function LandingPage() {
       <Hero />
       <HeroCards />
       <NewsSlider />
+      <EventsSection />
+      <AnnouncementsSection />
       <JobSection />
       <AboutUsSection />
     </div>

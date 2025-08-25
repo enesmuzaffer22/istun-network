@@ -1,6 +1,10 @@
 import JobsPage from "../pages/JobsPage";
 import LandingPage from "../pages/LandingPage";
 import NewsPage from "../pages/NewsPage";
+import AnnouncementsPage from "../pages/AnnouncementsPage";
+import AnnouncementDetailPage from "../pages/AnnouncementDetailPage";
+import EventsPage from "../pages/EventsPage";
+import EventDetailPage from "../pages/EventDetailPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import ProfilePage from "../pages/ProfilePage";
@@ -76,6 +80,22 @@ export const RouteList = [
   {
     path: "/haberler/:id",
     element: <NewsDetailPage />,
+  },
+  {
+    path: "/duyurular",
+    element: <AnnouncementsPage />,
+  },
+  {
+    path: "/duyurular/:id",
+    element: <AnnouncementDetailPage />,
+  },
+  {
+    path: "/etkinlikler",
+    element: <EventsPage />,
+  },
+  {
+    path: "/etkinlikler/:id",
+    element: <EventDetailPage />,
   },
   {
     path: "/profil",

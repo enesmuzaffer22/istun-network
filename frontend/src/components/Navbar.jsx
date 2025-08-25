@@ -12,6 +12,7 @@ function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isAboutDropdownOpen, setIsAboutDropdownOpen] = useState(false);
+  const [isNewsDropdownOpen, setIsNewsDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -20,6 +21,7 @@ function Navbar() {
 
   // Dropdown delay için timeout ref
   const dropdownTimeoutRef = useRef(null);
+  const newsDropdownTimeoutRef = useRef(null);
 
   // Landing page tespiti
   const isLandingPage = location.pathname === "/";
@@ -50,7 +52,22 @@ function Navbar() {
     // Set timeout to close dropdown after 500ms
     dropdownTimeoutRef.current = setTimeout(() => {
       setIsAboutDropdownOpen(false);
-    }, 300);
+    }, 100);
+  };
+
+  // News dropdown hover handlers
+  const handleNewsDropdownEnter = () => {
+    if (newsDropdownTimeoutRef.current) {
+      clearTimeout(newsDropdownTimeoutRef.current);
+      newsDropdownTimeoutRef.current = null;
+    }
+    setIsNewsDropdownOpen(true);
+  };
+
+  const handleNewsDropdownLeave = () => {
+    newsDropdownTimeoutRef.current = setTimeout(() => {
+      setIsNewsDropdownOpen(false);
+    }, 100);
   };
 
   // Cleanup timeout on unmount
@@ -58,6 +75,9 @@ function Navbar() {
     return () => {
       if (dropdownTimeoutRef.current) {
         clearTimeout(dropdownTimeoutRef.current);
+      }
+      if (newsDropdownTimeoutRef.current) {
+        clearTimeout(newsDropdownTimeoutRef.current);
       }
     };
   }, []);
@@ -87,7 +107,11 @@ function Navbar() {
           "/sosyal-etki",
           "/kopru-projeleri",
           "/basarilarimiz",
-        ].includes(location.pathname));
+        ].includes(location.pathname)) ||
+      (path === "/haberler" &&
+        ["/haberler", "/duyurular", "/etkinlikler"].includes(
+          location.pathname
+        ));
 
     // Landing page'de scroll durumuna göre, diğer sayfalarda her zaman normal renkler
     const textColor = isLandingPage
@@ -120,7 +144,11 @@ function Navbar() {
           "/sosyal-etki",
           "/kopru-projeleri",
           "/basarilarimiz",
-        ].includes(location.pathname));
+        ].includes(location.pathname)) ||
+      (path === "/haberler" &&
+        ["/haberler", "/duyurular", "/etkinlikler"].includes(
+          location.pathname
+        ));
     return isActive
       ? "text-white font-bold text-lg transition-colors"
       : "text-white text-lg font-medium hover:text-gray-200 transition-colors";
@@ -156,9 +184,48 @@ function Navbar() {
           <Link to="/" className={getNavLinkClass("/")}>
             Ana Sayfa
           </Link>
-          <Link to="/haberler" className={getNavLinkClass("/haberler")}>
-            Haberler
-          </Link>
+          {/* Haberler Dropdown */}
+          <div
+            className="relative"
+            onMouseEnter={handleNewsDropdownEnter}
+            onMouseLeave={handleNewsDropdownLeave}
+          >
+            <div
+              className={`${getNavLinkClass(
+                "/haberler"
+              )} cursor-pointer flex items-center gap-1`}
+            >
+              Haberler
+              <i
+                className={`bi bi-chevron-down text-sm transition-transform ${
+                  isNewsDropdownOpen ? "rotate-180" : ""
+                }`}
+              ></i>
+            </div>
+            {/* Dropdown Menu */}
+            {isNewsDropdownOpen && (
+              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 z-50">
+                <Link
+                  to="/haberler"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                >
+                  Haberler
+                </Link>
+                <Link
+                  to="/duyurular"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                >
+                  Duyurular
+                </Link>
+                <Link
+                  to="/etkinlikler"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                >
+                  Etkinlikler
+                </Link>
+              </div>
+            )}
+          </div>
           {/* Hakkımızda Dropdown */}
           <div
             className="relative"
@@ -362,13 +429,48 @@ function Navbar() {
               >
                 Ana Sayfa
               </Link>
-              <Link
-                to="/haberler"
-                className={getMobileNavLinkClass("/haberler")}
-                onClick={toggleMenu}
-              >
-                Haberler
-              </Link>
+              {/* Haberler Mobile Dropdown */}
+              <div className="flex flex-col items-center gap-4">
+                <div
+                  className={`${getMobileNavLinkClass(
+                    "/haberler"
+                  )} cursor-pointer flex items-center gap-2`}
+                  onClick={() => setIsNewsDropdownOpen(!isNewsDropdownOpen)}
+                >
+                  Haberler
+                  <i
+                    className={`bi bi-chevron-down text-sm transition-transform ${
+                      isNewsDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  ></i>
+                </div>
+                {/* Mobile Dropdown Menu */}
+                {isNewsDropdownOpen && (
+                  <div className="flex flex-col gap-3 pl-4">
+                    <Link
+                      to="/haberler"
+                      className="text-white/80 text-base hover:text-white transition-colors flex items-center gap-2"
+                      onClick={toggleMenu}
+                    >
+                      Haberler
+                    </Link>
+                    <Link
+                      to="/duyurular"
+                      className="text-white/80 text-base hover:text-white transition-colors flex items-center gap-2"
+                      onClick={toggleMenu}
+                    >
+                      Duyurular
+                    </Link>
+                    <Link
+                      to="/etkinlikler"
+                      className="text-white/80 text-base hover:text-white transition-colors flex items-center gap-2"
+                      onClick={toggleMenu}
+                    >
+                      Etkinlikler
+                    </Link>
+                  </div>
+                )}
+              </div>
               {/* Hakkımızda Mobile Dropdown */}
               <div className="flex flex-col items-center gap-4">
                 <div
@@ -392,28 +494,28 @@ function Navbar() {
                       className="text-white/80 text-base hover:text-white transition-colors"
                       onClick={toggleMenu}
                     >
-                      • Hakkımızda
+                      Hakkımızda
                     </Link>
                     <Link
                       to="/sosyal-etki"
                       className="text-white/80 text-base hover:text-white transition-colors"
                       onClick={toggleMenu}
                     >
-                      • Sosyal Etki
+                      Sosyal Etki
                     </Link>
                     <Link
                       to="/kopru-projeleri"
                       className="text-white/80 text-base hover:text-white transition-colors"
                       onClick={toggleMenu}
                     >
-                      • Köprü Projeleri
+                      Köprü Projeleri
                     </Link>
                     <Link
                       to="/basarilarimiz"
                       className="text-white/80 text-base hover:text-white transition-colors"
                       onClick={toggleMenu}
                     >
-                      • Başarılarımız
+                      Başarılarımız
                     </Link>
                   </div>
                 )}
