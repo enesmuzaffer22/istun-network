@@ -11,6 +11,7 @@ import ProfilePage from "../pages/ProfilePage";
 import AboutUsPage from "../pages/AboutUsPage";
 import SocialImpactPage from "../pages/SocialImpactPage";
 import BridgeProjectsPage from "../pages/BridgeProjectsPage";
+import ActivityDetailPage from "../pages/ActivityDetailPage";
 import AchievementsPage from "../pages/AchievementsPage";
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
@@ -114,8 +115,12 @@ export const RouteList = [
     element: <SocialImpactPage />,
   },
   {
-    path: "/kopru-projeleri",
+    path: "/birlikte-iz-birak",
     element: <BridgeProjectsPage />,
+  },
+  {
+    path: "/birlikte-iz-birak/etkinlik/:id",
+    element: <ActivityDetailPage />,
   },
   {
     path: "/basarilarimiz",

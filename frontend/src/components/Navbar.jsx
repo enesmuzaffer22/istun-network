@@ -105,7 +105,7 @@ function Navbar() {
         [
           "/hakkimizda",
           "/sosyal-etki",
-          "/kopru-projeleri",
+          "/birlikte-iz-birak",
           "/basarilarimiz",
         ].includes(location.pathname)) ||
       (path === "/haberler" &&
@@ -142,7 +142,7 @@ function Navbar() {
         [
           "/hakkimizda",
           "/sosyal-etki",
-          "/kopru-projeleri",
+          "/birlikte-iz-birak",
           "/basarilarimiz",
         ].includes(location.pathname)) ||
       (path === "/haberler" &&
@@ -260,10 +260,10 @@ function Navbar() {
                   Sosyal Etki
                 </Link>
                 <Link
-                  to="/kopru-projeleri"
+                  to="/birlikte-iz-birak"
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
                 >
-                  Köprü Projeleri
+                  Birlikte İz Bırak
                 </Link>
                 <Link
                   to="/basarilarimiz"
@@ -504,11 +504,11 @@ function Navbar() {
                       Sosyal Etki
                     </Link>
                     <Link
-                      to="/kopru-projeleri"
+                      to="/birlikte-iz-birak"
                       className="text-white/80 text-base hover:text-white transition-colors"
                       onClick={toggleMenu}
                     >
-                      Köprü Projeleri
+                      Birlikte İz Bırak
                     </Link>
                     <Link
                       to="/basarilarimiz"
