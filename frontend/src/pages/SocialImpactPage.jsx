@@ -94,9 +94,11 @@ function SocialImpactPage() {
           duration: 1,
           ease: "power3.out",
         }
-      )
-        // Score section animasyonu
-        .fromTo(
+      );
+
+      // Score section animasyonu (varsa)
+      if (scoreRef.current) {
+        tl.fromTo(
           scoreRef.current,
           {
             opacity: 0,
@@ -109,10 +111,14 @@ function SocialImpactPage() {
             ease: "back.out(1.7)",
           },
           "-=0.3"
-        )
-        // Projects section animasyonu
-        .fromTo(
-          projectsRef.current.children,
+        );
+      }
+
+      // Projects section animasyonu (varsa çocukları)
+      const projectChildren = projectsRef.current?.children;
+      if (projectChildren && projectChildren.length) {
+        tl.fromTo(
+          projectChildren,
           {
             opacity: 0,
             y: 30,
@@ -125,10 +131,14 @@ function SocialImpactPage() {
             ease: "power2.out",
           },
           "-=0.2"
-        )
-        // Impact section animasyonu
-        .fromTo(
-          impactRef.current.children,
+        );
+      }
+
+      // Impact section animasyonu (bölüm mevcutsa)
+      const impactChildren = impactRef.current?.children;
+      if (impactChildren && impactChildren.length) {
+        tl.fromTo(
+          impactChildren,
           {
             opacity: 0,
             x: -30,
@@ -142,6 +152,7 @@ function SocialImpactPage() {
           },
           "-=0.3"
         );
+      }
     }, pageRef);
 
     return () => ctx.revert();
