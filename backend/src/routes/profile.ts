@@ -11,6 +11,7 @@ import express from "express";
 import { db, auth, admin } from "../firebase/firebase";
 import { protect, isAdmin } from "../middleware/authMiddleware";
 import { cache } from "../utils/cache";
+import { sendUserApprovedEmail, sendUserRejectedEmail } from "../utils/emailService";
 
 const router = express.Router();
 
@@ -21,9 +22,8 @@ const cacheMiddleware = (key: string, ttl: number = 180) => {
     res: express.Response,
     next: express.NextFunction
   ) => {
-    const cacheKey = `${key}_${JSON.stringify(req.query)}_${
-      req.params.id || req.params.username || ""
-    }_${req.user?.uid || ""}`;
+    const cacheKey = `${key}_${JSON.stringify(req.query)}_${req.params.id || req.params.username || ""
+      }_${req.user?.uid || ""}`;
     const cachedData = cache.get(cacheKey);
 
     if (cachedData) {
@@ -185,7 +185,15 @@ router.put("/me", protect, async (req, res) => {
     }
 
     // Cache'i temizle - kullanıcının kendi profili güncellendiği için
-    cache.delete(`user_me_${userId}`);
+    // Cache key format: user_me_{query}_{params}_{userId}
+    cache.delete(`user_me_{}_${userId}`);
+
+    // Ayrıca public profile cache'ini de temizle (eğer username değişmediyse)
+    const userDocAfterUpdate = await db.collection("users").doc(userId).get();
+    const updatedUserData = userDocAfterUpdate.data();
+    if (updatedUserData?.username) {
+      cache.delete(`user_public_{}_${updatedUserData.username}_${userId}`);
+    }
 
     res.json({ message: "Profil başarıyla güncellendi." });
   } catch (error: any) {
@@ -443,9 +451,13 @@ router.post("/:id/approve", protect, isAdmin, async (req, res) => {
         .json({ message: "Onaylanacak kullanıcı bulunamadı." });
     }
 
+    const userData = userDoc.data();
+
     // Firestore'da kullanıcının statüsünü 'approved' olarak güncelle
     await userRef.update({
       status: "approved",
+      approvedAt: new Date(),
+      approvedBy: req.user?.uid
     });
 
     // Firebase Auth'da kullanıcıyı aktif hale getir (eğer 'disabled' ise)
@@ -454,10 +466,24 @@ router.post("/:id/approve", protect, isAdmin, async (req, res) => {
     });
 
     // Cache'i temizle - kullanıcı listesi değişti
-    cache.delete("users_list");
+    // Tüm users_list cache'lerini temizle (farklı query parametreleri için)
+    cache.clear(); // Geçici çözüm - tüm cache'i temizle
+
+    // Kullanıcıya onay emaili gönder
+    try {
+      await sendUserApprovedEmail(
+        userData?.email || "",
+        userData?.name || "Kullanıcı",
+        userData?.surname || ""
+      );
+      console.log(`Onay emaili gönderildi: ${userData?.email}`);
+    } catch (emailError) {
+      console.error("Email gönderim hatası:", emailError);
+      // Email hatası ana işlemi durdurmasın
+    }
 
     res.json({
-      message: "Kullanıcı başarıyla onaylandı ve hesabı aktifleştirildi.",
+      message: "Kullanıcı başarıyla onaylandı, hesabı aktifleştirildi ve email gönderildi.",
     });
   } catch (error: any) {
     res.status(500).json({ message: "Sunucu hatası: " + error.message });
@@ -513,6 +539,8 @@ router.post("/:id/reject", protect, isAdmin, async (req, res) => {
     const userId = req.params.id;
     const userRef = db.collection("users").doc(userId);
 
+    const { reason } = req.body;
+
     // Kullanıcının var olup olmadığını kontrol et
     const userDoc = await userRef.get();
     if (!userDoc.exists) {
@@ -521,9 +549,14 @@ router.post("/:id/reject", protect, isAdmin, async (req, res) => {
         .json({ message: "Reddedilecek kullanıcı bulunamadı." });
     }
 
+    const userData = userDoc.data();
+
     // Firestore'da kullanıcının statüsünü 'rejected' olarak güncelle
     await userRef.update({
       status: "rejected",
+      rejectedAt: new Date(),
+      rejectedBy: req.user?.uid,
+      rejectionReason: reason || "Belirtilmemiş"
     });
 
     // Firebase Auth'da kullanıcıyı devre dışı bırak
@@ -532,9 +565,24 @@ router.post("/:id/reject", protect, isAdmin, async (req, res) => {
     });
 
     // Cache'i temizle - kullanıcı listesi değişti
-    cache.delete("users_list");
+    // Tüm users_list cache'lerini temizle (farklı query parametreleri için)
+    cache.clear(); // Geçici çözüm - tüm cache'i temizle
 
-    res.json({ message: "Kullanıcı kaydı reddedildi." });
+    // Kullanıcıya red emaili gönder
+    try {
+      await sendUserRejectedEmail(
+        userData?.email || "",
+        userData?.name || "Kullanıcı",
+        userData?.surname || "",
+        reason
+      );
+      console.log(`Red emaili gönderildi: ${userData?.email}`);
+    } catch (emailError) {
+      console.error("Email gönderim hatası:", emailError);
+      // Email hatası ana işlemi durdurmasın
+    }
+
+    res.json({ message: "Kullanıcı kaydı reddedildi ve email gönderildi." });
   } catch (error: any) {
     res.status(500).json({ message: "Sunucu hatası: " + error.message });
   }

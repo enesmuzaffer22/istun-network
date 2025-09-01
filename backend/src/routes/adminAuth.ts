@@ -2,6 +2,7 @@ import express from "express";
 import axios from "axios";
 import { auth, db } from "../firebase/firebase";
 import { protect, isAdmin } from "../middleware/authMiddleware";
+import { sendUserApprovedEmail, sendUserRejectedEmail } from "../utils/emailService";
 
 const router = express.Router();
 
@@ -214,6 +215,8 @@ router.post("/approve-user/:userId", protect, isAdmin, async (req, res) => {
             return res.status(404).json({ message: "Kullanıcı bulunamadı." });
         }
 
+        const userData = userDoc.data();
+
         // Status'u approved olarak güncelle
         await db.collection("users").doc(userId).update({
             status: "approved",
@@ -221,7 +224,29 @@ router.post("/approve-user/:userId", protect, isAdmin, async (req, res) => {
             approvedBy: req.user?.uid
         });
 
-        res.json({ message: "Kullanıcı başarıyla onaylandı." });
+        // Firebase Auth'da kullanıcıyı aktif hale getir
+        try {
+            await auth.updateUser(userId, {
+                disabled: false,
+            });
+        } catch (authError) {
+            console.error("Firebase Auth güncelleme hatası:", authError);
+        }
+
+        // Kullanıcıya onay emaili gönder
+        try {
+            await sendUserApprovedEmail(
+                userData?.email || "",
+                userData?.name || "Kullanıcı",
+                userData?.surname || ""
+            );
+            console.log(`Onay emaili gönderildi: ${userData?.email}`);
+        } catch (emailError) {
+            console.error("Email gönderim hatası:", emailError);
+            // Email hatası ana işlemi durdurmasın
+        }
+
+        res.json({ message: "Kullanıcı başarıyla onaylandı ve email gönderildi." });
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
@@ -272,6 +297,8 @@ router.post("/reject-user/:userId", protect, isAdmin, async (req, res) => {
             return res.status(404).json({ message: "Kullanıcı bulunamadı." });
         }
 
+        const userData = userDoc.data();
+
         // Status'u rejected olarak güncelle
         await db.collection("users").doc(userId).update({
             status: "rejected",
@@ -280,7 +307,30 @@ router.post("/reject-user/:userId", protect, isAdmin, async (req, res) => {
             rejectionReason: reason || "Belirtilmemiş"
         });
 
-        res.json({ message: "Kullanıcı başarıyla reddedildi." });
+        // Firebase Auth'da kullanıcıyı devre dışı bırak
+        try {
+            await auth.updateUser(userId, {
+                disabled: true,
+            });
+        } catch (authError) {
+            console.error("Firebase Auth güncelleme hatası:", authError);
+        }
+
+        // Kullanıcıya red emaili gönder
+        try {
+            await sendUserRejectedEmail(
+                userData?.email || "",
+                userData?.name || "Kullanıcı",
+                userData?.surname || "",
+                reason
+            );
+            console.log(`Red emaili gönderildi: ${userData?.email}`);
+        } catch (emailError) {
+            console.error("Email gönderim hatası:", emailError);
+            // Email hatası ana işlemi durdurmasın
+        }
+
+        res.json({ message: "Kullanıcı başarıyla reddedildi ve email gönderildi." });
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }

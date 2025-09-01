@@ -278,15 +278,40 @@ router.post(
  *               $ref: '#/components/schemas/Error'
  */
 // GET http://localhost:5000/api/news
-// Haberleri listele
+// Haberleri listele (sayfalama ile - sayfa başına 12 öğe)
 router.get("/", async (req, res) => {
   try {
-    const snapshot = await db
-      .collection("news")
-      .orderBy("created_at", "desc")
-      .get();
-    const news = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    res.json(news);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = 12; // Sayfa başına 12 öğe
+    const offset = (page - 1) * limit;
+
+    // Base query
+    let baseQuery = db.collection("news").orderBy("created_at", "desc");
+
+    let query = baseQuery.limit(limit);
+
+    if (offset > 0) {
+      // Offset için startAfter kullan
+      const snapshot = await baseQuery.limit(offset).get();
+
+      if (!snapshot.empty) {
+        const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+        query = baseQuery.startAfter(lastDoc).limit(limit);
+      }
+    }
+
+    const snapshot = await query.get();
+    const news = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    res.json({
+      data: news,
+      page,
+      limit,
+      hasMore: news.length === limit,
+    });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }

@@ -134,15 +134,40 @@ router.post("/", protect, isAdmin, async (req, res) => {
  *               $ref: '#/components/schemas/Error'
  */
 // ---- TÜM İŞ İLANLARINI GETİRME (GET) ----
-// Bu rota veritabanından ne geliyorsa onu gönderir, bu yüzden zaten doğru çalışıyordu.
+// İş ilanlarını listele (sayfalama ile - sayfa başına 12 öğe)
 router.get("/", async (req, res) => {
   try {
-    const snapshot = await db
-      .collection("jobs")
-      .orderBy("created_at", "desc")
-      .get();
-    const jobs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    res.json(jobs);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = 12; // Sayfa başına 12 öğe
+    const offset = (page - 1) * limit;
+
+    // Base query
+    let baseQuery = db.collection("jobs").orderBy("created_at", "desc");
+
+    let query = baseQuery.limit(limit);
+
+    if (offset > 0) {
+      // Offset için startAfter kullan
+      const snapshot = await baseQuery.limit(offset).get();
+
+      if (!snapshot.empty) {
+        const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+        query = baseQuery.startAfter(lastDoc).limit(limit);
+      }
+    }
+
+    const snapshot = await query.get();
+    const jobs = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    res.json({
+      data: jobs,
+      page,
+      limit,
+      hasMore: jobs.length === limit,
+    });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }

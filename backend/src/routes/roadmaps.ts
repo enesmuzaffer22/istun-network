@@ -152,18 +152,40 @@ router.post("/", protect, isAdmin, upload.single("image"), async (req, res) => {
  *               $ref: '#/components/schemas/Error'
  */
 // GET http://localhost:5000/api/roadmaps
-// Yol haritalarını listele
+// Yol haritalarını listele (sayfalama ile - sayfa başına 9 öğe)
 router.get("/", async (req, res) => {
   try {
-    const snapshot = await db
-      .collection("roadmaps")
-      .orderBy("created_at", "desc")
-      .get();
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = 9; // Sayfa başına 9 öğe
+    const offset = (page - 1) * limit;
+
+    // Base query
+    let baseQuery = db.collection("roadmaps").orderBy("created_at", "desc");
+
+    let query = baseQuery.limit(limit);
+
+    if (offset > 0) {
+      // Offset için startAfter kullan
+      const snapshot = await baseQuery.limit(offset).get();
+
+      if (!snapshot.empty) {
+        const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+        query = baseQuery.startAfter(lastDoc).limit(limit);
+      }
+    }
+
+    const snapshot = await query.get();
     const roadmaps = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
-    res.json(roadmaps);
+
+    res.json({
+      data: roadmaps,
+      page,
+      limit,
+      hasMore: roadmaps.length === limit,
+    });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }

@@ -16,6 +16,11 @@ import jobsRoutes from "./routes/jobs";
 import roadmapsRoutes from "./routes/roadmaps";
 import profileRoutes from "./routes/profile";
 import adminAuthRoutes from "./routes/adminAuth";
+import announcementsRoutes from "./routes/announcements";
+import eventsRoutes from "./routes/events";
+import bridgeprojectsRoutes from "./routes/bridgeprojects";
+import bridgeprojectsimpactRoutes from "./routes/bridgeprojectsimpact";
+import achievementsRoutes from "./routes/achievements";
 
 dotenv.config();
 
@@ -61,6 +66,11 @@ app.get("/", (req, res) => {
       jobs: "/api/jobs",
       roadmaps: "/api/roadmaps",
       users: "/api/users",
+      announcements: "/api/announcements",
+      events: "/api/events",
+      bridgeprojects: "/api/bridgeprojects",
+      bridgeprojectsimpact: "/api/bridgeprojectsimpact",
+      achievements: "/api/achievements",
     },
   });
 });
@@ -83,6 +93,11 @@ app.use("/api/jobs", jobsRoutes);
 app.use("/api/roadmaps", roadmapsRoutes);
 app.use("/api/users", profileRoutes);
 app.use("/api/admin/auth", adminAuthRoutes);
+app.use("/api/announcements", announcementsRoutes);
+app.use("/api/events", eventsRoutes);
+app.use("/api/bridgeprojects", bridgeprojectsRoutes);
+app.use("/api/bridgeprojectsimpact", bridgeprojectsimpactRoutes);
+app.use("/api/achievements", achievementsRoutes);
 
 // Sunucu başlat
 app.listen(PORT, () => {
