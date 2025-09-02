@@ -133,17 +133,32 @@ router.post("/", protect, isAdmin, upload.single("image"), async (req, res) => {
  * @swagger
  * /api/roadmaps:
  *   get:
- *     summary: Tüm yol haritalarını getir
+ *     summary: Tüm yol haritalarını getir (sayfalama)
  *     tags: [Roadmaps]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Sayfa numarası (varsayılan 1)
  *     responses:
  *       200:
  *         description: Yol haritaları listesi
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Roadmap'
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Roadmap'
+ *                 page:
+ *                   type: integer
+ *                 limit:
+ *                   type: integer
+ *                 hasMore:
+ *                   type: boolean
  *       500:
  *         description: Sunucu hatası
  *         content:

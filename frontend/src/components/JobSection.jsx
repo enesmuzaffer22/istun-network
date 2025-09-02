@@ -29,8 +29,13 @@ function JobSection() {
     if (isAuthenticated) {
       const fetchJobs = async () => {
         try {
-          const response = await API.get("/jobs");
-          setJobListings(response.data.slice(0, 4));
+          const response = await API.get("/jobs", { params: { page: 1 } });
+          const list = Array.isArray(response.data)
+            ? response.data
+            : Array.isArray(response.data?.data)
+            ? response.data.data
+            : [];
+          setJobListings(list.slice(0, 3));
         } catch (error) {
           console.error("İş ilanları yüklenirken hata oluştu:", error);
         }

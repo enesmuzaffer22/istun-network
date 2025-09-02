@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
+import API from "../utils/axios";
 
 // Tarih formatlama fonksiyonu
 const formatDate = (dateString) => {
@@ -56,20 +57,20 @@ function EventDetailPage() {
       try {
         setLoading(true);
         setError(null);
-
-        // Test verilerinden etkinlik detayını al
-        const response = await fetch("/test/events.json");
-        const events = await response.json();
-        const eventDetail = events.find((e) => e.id === parseInt(id));
-
-        if (eventDetail) {
-          setEvent(eventDetail);
+        const response = await API.get(`/events/${id}`);
+        const detail = response?.data?.data ?? response?.data;
+        if (detail?.id) {
+          setEvent(detail);
         } else {
           setError("Etkinlik bulunamadı.");
         }
       } catch (error) {
         console.error("Etkinlik detayı çekilirken hata:", error);
-        setError("Etkinlik yüklenirken bir hata oluştu.");
+        if (error.response?.status === 404) {
+          setError("Etkinlik bulunamadı.");
+        } else {
+          setError("Etkinlik yüklenirken bir hata oluştu.");
+        }
       } finally {
         setLoading(false);
       }

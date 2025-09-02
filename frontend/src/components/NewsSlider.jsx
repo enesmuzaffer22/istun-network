@@ -38,11 +38,16 @@ function NewsSlider() {
     const fetchNews = async () => {
       try {
         setLoading(true);
-        const response = await API.get("/news");
+        const response = await API.get("/news", { params: { page: 1 } });
 
         if (!isCancelled) {
-          // İlk 5 haberi al
-          setNewsData(response.data.slice(0, 5));
+          // İlk 6 haberi al (landing slider için)
+          const list = Array.isArray(response.data)
+            ? response.data
+            : Array.isArray(response.data?.data)
+            ? response.data.data
+            : [];
+          setNewsData(list.slice(0, 6));
         }
       } catch (error) {
         if (!isCancelled) {

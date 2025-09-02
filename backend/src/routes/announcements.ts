@@ -6,106 +6,224 @@ import { protect, isAdmin } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
+/**
+ * @openapi
+ * /api/announcements:
+ *   post:
+ *     tags: [Announcements]
+ *     summary: Duyuru oluştur
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [title, content, created_at]
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *               created_at:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Oluşturuldu
+ *       400:
+ *         $ref: '#/components/schemas/Error'
+ *       500:
+ *         $ref: '#/components/schemas/Error'
+ */
 // POST http://localhost:5000/api/announcements
 // Duyuru oluştur
 router.post("/", protect, isAdmin, async (req, res) => {
-    try {
-        const { title, content, created_at, category } = req.body;
+  try {
+    const { title, content, created_at, category } = req.body;
 
-        // Zorunlu alanlar kontrolü
-        if (!title || !content || !created_at) {
-            return res
-                .status(400)
-                .json({ message: "Başlık, içerik ve tarih zorunlu." });
-        }
-
-        // Firestore'a duyuru kaydet
-        const docRef = await db.collection("announcements").add({
-            title,
-            content,
-            created_at,
-            category: category || "",
-        });
-
-        res.status(201).json({ id: docRef.id, message: "Duyuru eklendi." });
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
+    // Zorunlu alanlar kontrolü
+    if (!title || !content || !created_at) {
+      return res
+        .status(400)
+        .json({ message: "Başlık, içerik ve tarih zorunlu." });
     }
+
+    // Firestore'a duyuru kaydet
+    const docRef = await db.collection("announcements").add({
+      title,
+      content,
+      created_at,
+      category: category || "",
+    });
+
+    res.status(201).json({ id: docRef.id, message: "Duyuru eklendi." });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
+/**
+ * @openapi
+ * /api/announcements:
+ *   get:
+ *     tags: [Announcements]
+ *     summary: Duyuruları listele (sayfalama)
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Sayfa numarası (varsayılan 1)
+ *     responses:
+ *       200:
+ *         description: Liste
+ *       500:
+ *         $ref: '#/components/schemas/Error'
+ */
 // GET http://localhost:5000/api/announcements
 // Duyuruları listele (sayfalama ile - sayfa başına 9 öğe)
 router.get("/", async (req, res) => {
-    try {
-        const page = parseInt(req.query.page as string) || 1;
-        const limit = 9; // Sayfa başına 9 öğe
-        const offset = (page - 1) * limit;
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = 9; // Sayfa başına 9 öğe
+    const offset = (page - 1) * limit;
 
-        // Base query
-        let baseQuery = db.collection("announcements").orderBy("created_at", "desc");
+    // Base query
+    let baseQuery = db
+      .collection("announcements")
+      .orderBy("created_at", "desc");
 
-        let query = baseQuery.limit(limit);
+    let query = baseQuery.limit(limit);
 
-        if (offset > 0) {
-            // Offset için startAfter kullan
-            const snapshot = await baseQuery.limit(offset).get();
+    if (offset > 0) {
+      // Offset için startAfter kullan
+      const snapshot = await baseQuery.limit(offset).get();
 
-            if (!snapshot.empty) {
-                const lastDoc = snapshot.docs[snapshot.docs.length - 1];
-                query = baseQuery.startAfter(lastDoc).limit(limit);
-            }
-        }
-
-        const snapshot = await query.get();
-        const announcements = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data()
-        }));
-
-        res.json({
-            data: announcements,
-            page,
-            limit,
-            hasMore: announcements.length === limit,
-        });
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
+      if (!snapshot.empty) {
+        const lastDoc = snapshot.docs[snapshot.docs.length - 1];
+        query = baseQuery.startAfter(lastDoc).limit(limit);
+      }
     }
+
+    const snapshot = await query.get();
+    const announcements = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.json({
+      data: announcements,
+      page,
+      limit,
+      hasMore: announcements.length === limit,
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
+/**
+ * @openapi
+ * /api/announcements/{id}:
+ *   get:
+ *     tags: [Announcements]
+ *     summary: Duyuru detayı
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Detay
+ *       404:
+ *         $ref: '#/components/schemas/Error'
+ *       500:
+ *         $ref: '#/components/schemas/Error'
+ */
 // GET http://localhost:5000/api/announcements/{id}
 // Duyuru detayı (Tek duyuru, id'ye göre)
 router.get("/:id", async (req, res) => {
-    try {
-        const doc = await db.collection("announcements").doc(req.params.id).get();
-        if (!doc.exists)
-            return res.status(404).json({ message: "Duyuru bulunamadı." });
-        res.json({ id: doc.id, ...doc.data() });
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    const doc = await db.collection("announcements").doc(req.params.id).get();
+    if (!doc.exists)
+      return res.status(404).json({ message: "Duyuru bulunamadı." });
+    res.json({ id: doc.id, ...doc.data() });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
+/**
+ * @openapi
+ * /api/announcements/{id}:
+ *   put:
+ *     tags: [Announcements]
+ *     summary: Duyuru güncelle
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         $ref: '#/components/schemas/Success'
+ *       500:
+ *         $ref: '#/components/schemas/Error'
+ */
 // PUT http://localhost:5000/api/announcements/{id}
 // Duyuru güncelle
 router.put("/:id", protect, isAdmin, async (req, res) => {
-    try {
-        await db.collection("announcements").doc(req.params.id).update(req.body);
-        res.json({ message: "Duyuru güncellendi." });
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    await db.collection("announcements").doc(req.params.id).update(req.body);
+    res.json({ message: "Duyuru güncellendi." });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
+/**
+ * @openapi
+ * /api/announcements/{id}:
+ *   delete:
+ *     tags: [Announcements]
+ *     summary: Duyuru sil
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         $ref: '#/components/schemas/Success'
+ *       500:
+ *         $ref: '#/components/schemas/Error'
+ */
 // DELETE http://localhost:5000/api/announcements/{id}
 // Duyuru sil
 router.delete("/:id", protect, isAdmin, async (req, res) => {
-    try {
-        await db.collection("announcements").doc(req.params.id).delete();
-        res.json({ message: "Duyuru silindi." });
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
-    }
+  try {
+    await db.collection("announcements").doc(req.params.id).delete();
+    res.json({ message: "Duyuru silindi." });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 export default router;

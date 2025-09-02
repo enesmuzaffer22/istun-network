@@ -16,19 +16,33 @@ function RoadmapsPage() {
   const [roadmaps, setRoadmaps] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   // Veri çekme useEffect'i
   useEffect(() => {
     let isCancelled = false; // Cleanup için flag
 
-    const fetchRoadmaps = async () => {
+    const fetchRoadmaps = async (targetPage) => {
       try {
         setLoading(true);
-        const response = await axios.get("/roadmaps");
+        const response = await axios.get("/roadmaps", {
+          params: { page: targetPage },
+        });
+        const list = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+        const nextHasMore =
+          typeof response.data?.hasMore === "boolean"
+            ? response.data.hasMore
+            : list.length === 9;
 
-        // Component unmount olmamışsa state'i güncelle
         if (!isCancelled) {
-          setRoadmaps(response.data);
+          setRoadmaps(list);
+          setHasMore(nextHasMore);
+          setPage(targetPage);
           setError(null);
         }
       } catch (err) {
@@ -43,7 +57,7 @@ function RoadmapsPage() {
       }
     };
 
-    fetchRoadmaps();
+    fetchRoadmaps(1);
 
     // Cleanup function
     return () => {
@@ -118,6 +132,125 @@ function RoadmapsPage() {
               />
             </div>
           ))}
+      </div>
+      {/* Pagination Controls */}
+      <div className="flex items-center justify-center gap-3">
+        <button
+          onClick={async () => {
+            if (page > 1 && !loading) {
+              try {
+                setLoading(true);
+                const target = page - 1;
+                const response = await axios.get("/roadmaps", {
+                  params: { page: target },
+                });
+                const list = Array.isArray(response.data)
+                  ? response.data
+                  : Array.isArray(response.data?.data)
+                  ? response.data.data
+                  : [];
+                const nextHasMore =
+                  typeof response.data?.hasMore === "boolean"
+                    ? response.data.hasMore
+                    : list.length === 9;
+                setRoadmaps(list);
+                setHasMore(nextHasMore);
+                setPage(target);
+              } catch (err) {
+                console.error("Kariyer Rotaları çekilirken hata:", err);
+              } finally {
+                setLoading(false);
+              }
+            }
+          }}
+          disabled={page === 1 || loading}
+          className={`mt-2 px-4 py-2 rounded-lg font-medium text-white transition-colors duration-200 ${
+            page === 1 || loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-primary hover:bg-red-700"
+          }`}
+        >
+          <i className="bi bi-chevron-left"></i>
+        </button>
+        <div className="flex items-center gap-2 mt-2">
+          {Array.from({ length: page }, (_, i) => i + 1)
+            .concat(hasMore ? [page + 1] : [])
+            .map((p) => (
+              <button
+                key={p}
+                onClick={async () => {
+                  if (p !== page && !loading) {
+                    try {
+                      setLoading(true);
+                      const response = await axios.get("/roadmaps", {
+                        params: { page: p },
+                      });
+                      const list = Array.isArray(response.data)
+                        ? response.data
+                        : Array.isArray(response.data?.data)
+                        ? response.data.data
+                        : [];
+                      const nextHasMore =
+                        typeof response.data?.hasMore === "boolean"
+                          ? response.data.hasMore
+                          : list.length === 9;
+                      setRoadmaps(list);
+                      setHasMore(nextHasMore);
+                      setPage(p);
+                    } catch (err) {
+                      console.error("Kariyer Rotaları çekilirken hata:", err);
+                    } finally {
+                      setLoading(false);
+                    }
+                  }
+                }}
+                className={`min-w-9 h-9 px-3 rounded-md text-sm font-medium transition-colors duration-200 ${
+                  p === page
+                    ? "bg-primary text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+        </div>
+        <button
+          onClick={async () => {
+            if (hasMore && !loading) {
+              try {
+                setLoading(true);
+                const target = page + 1;
+                const response = await axios.get("/roadmaps", {
+                  params: { page: target },
+                });
+                const list = Array.isArray(response.data)
+                  ? response.data
+                  : Array.isArray(response.data?.data)
+                  ? response.data.data
+                  : [];
+                const nextHasMore =
+                  typeof response.data?.hasMore === "boolean"
+                    ? response.data.hasMore
+                    : list.length === 9;
+                setRoadmaps(list);
+                setHasMore(nextHasMore);
+                setPage(target);
+              } catch (err) {
+                console.error("Kariyer Rotaları çekilirken hata:", err);
+              } finally {
+                setLoading(false);
+              }
+            }
+          }}
+          disabled={!hasMore || loading}
+          className={`mt-2 px-4 py-2 rounded-lg font-medium text-white transition-colors duration-200 ${
+            !hasMore || loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-primary hover:bg-red-700"
+          }`}
+        >
+          <i className="bi bi-chevron-right"></i>
+        </button>
       </div>
     </div>
   );

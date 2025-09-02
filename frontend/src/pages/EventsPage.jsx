@@ -113,6 +113,8 @@ function EventsPage() {
 
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
 
   // Etkinlik kategorileri
@@ -130,20 +132,30 @@ function EventsPage() {
   useEffect(() => {
     let isCancelled = false;
 
-    const fetchEvents = async () => {
+    const fetchEvents = async (targetPage) => {
       try {
         setLoading(true);
-        // Test verilerini kullan
-        const response = await fetch("/test/events.json");
-        const data = await response.json();
+        const response = await API.get("/events", {
+          params: { page: targetPage },
+        });
+        const list = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+        const nextHasMore =
+          typeof response.data?.hasMore === "boolean"
+            ? response.data.hasMore
+            : list.length === 6;
 
         if (!isCancelled) {
-          setEvents(data);
+          setEvents(list);
+          setHasMore(nextHasMore);
+          setPage(targetPage);
         }
       } catch (error) {
         if (!isCancelled) {
           console.error("Etkinlikler yüklenirken hata oluştu:", error);
-          // Fallback olarak boş array
           setEvents([]);
         }
       } finally {
@@ -153,7 +165,7 @@ function EventsPage() {
       }
     };
 
-    fetchEvents();
+    fetchEvents(1);
 
     return () => {
       isCancelled = true;
@@ -169,6 +181,58 @@ function EventsPage() {
   // Kategori değiştirme fonksiyonu
   const handleCategoryChange = (categoryKey) => {
     setSelectedCategory(categoryKey);
+  };
+
+  const goToPrev = async () => {
+    if (page > 1 && !loading) {
+      try {
+        setLoading(true);
+        const target = page - 1;
+        const response = await API.get("/events", { params: { page: target } });
+        const list = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+        const nextHasMore =
+          typeof response.data?.hasMore === "boolean"
+            ? response.data.hasMore
+            : list.length === 6;
+        setEvents(list);
+        setHasMore(nextHasMore);
+        setPage(target);
+      } catch (error) {
+        console.error("Etkinlikler yüklenirken hata oluştu:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const goToNext = async () => {
+    if (hasMore && !loading) {
+      try {
+        setLoading(true);
+        const target = page + 1;
+        const response = await API.get("/events", { params: { page: target } });
+        const list = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+        const nextHasMore =
+          typeof response.data?.hasMore === "boolean"
+            ? response.data.hasMore
+            : list.length === 6;
+        setEvents(list);
+        setHasMore(nextHasMore);
+        setPage(target);
+      } catch (error) {
+        console.error("Etkinlikler yüklenirken hata oluştu:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   useEffect(() => {
@@ -300,6 +364,77 @@ function EventsPage() {
             <p className="text-lg">Bu kategoride henüz etkinlik bulunmuyor.</p>
           </div>
         )}
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="flex items-center justify-center gap-3">
+        <button
+          onClick={goToPrev}
+          disabled={page === 1 || loading}
+          className={`mt-2 px-4 py-2 rounded-lg font-medium text-white transition-colors duration-200 ${
+            page === 1 || loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-primary hover:bg-red-700"
+          }`}
+        >
+          <i className="bi bi-chevron-left"></i>
+        </button>
+        <div className="flex items-center gap-2 mt-2">
+          {Array.from({ length: page }, (_, i) => i + 1)
+            .concat(hasMore ? [page + 1] : [])
+            .map((p) => (
+              <button
+                key={p}
+                onClick={async () => {
+                  if (p !== page && !loading) {
+                    try {
+                      setLoading(true);
+                      const response = await API.get("/events", {
+                        params: { page: p },
+                      });
+                      const list = Array.isArray(response.data)
+                        ? response.data
+                        : Array.isArray(response.data?.data)
+                        ? response.data.data
+                        : [];
+                      const nextHasMore =
+                        typeof response.data?.hasMore === "boolean"
+                          ? response.data.hasMore
+                          : list.length === 6;
+                      setEvents(list);
+                      setHasMore(nextHasMore);
+                      setPage(p);
+                    } catch (error) {
+                      console.error(
+                        "Etkinlikler yüklenirken hata oluştu:",
+                        error
+                      );
+                    } finally {
+                      setLoading(false);
+                    }
+                  }
+                }}
+                className={`min-w-9 h-9 px-3 rounded-md text-sm font-medium transition-colors duration-200 ${
+                  p === page
+                    ? "bg-primary text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+        </div>
+        <button
+          onClick={goToNext}
+          disabled={!hasMore || loading}
+          className={`mt-2 px-4 py-2 rounded-lg font-medium text-white transition-colors duration-200 ${
+            !hasMore || loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-primary hover:bg-red-700"
+          }`}
+        >
+          <i className="bi bi-chevron-right"></i>
+        </button>
       </div>
     </div>
   );

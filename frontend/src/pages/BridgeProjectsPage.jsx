@@ -1,97 +1,64 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API from "../utils/axios";
 
 function BridgeProjectsPage() {
   const navigate = useNavigate();
 
-  // Örnek etkinlik verileri
-  const activities = [
-    {
-      id: 1,
-      title: "Çevre Temizlik Projesi",
-      image: "/api/placeholder/400/500",
-      description:
-        "Üniversitemiz çevresinde düzenlenen kapsamlı temizlik etkinliği. Öğrencilerimiz çevre bilinci ile bir araya gelerek kampüs ve çevre alanların temizlenmesi için gönüllü olarak katıldı.",
-      details:
-        "Bu proje kapsamında 50'den fazla öğrenci bir araya gelerek üniversite kampüsü ve çevre mahallelerinde temizlik çalışması gerçekleştirdi. Toplanan atıklar geri dönüşüm merkezlerine teslim edildi.",
-      participants: 52,
-      duration: "1 gün",
-      impact: "2 ton atık toplandı",
-      date: "15 Mart 2024",
-    },
-    {
-      id: 2,
-      title: "Dijital Okuryazarlık Eğitimi",
-      image: "/api/placeholder/400/500",
-      description:
-        "Yaşlı vatandaşlara yönelik düzenlenen dijital okuryazarlık eğitimi programı. Teknoloji kullanımında rehberlik sağlandı.",
-      details:
-        "65 yaş üstü vatandaşlara akıllı telefon ve tablet kullanımı, e-devlet işlemleri, video arama yapma gibi temel dijital beceriler öğretildi. 8 hafta süren program ile toplam 120 kişiye ulaşıldı.",
-      participants: 30,
-      duration: "8 hafta",
-      impact: "120 yaşlı vatandaşa ulaşıldı",
-      date: "10 Şubat - 5 Nisan 2024",
-    },
-    {
-      id: 3,
-      title: "Kod Öğretim Atölyesi",
-      image: "/api/placeholder/400/500",
-      description:
-        "Lise öğrencilerine yönelik programlama eğitimi. Geleceğin teknoloji liderleri için temel kodlama becerileri aktarıldı.",
-      details:
-        "İstanbul'daki 5 farklı lisede düzenlenen atölyelerde Python programlama dili temel seviyede öğretildi. Öğrenciler basit projeler geliştirerek pratik deneyim kazandı.",
-      participants: 25,
-      duration: "4 hafta",
-      impact: "200 lise öğrencisine ulaşıldı",
-      date: "1-28 Mayıs 2024",
-    },
-    {
-      id: 4,
-      title: "Kitap Bağış Kampanyası",
-      image: "/api/placeholder/400/500",
-      description:
-        "Kırsal bölgelerdeki okullara kitap bağışı için düzenlenen kampanya. Eğitim fırsatlarının artırılması hedeflendi.",
-      details:
-        "Üniversite öğrencileri ve akademik personelden toplanan 2000'den fazla kitap, Anadolu'nun farklı illerindeki 15 okula ulaştırıldı. Kütüphaneler kuruldu ve okuma kültürü desteklendi.",
-      participants: 40,
-      duration: "2 ay",
-      impact: "15 okula 2000+ kitap ulaştırıldı",
-      date: "1 Ekim - 30 Kasım 2023",
-    },
-    {
-      id: 5,
-      title: "Teknoloji Mentorluğu",
-      image: "/api/placeholder/400/500",
-      description:
-        "Dezavantajlı bölgelerdeki gençlere teknoloji alanında mentorluk desteği sağlandı.",
-      details:
-        "İstanbul'un farklı ilçelerindeki gençlik merkezlerinde teknoloji mentorluğu verildi. Kariyer rehberliği, proje geliştirme ve sektör bilgisi paylaşıldı.",
-      participants: 35,
-      duration: "6 ay",
-      impact: "80 gence mentorluk sağlandı",
-      date: "1 Ocak - 30 Haziran 2024",
-    },
-    {
-      id: 6,
-      title: "Sağlık Tarama Etkinliği",
-      image: "/api/placeholder/400/500",
-      description:
-        "Mahalle sakinleri için ücretsiz sağlık tarama ve bilgilendirme etkinliği düzenlendi.",
-      details:
-        "Üniversitemizin sağlık bilimleri öğrencileri ile birlikte düzenlenen etkinlikte tansiyon, kan şekeri ölçümü ve temel sağlık bilgilendirmesi yapıldı.",
-      participants: 45,
-      duration: "1 hafta",
-      impact: "300 kişiye sağlık taraması",
-      date: "15-22 Haziran 2024",
-    },
-  ];
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [impact, setImpact] = useState(null);
 
-  const impactStats = [
-    { number: "500+", label: "Gönüllü Öğrenci" },
-    { number: "100+", label: "Bağış Yapılan Kurum" },
-    { number: "25", label: "Aktif Proje" },
-    { number: "1000+", label: "Gönüllü Saati" },
-  ];
+  useEffect(() => {
+    let isCancelled = false;
+
+    const fetchImpact = async () => {
+      try {
+        const response = await API.get("/bridgeprojectsimpact");
+        const data = response?.data?.data ?? response?.data;
+        if (!isCancelled) setImpact(data);
+      } catch (error) {
+        console.error("Etki skorları yüklenirken hata:", error);
+      }
+    };
+
+    const fetchActivities = async (targetPage) => {
+      try {
+        setLoading(true);
+        const response = await API.get("/bridgeprojects", {
+          params: { page: targetPage },
+        });
+        const list = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+        const nextHasMore =
+          typeof response.data?.hasMore === "boolean"
+            ? response.data.hasMore
+            : list.length === 6;
+        if (!isCancelled) {
+          setActivities(list);
+          setHasMore(nextHasMore);
+          setPage(targetPage);
+        }
+      } catch (error) {
+        console.error("Bridge Projects yüklenirken hata:", error);
+        if (!isCancelled) setActivities([]);
+      } finally {
+        if (!isCancelled) setLoading(false);
+      }
+    };
+
+    fetchImpact();
+    fetchActivities(1);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   const objectives = [
     {
@@ -201,14 +168,38 @@ function BridgeProjectsPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {impactStats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold mb-2">
-                  {stat.number}
-                </div>
-                <div className="text-white/80 text-lg">{stat.label}</div>
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-bold mb-2">
+                {impact?.volunteer_student != null
+                  ? `${impact.volunteer_student}+`
+                  : "-"}
               </div>
-            ))}
+              <div className="text-white/80 text-lg">Gönüllü Öğrenci</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-bold mb-2">
+                {impact?.donated_institution != null
+                  ? `${impact.donated_institution}+`
+                  : "-"}
+              </div>
+              <div className="text-white/80 text-lg">Bağış Yapılan Kurum</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-bold mb-2">
+                {impact?.active_project != null
+                  ? `${impact.active_project}+`
+                  : "-"}
+              </div>
+              <div className="text-white/80 text-lg">Aktif Proje</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-bold mb-2">
+                {impact?.volunteer_hour != null
+                  ? `${impact.volunteer_hour}+`
+                  : "-"}
+              </div>
+              <div className="text-white/80 text-lg">Gönüllü Saati</div>
+            </div>
           </div>
         </div>
       </section>
@@ -389,42 +380,170 @@ function BridgeProjectsPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {activities.map((activity) => (
-              <div
-                key={activity.id}
-                onClick={() =>
-                  navigate(`/birlikte-iz-birak/etkinlik/${activity.id}`)
-                }
-                className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden cursor-pointer hover:shadow-xl transition-shadow"
-              >
-                <div className="aspect-[4/5] bg-gray-200 relative overflow-hidden">
-                  <img
-                    src={activity.image}
-                    alt={activity.title}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">
-                    {activity.title}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed line-clamp-3">
-                    {activity.description}
-                  </p>
-                  <div className="mt-4 space-y-2">
-                    <div className="flex items-center gap-1 text-sm text-gray-500">
-                      <i className="bi bi-people"></i>
-                      <span>{activity.participants} katılımcı</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-sm text-gray-500">
-                      <i className="bi bi-calendar text-primary"></i>
-                      <span>{activity.date}</span>
+            {loading && (
+              <div className="col-span-full text-center text-gray-500">
+                Yükleniyor...
+              </div>
+            )}
+            {!loading &&
+              activities.map((activity) => (
+                <div
+                  key={activity.id}
+                  onClick={() =>
+                    navigate(`/birlikte-iz-birak/etkinlik/${activity.id}`)
+                  }
+                  className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden cursor-pointer hover:shadow-xl transition-shadow"
+                >
+                  <div className="aspect-[4/5] bg-gray-200 relative overflow-hidden">
+                    <img
+                      src={activity.image_url}
+                      alt={activity.title}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">
+                      {activity.title}
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed line-clamp-3">
+                      {activity.description}
+                    </p>
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center gap-1 text-sm text-gray-500">
+                        <i className="bi bi-people"></i>
+                        <span>{activity.number_of_participants} katılımcı</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm text-gray-500">
+                        <i className="bi bi-calendar text-primary"></i>
+                        <span>
+                          {activity.event_date || activity.created_at}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="flex items-center justify-center gap-3 mt-8">
+            <button
+              onClick={async () => {
+                if (page > 1 && !loading) {
+                  try {
+                    setLoading(true);
+                    const target = page - 1;
+                    const response = await API.get("/bridgeprojects", {
+                      params: { page: target },
+                    });
+                    const list = Array.isArray(response.data)
+                      ? response.data
+                      : Array.isArray(response.data?.data)
+                      ? response.data.data
+                      : [];
+                    const nextHasMore =
+                      typeof response.data?.hasMore === "boolean"
+                        ? response.data.hasMore
+                        : list.length === 6;
+                    setActivities(list);
+                    setHasMore(nextHasMore);
+                    setPage(target);
+                  } catch (error) {
+                    console.error("Önceki sayfa yüklenemedi:", error);
+                  } finally {
+                    setLoading(false);
+                  }
+                }
+              }}
+              disabled={page === 1 || loading}
+              className={`px-4 py-2 rounded-lg font-medium text-white transition-colors duration-200 ${
+                page === 1 || loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-primary hover:bg-red-700"
+              }`}
+            >
+              <i className="bi bi-chevron-left"></i>
+            </button>
+            <div className="flex items-center gap-2">
+              {Array.from({ length: page }, (_, i) => i + 1)
+                .concat(hasMore ? [page + 1] : [])
+                .map((p) => (
+                  <button
+                    key={p}
+                    onClick={async () => {
+                      if (p !== page && !loading) {
+                        try {
+                          setLoading(true);
+                          const response = await API.get("/bridgeprojects", {
+                            params: { page: p },
+                          });
+                          const list = Array.isArray(response.data)
+                            ? response.data
+                            : Array.isArray(response.data?.data)
+                            ? response.data.data
+                            : [];
+                          const nextHasMore =
+                            typeof response.data?.hasMore === "boolean"
+                              ? response.data.hasMore
+                              : list.length === 6;
+                          setActivities(list);
+                          setHasMore(nextHasMore);
+                          setPage(p);
+                        } catch (error) {
+                          console.error("Sayfa yüklenemedi:", error);
+                        } finally {
+                          setLoading(false);
+                        }
+                      }
+                    }}
+                    className={`min-w-9 h-9 px-3 rounded-md text-sm font-medium transition-colors duration-200 ${
+                      p === page
+                        ? "bg-primary text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+            </div>
+            <button
+              onClick={async () => {
+                if (hasMore && !loading) {
+                  try {
+                    setLoading(true);
+                    const target = page + 1;
+                    const response = await API.get("/bridgeprojects", {
+                      params: { page: target },
+                    });
+                    const list = Array.isArray(response.data)
+                      ? response.data
+                      : Array.isArray(response.data?.data)
+                      ? response.data.data
+                      : [];
+                    const nextHasMore =
+                      typeof response.data?.hasMore === "boolean"
+                        ? response.data.hasMore
+                        : list.length === 6;
+                    setActivities(list);
+                    setHasMore(nextHasMore);
+                    setPage(target);
+                  } catch (error) {
+                    console.error("Sonraki sayfa yüklenemedi:", error);
+                  } finally {
+                    setLoading(false);
+                  }
+                }
+              }}
+              disabled={!hasMore || loading}
+              className={`px-4 py-2 rounded-lg font-medium text-white transition-colors duration-200 ${
+                !hasMore || loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-primary hover:bg-red-700"
+              }`}
+            >
+              <i className="bi bi-chevron-right"></i>
+            </button>
           </div>
         </div>
       </section>

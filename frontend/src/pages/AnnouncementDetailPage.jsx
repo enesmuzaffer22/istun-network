@@ -40,73 +40,20 @@ function AnnouncementDetailPage() {
       try {
         setLoading(true);
         setError(null);
-
-        // Test verilerinden duyuru detayını al
-        const response = await fetch("/test/announcements.json");
-        const announcements = await response.json();
-        const announcementDetail = announcements.find(
-          (a) => a.id === parseInt(id)
-        );
-
-        if (announcementDetail) {
-          setAnnouncement(announcementDetail);
+        const response = await API.get(`/announcements/${id}`);
+        // API ya tek obje ya da { data: {...} } dönebilir
+        const detail = response?.data?.data ?? response?.data;
+        if (detail?.id) {
+          setAnnouncement(detail);
         } else {
           setError("Duyuru bulunamadı.");
         }
       } catch (error) {
         console.error("Duyuru detayı çekilirken hata:", error);
-
-        // Hata durumunda örnek veri (gerçek uygulamada kaldırılabilir)
         if (error.response?.status === 404) {
           setError("Duyuru bulunamadı.");
         } else {
-          // Örnek duyuru verisi
-          setAnnouncement({
-            id: parseInt(id),
-            title: "Yeni Dönem Kayıtları Başladı",
-            content: `# Yeni Dönem Kayıtları
-
-2024 Bahar dönemi kayıtları için son tarih **15 Şubat 2024**. Geç kalınmaması önemle duyurulur.
-
-## Kayıt İşlemleri
-
-Kayıt işlemleri için aşağıdaki adımları takip ediniz:
-
-### Gerekli Belgeler
-
-- Kimlik fotokopisi
-- Diploma veya geçici mezuniyet belgesi
-- Transkript
-- 2 adet fotoğraf
-
-### Kayıt Yerleri
-
-1. **Öğrenci İşleri Birimi** - Ana kampüs
-2. **Uzaktan Kayıt Sistemi** - Online platform üzerinden
-3. **Bölüm Sekreterliği** - İlgili bölüm binası
-
-## Önemli Tarihler
-
-| Tarih | Etkinlik |
-|-------|----------|
-| 1-15 Şubat 2024 | Kayıt dönemi |
-| 20 Şubat 2024 | Ders başlangıcı |
-| 25 Şubat 2024 | Ders ekleme/çıkarma son günü |
-
-## İletişim
-
-Sorularınız için:
-- **E-posta:** ogrenci@istu.edu.tr
-- **Telefon:** (0212) 444 17 17
-- **Adres:** İSTÜ Öğrenci İşleri Müdürlüğü
-
-> **Not:** Kayıt işlemlerini zamanında tamamlamayan öğrenciler için ek kayıt dönemi açılmayacaktır.
-
-Başarılar dileriz!`,
-            created_at: new Date().toISOString(),
-            category: "Kayıt",
-            author: "Öğrenci İşleri Müdürlüğü",
-          });
+          setError("Bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
         }
       } finally {
         setLoading(false);

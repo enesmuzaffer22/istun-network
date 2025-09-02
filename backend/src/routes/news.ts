@@ -259,17 +259,32 @@ router.post(
  * @swagger
  * /api/news:
  *   get:
- *     summary: Tüm haberleri getir
+ *     summary: Tüm haberleri getir (sayfalama)
  *     tags: [News]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Sayfa numarası (varsayılan 1)
  *     responses:
  *       200:
  *         description: Haber listesi
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/News'
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/News'
+ *                 page:
+ *                   type: integer
+ *                 limit:
+ *                   type: integer
+ *                 hasMore:
+ *                   type: boolean
  *       500:
  *         description: Sunucu hatası
  *         content:
@@ -303,7 +318,7 @@ router.get("/", async (req, res) => {
     const snapshot = await query.get();
     const news = snapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
 
     res.json({

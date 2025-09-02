@@ -1,6 +1,6 @@
 // frontend/src/pages/NewsPage.jsx
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { gsap } from "gsap";
 import NewsCard from "../components/NewsCard";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +14,8 @@ function NewsPage() {
 
   const [newsData, setNewsData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
 
   // Kategori listesi
@@ -30,16 +32,28 @@ function NewsPage() {
   ];
 
   useEffect(() => {
-    let isCancelled = false; // Cleanup için flag
+    let isCancelled = false;
 
-    const fetchNews = async () => {
+    const fetchInitial = async () => {
       try {
         setLoading(true);
-        const response = await API.get("/news");
+        const response = await API.get("/news", {
+          params: { page: 1 },
+        });
+        const list = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+        const nextHasMore =
+          typeof response.data?.hasMore === "boolean"
+            ? response.data.hasMore
+            : list.length === 12;
 
-        // Component unmount olmamışsa state'i güncelle
         if (!isCancelled) {
-          setNewsData(response.data);
+          setNewsData(list);
+          setHasMore(nextHasMore);
+          setPage(1);
         }
       } catch (error) {
         if (!isCancelled) {
@@ -52,9 +66,8 @@ function NewsPage() {
       }
     };
 
-    fetchNews();
+    fetchInitial();
 
-    // Cleanup function
     return () => {
       isCancelled = true;
     };
@@ -69,6 +82,49 @@ function NewsPage() {
   // Kategori değiştirme fonksiyonu
   const handleCategoryChange = (categoryKey) => {
     setSelectedCategory(categoryKey);
+  };
+
+  const fetchPage = useCallback(async (targetPage) => {
+    try {
+      setLoading(true);
+      const response = await API.get("/news", {
+        params: { page: targetPage },
+      });
+      const list = Array.isArray(response.data)
+        ? response.data
+        : Array.isArray(response.data?.data)
+        ? response.data.data
+        : [];
+      const nextHasMore =
+        typeof response.data?.hasMore === "boolean"
+          ? response.data.hasMore
+          : list.length === 12;
+      setNewsData(list);
+      setHasMore(nextHasMore);
+      setPage(targetPage);
+    } catch (error) {
+      console.error("Sayfa yüklenirken hata oluştu:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const goToPrev = () => {
+    if (page > 1) {
+      fetchPage(page - 1);
+    }
+  };
+
+  const goToNext = () => {
+    if (hasMore) {
+      fetchPage(page + 1);
+    }
+  };
+
+  const getVisiblePages = () => {
+    const pages = Array.from({ length: page }, (_, i) => i + 1);
+    if (hasMore) pages.push(page + 1);
+    return pages;
   };
 
   useEffect(() => {
@@ -173,6 +229,47 @@ function NewsPage() {
             <p className="text-lg">Bu kategoride henüz haber bulunmuyor.</p>
           </div>
         )}
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="flex items-center justify-center gap-3">
+        <button
+          onClick={goToPrev}
+          disabled={page === 1 || loading}
+          className={`mt-2 px-4 py-2 rounded-lg font-medium text-white transition-colors duration-200 ${
+            page === 1 || loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-primary hover:bg-red-700"
+          }`}
+        >
+          <i className="bi bi-chevron-left"></i>
+        </button>
+        <div className="flex items-center gap-2 mt-2">
+          {getVisiblePages().map((p) => (
+            <button
+              key={p}
+              onClick={() => (p !== page ? fetchPage(p) : null)}
+              className={`min-w-9 h-9 px-3 rounded-md text-sm font-medium transition-colors duration-200 ${
+                p === page
+                  ? "bg-primary text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={goToNext}
+          disabled={!hasMore || loading}
+          className={`mt-2 px-4 py-2 rounded-lg font-medium text-white transition-colors duration-200 ${
+            !hasMore || loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-primary hover:bg-red-700"
+          }`}
+        >
+          <i className="bi bi-chevron-right"></i>
+        </button>
       </div>
     </div>
   );

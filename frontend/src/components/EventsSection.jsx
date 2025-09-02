@@ -115,107 +115,18 @@ function EventsSection() {
     const fetchEvents = async () => {
       try {
         setLoading(true);
-        // Test verilerini kullan
-        const response = await fetch("/test/events.json");
-        const data = await response.json();
-
+        const response = await API.get("/events", { params: { page: 1 } });
+        const list = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
         if (!isCancelled) {
-          // Tarihe göre sırala ve ilk 3 veriyi al
-          const sortedData = data.sort(
-            (a, b) => new Date(b.created_at) - new Date(a.created_at)
-          );
-          setEvents(sortedData.slice(0, 3));
+          setEvents(list.slice(0, 3));
         }
       } catch (error) {
         if (!isCancelled) {
           console.error("Etkinlikler çekilemedi:", error);
-          // Hata durumunda örnek veriler
-          setEvents([
-            {
-              id: 1,
-              title: "Kariyer Günleri 2024",
-              content:
-                "Sektörün önde gelen firmaları ile buluşma fırsatı. CV değerlendirme, mülakat teknikleri ve networking etkinlikleri.",
-              event_date: new Date(
-                Date.now() + 7 * 24 * 60 * 60 * 1000
-              ).toISOString(),
-              category: "Kariyer",
-              location: "İSTÜ Konferans Salonu",
-              time: "09:00",
-              attendees: 250,
-              image_url: "https://picsum.photos/400/500?random=1",
-            },
-            {
-              id: 2,
-              title: "Yapay Zeka ve Geleceği Semineri",
-              content:
-                "AI teknolojilerinin iş dünyasına etkisi ve gelecek projeksiyonları üzerine uzman konuşmacılar ile söyleşi.",
-              event_date: new Date(
-                Date.now() + 14 * 24 * 60 * 60 * 1000
-              ).toISOString(),
-              category: "Teknoloji",
-              location: "Amfi Tiyatro",
-              time: "14:00",
-              attendees: 180,
-              image_url: "https://picsum.photos/400/500?random=2",
-            },
-            {
-              id: 3,
-              title: "Startup Pitch Yarışması",
-              content:
-                "Genç girişimcilerin projelerini sunacağı ve yatırımcılar ile buluşacağı heyecan dolu yarışma.",
-              event_date: new Date(
-                Date.now() + 21 * 24 * 60 * 60 * 1000
-              ).toISOString(),
-              category: "Girişimcilik",
-              location: "İnovasyon Merkezi",
-              time: "10:00",
-              attendees: 120,
-              image_url: "https://picsum.photos/400/500?random=3",
-            },
-            {
-              id: 4,
-              title: "Mezunlar Buluşması",
-              content:
-                "2020-2023 mezunları ile networking etkinliği. Deneyim paylaşımı ve iş birliği fırsatları.",
-              event_date: new Date(
-                Date.now() + 28 * 24 * 60 * 60 * 1000
-              ).toISOString(),
-              category: "Network",
-              location: "Sosyal Tesisler",
-              time: "18:30",
-              attendees: 85,
-              image_url: "https://picsum.photos/400/500?random=4",
-            },
-            {
-              id: 5,
-              title: "Hackathon 2024",
-              content:
-                "48 saatlik yoğun kodlama maratonu. Takım halinde gerçek problemlere çözüm üretme deneyimi.",
-              event_date: new Date(
-                Date.now() + 35 * 24 * 60 * 60 * 1000
-              ).toISOString(),
-              category: "Kodlama",
-              location: "Bilgisayar Laboratuvarları",
-              time: "09:00",
-              attendees: 60,
-              image_url: "https://picsum.photos/400/500?random=5",
-            },
-            {
-              id: 6,
-              title: "Kişisel Gelişim Atölyesi",
-              content:
-                "İletişim becerileri, liderlik ve takım çalışması üzerine interaktif atölye çalışması.",
-              event_date: new Date(
-                Date.now() + 42 * 24 * 60 * 60 * 1000
-              ).toISOString(),
-              category: "Gelişim",
-              location: "Eğitim Sınıfları",
-              time: "13:00",
-              attendees: 40,
-              image_url: "https://picsum.photos/400/500?random=6",
-            },
-          ]);
         }
       } finally {
         if (!isCancelled) {

@@ -55,6 +55,8 @@ function AnnouncementsPage() {
 
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
 
   // Duyuru kategorileri
@@ -73,70 +75,30 @@ function AnnouncementsPage() {
   useEffect(() => {
     let isCancelled = false;
 
-    const fetchAnnouncements = async () => {
+    const fetchAnnouncements = async (targetPage) => {
       try {
         setLoading(true);
-        // Test verilerini kullan
-        const response = await fetch("/test/announcements.json");
-        const data = await response.json();
+        const response = await API.get("/announcements", {
+          params: { page: targetPage },
+        });
+        const list = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+        const nextHasMore =
+          typeof response.data?.hasMore === "boolean"
+            ? response.data.hasMore
+            : list.length === 9;
 
         if (!isCancelled) {
-          setAnnouncements(data);
+          setAnnouncements(list);
+          setHasMore(nextHasMore);
+          setPage(targetPage);
         }
       } catch (error) {
         if (!isCancelled) {
           console.error("Duyurular yüklenirken hata oluştu:", error);
-          // Hata durumunda örnek veriler
-          setAnnouncements([
-            {
-              id: 1,
-              title: "Yeni Dönem Kayıtları Başladı",
-              content:
-                "2024 Bahar dönemi kayıtları için son tarih 15 Şubat 2024. Geç kalınmaması önemle duyurulur. Kayıt işlemleri için öğrenci işleri birimine başvurabilirsiniz.",
-              created_at: new Date().toISOString(),
-              category: "Kayıt",
-            },
-            {
-              id: 2,
-              title: "Kariyer Günleri Etkinliği",
-              content:
-                "20-22 Mart tarihleri arasında düzenlenecek Kariyer Günleri etkinliğine tüm öğrencilerimiz davetlidir. Sektörün önde gelen firmaları katılacak.",
-              created_at: new Date(Date.now() - 86400000).toISOString(),
-              category: "Etkinlik",
-            },
-            {
-              id: 3,
-              title: "Burs Başvuruları",
-              content:
-                "2024 yılı burs başvuruları için gerekli belgeler ve son başvuru tarihi hakkında bilgiler. Başvuru formu üniversite web sitesinde mevcuttur.",
-              created_at: new Date(Date.now() - 172800000).toISOString(),
-              category: "Burs",
-            },
-            {
-              id: 4,
-              title: "Final Sınavları Programı",
-              content:
-                "2024 Güz dönemi final sınavları programı açıklanmıştır. Sınav tarihleri ve salon bilgileri için ders programınızı kontrol ediniz.",
-              created_at: new Date(Date.now() - 259200000).toISOString(),
-              category: "Sınav",
-            },
-            {
-              id: 5,
-              title: "Kütüphane Çalışma Saatleri",
-              content:
-                "Sınav dönemine özel kütüphane 24 saat açık olacaktır. Gece vardiyası için öğrenci kartınızı yanınızda bulundurunuz.",
-              created_at: new Date(Date.now() - 345600000).toISOString(),
-              category: "İdari",
-            },
-            {
-              id: 6,
-              title: "Proje Yarışması Duyurusu",
-              content:
-                "Bilgisayar Mühendisliği bölümü tarafından düzenlenen proje yarışmasına katılım açıktır. Son başvuru tarihi 30 Nisan 2024.",
-              created_at: new Date(Date.now() - 432000000).toISOString(),
-              category: "Akademik",
-            },
-          ]);
         }
       } finally {
         if (!isCancelled) {
@@ -145,7 +107,7 @@ function AnnouncementsPage() {
       }
     };
 
-    fetchAnnouncements();
+    fetchAnnouncements(1);
 
     return () => {
       isCancelled = true;
@@ -163,6 +125,62 @@ function AnnouncementsPage() {
   // Kategori değiştirme fonksiyonu
   const handleCategoryChange = (categoryKey) => {
     setSelectedCategory(categoryKey);
+  };
+
+  const goToPrev = async () => {
+    if (page > 1 && !loading) {
+      try {
+        setLoading(true);
+        const target = page - 1;
+        const response = await API.get("/announcements", {
+          params: { page: target },
+        });
+        const list = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+        const nextHasMore =
+          typeof response.data?.hasMore === "boolean"
+            ? response.data.hasMore
+            : list.length === 9;
+        setAnnouncements(list);
+        setHasMore(nextHasMore);
+        setPage(target);
+      } catch (error) {
+        console.error("Duyurular yüklenirken hata oluştu:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const goToNext = async () => {
+    if (hasMore && !loading) {
+      try {
+        setLoading(true);
+        const target = page + 1;
+        const response = await API.get("/announcements", {
+          params: { page: target },
+        });
+        const list = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
+        const nextHasMore =
+          typeof response.data?.hasMore === "boolean"
+            ? response.data.hasMore
+            : list.length === 9;
+        setAnnouncements(list);
+        setHasMore(nextHasMore);
+        setPage(target);
+      } catch (error) {
+        console.error("Duyurular yüklenirken hata oluştu:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   useEffect(() => {
@@ -295,6 +313,77 @@ function AnnouncementsPage() {
             <p className="text-lg">Bu kategoride henüz duyuru bulunmuyor.</p>
           </div>
         )}
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="flex items-center justify-center gap-3">
+        <button
+          onClick={goToPrev}
+          disabled={page === 1 || loading}
+          className={`mt-2 px-4 py-2 rounded-lg font-medium text-white transition-colors duration-200 ${
+            page === 1 || loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-primary hover:bg-red-700"
+          }`}
+        >
+          <i className="bi bi-chevron-left"></i>
+        </button>
+        <div className="flex items-center gap-2 mt-2">
+          {Array.from({ length: page }, (_, i) => i + 1)
+            .concat(hasMore ? [page + 1] : [])
+            .map((p) => (
+              <button
+                key={p}
+                onClick={async () => {
+                  if (p !== page && !loading) {
+                    try {
+                      setLoading(true);
+                      const response = await API.get("/announcements", {
+                        params: { page: p },
+                      });
+                      const list = Array.isArray(response.data)
+                        ? response.data
+                        : Array.isArray(response.data?.data)
+                        ? response.data.data
+                        : [];
+                      const nextHasMore =
+                        typeof response.data?.hasMore === "boolean"
+                          ? response.data.hasMore
+                          : list.length === 9;
+                      setAnnouncements(list);
+                      setHasMore(nextHasMore);
+                      setPage(p);
+                    } catch (error) {
+                      console.error(
+                        "Duyurular yüklenirken hata oluştu:",
+                        error
+                      );
+                    } finally {
+                      setLoading(false);
+                    }
+                  }
+                }}
+                className={`min-w-9 h-9 px-3 rounded-md text-sm font-medium transition-colors duration-200 ${
+                  p === page
+                    ? "bg-primary text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+        </div>
+        <button
+          onClick={goToNext}
+          disabled={!hasMore || loading}
+          className={`mt-2 px-4 py-2 rounded-lg font-medium text-white transition-colors duration-200 ${
+            !hasMore || loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-primary hover:bg-red-700"
+          }`}
+        >
+          <i className="bi bi-chevron-right"></i>
+        </button>
       </div>
     </div>
   );

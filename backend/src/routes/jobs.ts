@@ -115,17 +115,32 @@ router.post("/", protect, isAdmin, async (req, res) => {
  * @swagger
  * /api/jobs:
  *   get:
- *     summary: Tüm iş ilanlarını getir
+ *     summary: Tüm iş ilanlarını getir (sayfalama)
  *     tags: [Jobs]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Sayfa numarası (varsayılan 1)
  *     responses:
  *       200:
  *         description: İş ilanları listesi
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Job'
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Job'
+ *                 page:
+ *                   type: integer
+ *                 limit:
+ *                   type: integer
+ *                 hasMore:
+ *                   type: boolean
  *       500:
  *         description: Sunucu hatası
  *         content:
@@ -159,7 +174,7 @@ router.get("/", async (req, res) => {
     const snapshot = await query.get();
     const jobs = snapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
     }));
 
     res.json({

@@ -34,47 +34,20 @@ function AnnouncementsSection() {
     const fetchAnnouncements = async () => {
       try {
         setLoading(true);
-        // Test verilerini kullan
-        const response = await fetch("/test/announcements.json");
-        const data = await response.json();
-
+        const response = await API.get("/announcements", {
+          params: { page: 1 },
+        });
+        const list = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.data)
+          ? response.data.data
+          : [];
         if (!isCancelled) {
-          // Tarihe göre sırala ve ilk 3 veriyi al
-          const sortedData = data.sort(
-            (a, b) => new Date(b.created_at) - new Date(a.created_at)
-          );
-          setAnnouncements(sortedData.slice(0, 3));
+          setAnnouncements(list.slice(0, 3));
         }
       } catch (error) {
         if (!isCancelled) {
           console.error("Duyurular çekilemedi:", error);
-          // Hata durumunda örnek veriler
-          setAnnouncements([
-            {
-              id: 1,
-              title: "Yeni Dönem Kayıtları Başladı",
-              content:
-                "2024 Bahar dönemi kayıtları için son tarih 15 Şubat 2024. Geç kalınmaması önemle duyurulur.",
-              created_at: new Date().toISOString(),
-              category: "Eğitim",
-            },
-            {
-              id: 2,
-              title: "Kariyer Günleri Etkinliği",
-              content:
-                "20-22 Mart tarihleri arasında düzenlenecek Kariyer Günleri etkinliğine tüm öğrencilerimiz davetlidir.",
-              created_at: new Date().toISOString(),
-              category: "Etkinlik",
-            },
-            {
-              id: 3,
-              title: "Burs Başvuruları",
-              content:
-                "2024 yılı burs başvuruları için gerekli belgeler ve son başvuru tarihi hakkında bilgiler.",
-              created_at: new Date().toISOString(),
-              category: "Burs",
-            },
-          ]);
         }
       } finally {
         if (!isCancelled) {
