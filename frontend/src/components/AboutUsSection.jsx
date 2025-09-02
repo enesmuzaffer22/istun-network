@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -10,6 +11,7 @@ function AboutUsSection() {
   const headingRef = useRef(null);
   const paragraphRef = useRef(null);
   const imageRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -19,7 +21,8 @@ function AboutUsSection() {
           trigger: sectionRef.current,
           start: "top 80%",
           end: "bottom 20%",
-          toggleActions: "play none none reverse",
+          toggleActions: "play none none none",
+          once: true,
         },
       });
 
@@ -114,6 +117,14 @@ function AboutUsSection() {
           merkeze alan yapımızla, bireysel başarılardan kolektif büyümeye uzanan
           bir yolculuğu birlikte sürdürüyoruz.
         </p>
+        <div>
+          <button
+            className="bg-primary text-white px-6 py-3 rounded-full hover:bg-primary/90 transition-colors cursor-pointer w-fit"
+            onClick={() => navigate("/hakkimizda")}
+          >
+            Hakkımızda
+          </button>
+        </div>
       </div>
       <img
         ref={imageRef}

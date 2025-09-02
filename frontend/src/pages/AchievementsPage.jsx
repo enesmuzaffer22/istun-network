@@ -1,11 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import API from "../utils/axios";
+
+gsap.registerPlugin(ScrollTrigger);
 
 function AchievementsPage() {
   const [achievements, setAchievements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+
+  const heroTitleRef = useRef(null);
+  const heroDescRef = useRef(null);
+  const gridRef = useRef(null);
 
   useEffect(() => {
     let isCancelled = false;
@@ -46,15 +54,57 @@ function AchievementsPage() {
     };
   }, []);
 
+  // GSAP animasyonları
+  useEffect(() => {
+    // Hero alanı sayfa yüklenince
+    gsap.fromTo(
+      heroTitleRef.current,
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
+    );
+    gsap.fromTo(
+      heroDescRef.current,
+      { opacity: 0, y: 40 },
+      { opacity: 1, y: 0, duration: 0.8, ease: "power2.out", delay: 0.1 }
+    );
+
+    if (!loading && achievements.length > 0 && gridRef.current) {
+      gsap.fromTo(
+        gridRef.current.children,
+        { opacity: 0, y: 40, scale: 0.95 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.5,
+          stagger: 0.08,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: gridRef.current,
+            start: "top 85%",
+            toggleActions: "play none none none",
+            once: true,
+          },
+        }
+      );
+    }
+  }, [loading, achievements]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <section className="bg-primary text-white py-20">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
+          <h1
+            ref={heroTitleRef}
+            className="text-4xl md:text-6xl font-bold mb-6 text-white"
+          >
             Başarılarımız
           </h1>
-          <p className="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed">
+          <p
+            ref={heroDescRef}
+            className="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed"
+          >
             Sektörde tanınırlığımızı ve başarımızı gösteren prestijli
             ödüllerimiz.
           </p>
@@ -64,7 +114,10 @@ function AchievementsPage() {
       {/* Awards Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div
+            ref={gridRef}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          >
             {loading && (
               <p className="col-span-full text-center">Yükleniyor...</p>
             )}

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import heroVideo from "../assets/video/hero_video.mp4";
 
@@ -12,6 +13,7 @@ function Hero() {
   const contentRef = useRef(null);
   const videoRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate();
 
   const scrollToContent = () => {
     window.scrollTo({
@@ -72,7 +74,7 @@ function Hero() {
         {/* Top Left - Paragraph */}
         <div className="w-full lg:w-1/2 xl:w-2/5 pt-20">
           <div
-            className="relative overflow-hidden cursor-pointer"
+            className="relative cursor-pointer"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           >
@@ -135,7 +137,12 @@ function Hero() {
                 />
               </svg>
             </button>
-            <button className={heroSecondaryButtonStyles}>Hakkımızda</button>
+            <button
+              className={heroSecondaryButtonStyles}
+              onClick={() => navigate("/hakkimizda")}
+            >
+              Hakkımızda
+            </button>
           </div>
         </div>
       </div>

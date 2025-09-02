@@ -31,7 +31,8 @@ function HeroCards() {
           scrollTrigger: {
             trigger: cardsRef.current,
             start: "top 80%",
-            toggleActions: "play none none reverse",
+            toggleActions: "play none none none",
+            once: true,
           },
         }
       );

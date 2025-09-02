@@ -1,14 +1,153 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 function AboutUsPage() {
+  const heroTitleRef = useRef(null);
+  const heroDescRef = useRef(null);
+  const missionRef = useRef(null);
+  const visionRef = useRef(null);
+  const valuesHeaderRef = useRef(null);
+  const valuesGridRef = useRef(null);
+  const statsHeaderRef = useRef(null);
+  const statsGridRef = useRef(null);
+
+  useEffect(() => {
+    // Hero başlık/alt başlık giriş animasyonu (sayfa yüklenince bir kez)
+    gsap.fromTo(
+      heroTitleRef.current,
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
+    );
+    gsap.fromTo(
+      heroDescRef.current,
+      { opacity: 0, y: 40 },
+      { opacity: 1, y: 0, duration: 0.8, ease: "power2.out", delay: 0.1 }
+    );
+
+    // Scroll ile görünen bölümler (tek seferlik)
+    const sections = [
+      { el: missionRef, start: "top 85%" },
+      { el: visionRef, start: "top 85" + "%" },
+    ];
+    sections.forEach(({ el, start }) => {
+      if (!el.current) return;
+      gsap.fromTo(
+        el.current,
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: el.current,
+            start,
+            toggleActions: "play none none none",
+            once: true,
+          },
+        }
+      );
+    });
+
+    if (valuesHeaderRef.current) {
+      gsap.fromTo(
+        valuesHeaderRef.current,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: valuesHeaderRef.current,
+            start: "top 85%",
+            toggleActions: "play none none none",
+            once: true,
+          },
+        }
+      );
+    }
+
+    if (valuesGridRef.current) {
+      gsap.fromTo(
+        valuesGridRef.current.children,
+        { opacity: 0, y: 50, scale: 0.95 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: valuesGridRef.current,
+            start: "top 85%",
+            toggleActions: "play none none none",
+            once: true,
+          },
+        }
+      );
+    }
+
+    if (statsHeaderRef.current) {
+      gsap.fromTo(
+        statsHeaderRef.current,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: statsHeaderRef.current,
+            start: "top 85%",
+            toggleActions: "play none none none",
+            once: true,
+          },
+        }
+      );
+    }
+
+    if (statsGridRef.current) {
+      gsap.fromTo(
+        statsGridRef.current.children,
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.4,
+          stagger: 0.1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: statsGridRef.current,
+            start: "top 90%",
+            toggleActions: "play none none none",
+            once: true,
+          },
+        }
+      );
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <section className="bg-primary text-white py-20">
         <div className="container mx-auto px-4 2xl:px-[120px]">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Hakkımızda</h1>
-            <p className="text-xl md:text-2xl text-white/90 leading-relaxed">
+            <h1
+              ref={heroTitleRef}
+              className="text-4xl md:text-5xl font-bold mb-6"
+            >
+              Hakkımızda
+            </h1>
+            <p
+              ref={heroDescRef}
+              className="text-xl md:text-2xl text-white/90 leading-relaxed"
+            >
               İstanbul Sağlık ve Teknoloji Üniversitesi öğrencileri ve
               mezunlarını güçlü bir network ile buluşturan platform
             </p>
@@ -21,7 +160,10 @@ function AboutUsPage() {
         <div className="container mx-auto px-4 2xl:px-[120px]">
           <div className="grid lg:grid-cols-2 gap-16">
             {/* Misyon */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+            <div
+              ref={missionRef}
+              className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100"
+            >
               <div className="flex items-center mb-6">
                 <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mr-4">
                   <i className="bi bi-bullseye text-2xl text-primary"></i>
@@ -48,7 +190,10 @@ function AboutUsPage() {
             </div>
 
             {/* Vizyon */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+            <div
+              ref={visionRef}
+              className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100"
+            >
               <div className="flex items-center mb-6">
                 <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mr-4">
                   <i className="bi bi-eye text-2xl text-primary"></i>
@@ -79,7 +224,7 @@ function AboutUsPage() {
       {/* Values Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 2xl:px-[120px]">
-          <div className="text-center mb-16">
+          <div ref={valuesHeaderRef} className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
               Değerlerimiz
             </h2>
@@ -88,7 +233,10 @@ function AboutUsPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div
+            ref={valuesGridRef}
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
             {/* İş Birliği */}
             <div className="text-center group">
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-primary/20 transition-colors">
@@ -179,12 +327,15 @@ function AboutUsPage() {
       {/* Statistics Section */}
       <section className="py-20 bg-primary text-white">
         <div className="container mx-auto px-4 2xl:px-[120px]">
-          <div className="text-center mb-16">
+          <div ref={statsHeaderRef} className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Rakamlarla ISTUNetwork</h2>
             <p className="text-xl text-white/90">Büyüyen topluluğumuzun gücü</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div
+            ref={statsGridRef}
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
+          >
             <div className="text-center">
               <div className="text-4xl md:text-5xl font-bold mb-2">500+</div>
               <div className="text-white/80 text-lg">Aktif Öğrenci</div>

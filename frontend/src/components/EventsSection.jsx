@@ -158,7 +158,8 @@ function EventsSection() {
             scrollTrigger: {
               trigger: headerRef.current,
               start: "top 80%",
-              toggleActions: "play none none reverse",
+              toggleActions: "play none none none",
+              once: true,
             },
           }
         );
@@ -177,7 +178,8 @@ function EventsSection() {
             scrollTrigger: {
               trigger: cardsContainerRef.current,
               start: "top 85%",
-              toggleActions: "play none none reverse",
+              toggleActions: "play none none none",
+              once: true,
             },
           }
         );
