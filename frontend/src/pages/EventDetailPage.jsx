@@ -223,6 +223,8 @@ function EventDetailPage() {
   const isRegistrationClosed =
     registrationDeadline && now > registrationDeadline;
   const isEventPassed = now > eventDate;
+  const hasRegistrationLink =
+    event.has_registration_link && event.registration_link;
 
   const getButtonState = () => {
     if (isEventPassed) {
@@ -231,6 +233,7 @@ function EventDetailPage() {
         text: "Etkinlik Tamamlandı",
         tooltip: "Bu etkinlik sona ermiştir.",
         className: "bg-gray-400 cursor-not-allowed",
+        showButton: false,
       };
     }
 
@@ -240,6 +243,17 @@ function EventDetailPage() {
         text: "Kayıt Süresi Doldu",
         tooltip: `Kayıt son tarihi: ${formatDate(event.registration_deadline)}`,
         className: "bg-red-400 cursor-not-allowed",
+        showButton: false,
+      };
+    }
+
+    if (!hasRegistrationLink) {
+      return {
+        disabled: true,
+        text: "Kayıt Linki Yok",
+        tooltip: "Bu etkinlik için kayıt linki bulunmuyor.",
+        className: "bg-gray-400 cursor-not-allowed",
+        showButton: false,
       };
     }
 
@@ -248,6 +262,7 @@ function EventDetailPage() {
       text: "Etkinliğe Katıl",
       tooltip: "Etkinliğe katılmak için tıklayın.",
       className: "bg-primary hover:bg-red-700",
+      showButton: true,
     };
   };
 
@@ -407,35 +422,49 @@ function EventDetailPage() {
 
           {/* Aksiyon Butonu */}
           <div ref={actionButtonRef} className="opacity-0">
-            <div className="relative group">
-              <button
-                disabled={buttonState.disabled}
-                className={`w-full ${
-                  buttonState.className
-                } text-white px-8 py-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-                  !buttonState.disabled ? "transform hover:scale-105" : ""
-                }`}
-              >
-                <i
-                  className={`bi ${
-                    buttonState.disabled
-                      ? isEventPassed
-                        ? "bi-check-circle"
-                        : "bi-x-circle"
-                      : "bi-calendar-plus"
+            {buttonState.showButton && (
+              <div className="relative group">
+                <button
+                  disabled={buttonState.disabled}
+                  className={`w-full ${
+                    buttonState.className
+                  } text-white px-8 py-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+                    !buttonState.disabled ? "transform hover:scale-105" : ""
                   }`}
-                ></i>
-                <span>{buttonState.text}</span>
-              </button>
+                  onClick={() => {
+                    if (!buttonState.disabled && event.registration_link) {
+                      let url = event.registration_link;
+                      const hasHttp =
+                        url.startsWith("http://") || url.startsWith("https://");
+                      const hasProtocolRelative = url.startsWith("//");
+                      if (!hasHttp && !hasProtocolRelative) {
+                        url = "//" + url;
+                      }
+                      window.open(url, "_blank", "noopener,noreferrer");
+                    }
+                  }}
+                >
+                  <i
+                    className={`bi ${
+                      buttonState.disabled
+                        ? isEventPassed
+                          ? "bi-check-circle"
+                          : "bi-x-circle"
+                        : "bi-calendar-plus"
+                    }`}
+                  ></i>
+                  <span>{buttonState.text}</span>
+                </button>
 
-              {/* Tooltip */}
-              {buttonState.disabled && (
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
-                  {buttonState.tooltip}
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
-                </div>
-              )}
-            </div>
+                {/* Tooltip */}
+                {buttonState.disabled && (
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-sm rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                    {buttonState.tooltip}
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

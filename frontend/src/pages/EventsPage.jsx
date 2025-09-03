@@ -20,6 +20,7 @@ const EventCard = ({ event, onClick }) => {
   const isRegistrationClosed =
     event.registration_deadline &&
     new Date() > new Date(event.registration_deadline);
+  const hasRegistrationLink = event.has_registration_link && event.registration_link;
 
   return (
     <div
@@ -56,6 +57,11 @@ const EventCard = ({ event, onClick }) => {
             <div className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg flex items-center gap-1">
               <i className="bi bi-x-circle text-xs"></i>
               <span>Kayıt Kapandı</span>
+            </div>
+          ) : !hasRegistrationLink ? (
+            <div className="bg-gray-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg flex items-center gap-1">
+              <i className="bi bi-link-45deg text-xs"></i>
+              <span>Link Yok</span>
             </div>
           ) : (
             <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg flex items-center gap-1">

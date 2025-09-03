@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import SocialImpactGallery from "../components/SocialImpactGallery";
+import API from "../utils/axios";
 import img1 from "../assets/img/social_impact/1.PNG";
 import img2 from "../assets/img/social_impact/2.PNG";
 import img3 from "../assets/img/social_impact/3.jpg";
@@ -17,6 +18,36 @@ function SocialImpactPage() {
   const scoreRef = useRef(null);
   const projectsRef = useRef(null);
   const impactRef = useRef(null);
+
+  const [socialImpactData, setSocialImpactData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // API'den sosyal etki verilerini çekme
+  useEffect(() => {
+    const fetchSocialImpactData = async () => {
+      try {
+        setLoading(true);
+        const response = await API.get("/socialimpactscores");
+        const data = response?.data?.data ?? response?.data;
+        if (data) {
+          setSocialImpactData(data);
+        }
+      } catch (error) {
+        console.error("Sosyal etki verileri çekilemedi:", error);
+        // Hata durumunda varsayılan değerler kullan
+        setSocialImpactData({
+          social_impact_score: "85",
+          number_of_people_reached: "2500",
+          social_projects: "25",
+          awards: "15",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSocialImpactData();
+  }, []);
 
   // Sosyal etki projesi resimleri
   const galleryItems = [
@@ -156,7 +187,7 @@ function SocialImpactPage() {
     }, pageRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [loading]); // loading değiştiğinde animasyonları tekrar çalıştır
 
   return (
     <div ref={pageRef} className="min-h-screen bg-gray-50">
@@ -226,7 +257,18 @@ function SocialImpactPage() {
                     strokeWidth="8"
                     fill="none"
                     strokeDasharray="283"
-                    strokeDashoffset="70.75"
+                    strokeDashoffset={
+                      loading
+                        ? "70.75"
+                        : `${
+                            283 -
+                            283 *
+                              (parseInt(
+                                socialImpactData?.social_impact_score || "85"
+                              ) /
+                                100)
+                          }`
+                    }
                     strokeLinecap="round"
                     className="transition-all duration-2000 ease-out"
                   />
@@ -248,7 +290,11 @@ function SocialImpactPage() {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-5xl md:text-6xl font-bold text-primary mb-2">
-                      85
+                      {loading ? (
+                        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+                      ) : (
+                        socialImpactData?.social_impact_score || "85"
+                      )}
                     </div>
                     <div className="text-gray-600 font-medium">
                       Sosyal Etki Puanı
@@ -265,7 +311,11 @@ function SocialImpactPage() {
                   <i className="bi bi-people text-white text-xl"></i>
                 </div>
                 <div className="text-2xl font-bold text-green-700 mb-2">
-                  2,500+
+                  {loading ? (
+                    <div className="w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                  ) : (
+                    `${socialImpactData?.number_of_people_reached || "2500"}+`
+                  )}
                 </div>
                 <div className="text-green-600 font-medium">Etkilenen Kişi</div>
               </div>
@@ -274,7 +324,13 @@ function SocialImpactPage() {
                 <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <i className="bi bi-calendar-event text-white text-xl"></i>
                 </div>
-                <div className="text-2xl font-bold text-blue-700 mb-2">25+</div>
+                <div className="text-2xl font-bold text-blue-700 mb-2">
+                  {loading ? (
+                    <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                  ) : (
+                    `${socialImpactData?.social_projects || "25"}+`
+                  )}
+                </div>
                 <div className="text-blue-600 font-medium">Sosyal Proje</div>
               </div>
 
@@ -283,7 +339,11 @@ function SocialImpactPage() {
                   <i className="bi bi-award text-white text-xl"></i>
                 </div>
                 <div className="text-2xl font-bold text-purple-700 mb-2">
-                  15+
+                  {loading ? (
+                    <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                  ) : (
+                    `${socialImpactData?.awards || "15"}+`
+                  )}
                 </div>
                 <div className="text-purple-600 font-medium">
                   Ödül & Tanıtım

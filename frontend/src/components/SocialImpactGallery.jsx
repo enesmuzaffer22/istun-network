@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
+import ImagePopup from "./ImagePopup";
 
 const useMedia = (queries, values, defaultValue) => {
   const get = () =>
@@ -75,6 +76,17 @@ const SocialImpactGallery = ({
   const [containerRef, { width }] = useMeasure();
   const [imagesReady, setImagesReady] = useState(false);
   const [containerHeight, setContainerHeight] = useState(0);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  const handleImageClick = (index) => {
+    setSelectedImageIndex(index);
+    setIsPopupOpen(true);
+  };
+
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
+  };
 
   const getInitialPosition = (item) => {
     const containerRect = containerRef.current?.getBoundingClientRect();
@@ -222,9 +234,9 @@ const SocialImpactGallery = ({
         <div
           key={item.id}
           data-key={item.id}
-          className="absolute box-content"
+          className="absolute box-content cursor-pointer"
           style={{ willChange: "transform, width, height, opacity" }}
-          onClick={() => window.open(item.url, "_blank", "noopener")}
+          onClick={() => handleImageClick(grid.indexOf(item))}
           onMouseEnter={(e) => handleMouseEnter(item.id, e.currentTarget)}
           onMouseLeave={(e) => handleMouseLeave(item.id, e.currentTarget)}
         >
@@ -238,6 +250,14 @@ const SocialImpactGallery = ({
           </div>
         </div>
       ))}
+      
+      {/* Image Popup */}
+      <ImagePopup
+        isOpen={isPopupOpen}
+        onClose={handleClosePopup}
+        images={items}
+        initialIndex={selectedImageIndex}
+      />
     </div>
   );
 };

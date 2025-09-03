@@ -20,6 +20,9 @@ const formatDate = (dateString) => {
 
 // Etkinlik kartı bileşeni
 const EventCard = ({ event, onClick }) => {
+  const hasRegistrationLink =
+    event.has_registration_link && event.registration_link;
+
   return (
     <div
       className="group cursor-pointer overflow-hidden rounded-2xl bg-white shadow-md hover:shadow-xl transition-all duration-300"
@@ -49,9 +52,23 @@ const EventCard = ({ event, onClick }) => {
           </div>
         )}
 
+        {/* Kayıt linki durumu badge */}
+        {hasRegistrationLink && (
+          <div className="absolute top-4 right-4">
+            <div className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg flex items-center gap-1">
+              <i className="bi bi-link-45deg text-xs"></i>
+              <span>Kayıt Linki</span>
+            </div>
+          </div>
+        )}
+
         {/* Tarih badge */}
         {event.event_date && (
-          <div className="absolute top-4 right-4">
+          <div
+            className={`absolute ${
+              hasRegistrationLink ? "top-16" : "top-4"
+            } right-4`}
+          >
             <div className="bg-white text-gray-800 px-3 py-1 rounded-full text-sm font-medium shadow-lg flex items-center gap-1">
               <i className="bi bi-calendar3 text-xs"></i>
               <span>{formatDate(event.event_date)}</span>
