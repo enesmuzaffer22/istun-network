@@ -21,6 +21,7 @@ import eventsRoutes from "./routes/events";
 import bridgeprojectsRoutes from "./routes/bridgeprojects";
 import bridgeprojectsimpactRoutes from "./routes/bridgeprojectsimpact";
 import achievementsRoutes from "./routes/achievements";
+import socialimpactscoresRoutes from "./routes/socialimpactscores";
 
 dotenv.config();
 
@@ -71,6 +72,7 @@ app.get("/", (req, res) => {
       bridgeprojects: "/api/bridgeprojects",
       bridgeprojectsimpact: "/api/bridgeprojectsimpact",
       achievements: "/api/achievements",
+      socialimpactscores: "/api/socialimpactscores",
     },
   });
 });
@@ -98,6 +100,7 @@ app.use("/api/events", eventsRoutes);
 app.use("/api/bridgeprojects", bridgeprojectsRoutes);
 app.use("/api/bridgeprojectsimpact", bridgeprojectsimpactRoutes);
 app.use("/api/achievements", achievementsRoutes);
+app.use("/api/socialimpactscores", socialimpactscoresRoutes);
 
 // Sunucu başlat
 app.listen(PORT, () => {

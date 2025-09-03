@@ -86,17 +86,16 @@ router.post("/", protect, isAdmin, upload.single("image"), async (req, res) => {
       organizer,
       registration_required,
       registration_deadline,
-      tags,
+      registration_link,
+      has_registration_link,
+      tags
     } = req.body;
 
     // Zorunlu alanlar kontrolü
     if (!title || !content || !description || !event_date || !created_at) {
       return res
         .status(400)
-        .json({
-          message:
-            "Başlık, içerik, açıklama, etkinlik tarihi ve oluşturma tarihi zorunlu.",
-        });
+        .json({ message: "Başlık, içerik, açıklama, etkinlik tarihi ve oluşturma tarihi zorunlu." });
     }
 
     let image_url = "";
@@ -116,11 +115,22 @@ router.post("/", protect, isAdmin, upload.single("image"), async (req, res) => {
     // Tags string array'e çevir (eğer string olarak gelirse)
     let tagsArray = [];
     if (tags) {
-      if (typeof tags === "string") {
-        tagsArray = tags.split(",").map((tag: string) => tag.trim());
+      if (typeof tags === 'string') {
+        tagsArray = tags.split(',').map((tag: string) => tag.trim());
       } else if (Array.isArray(tags)) {
         tagsArray = tags;
       }
+    }
+
+    // Boolean değerleri düzelt
+    const registrationRequiredValue = registration_required === true || registration_required === "true";
+    const hasRegistrationLinkValue = has_registration_link === true || has_registration_link === "true";
+
+    // Eğer has_registration_link true ise registration_link de olmalı
+    if (hasRegistrationLinkValue && !registration_link) {
+      return res
+        .status(400)
+        .json({ message: "Kayıt linki varsa registration_link alanı zorunlu." });
     }
 
     // Firestore'a etkinlik kaydet
@@ -135,9 +145,10 @@ router.post("/", protect, isAdmin, upload.single("image"), async (req, res) => {
       time: time || "",
       image_url,
       organizer: organizer || "",
-      registration_required:
-        registration_required === true || registration_required === "true",
+      registration_required: registrationRequiredValue,
       registration_deadline: registration_deadline || null,
+      registration_link: registration_link || "",
+      has_registration_link: hasRegistrationLinkValue,
       tags: tagsArray,
     });
 
@@ -334,18 +345,37 @@ router.put("/:id", protect, isAdmin, async (req, res) => {
 
     // Tags string array'e çevir (eğer string olarak gelirse)
     if (updateData.tags) {
-      if (typeof updateData.tags === "string") {
-        updateData.tags = updateData.tags
-          .split(",")
-          .map((tag: string) => tag.trim());
+      if (typeof updateData.tags === 'string') {
+        updateData.tags = updateData.tags.split(',').map((tag: string) => tag.trim());
       }
     }
 
     // Boolean değerleri düzelt
     if (updateData.registration_required !== undefined) {
-      updateData.registration_required =
-        updateData.registration_required === true ||
-        updateData.registration_required === "true";
+      updateData.registration_required = updateData.registration_required === true || updateData.registration_required === "true";
+    }
+
+    if (updateData.has_registration_link !== undefined) {
+      updateData.has_registration_link = updateData.has_registration_link === true || updateData.has_registration_link === "true";
+
+      // Eğer has_registration_link true yapılıyorsa ve registration_link yoksa hata ver
+      if (updateData.has_registration_link && !updateData.registration_link) {
+        // Mevcut kaydı kontrol et
+        const doc = await db.collection("events").doc(req.params.id).get();
+        if (doc.exists) {
+          const currentData = doc.data();
+          if (!currentData?.registration_link) {
+            return res
+              .status(400)
+              .json({ message: "Kayıt linki varsa registration_link alanı zorunlu." });
+          }
+        }
+      }
+
+      // Eğer has_registration_link false yapılıyorsa registration_link'i temizle
+      if (!updateData.has_registration_link) {
+        updateData.registration_link = "";
+      }
     }
 
     await db.collection("events").doc(req.params.id).update(updateData);
