@@ -59,7 +59,7 @@ FIREBASE_STORAGE_BUCKET=firebase_storage_bucket
 ```
 4. `npm run dev` ile uygulamayı başlatın (backend, frontend, dashboard).
 
-## Son olarak...
+## 🙏 Son olarak...
 Proje halen geliştirilme aşamasında. 2025 Eylül ayının sonlarına doğru projeyi canlıya almayı planlıyoruz.
 
 Projenin geliştirilmesi ve yürütülmesi muhtemelen durmayacak. Bu nedenle bu proje ile ilgilenecek geliştiriciler ve web sitesi içinde editörlük yapabilecek ekip arkadaşları arıyoruz. Bununla ilgili duyuruyu ilerleyen zamanlarda sizler ile paylaşmış olacağız.
