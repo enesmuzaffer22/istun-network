@@ -166,7 +166,8 @@ function Navbar() {
         }`}
       >
         <div className="logo">
-          <span
+          <Link
+            to="/"
             className={`md:text-2xl font-bold text-xl transition-colors duration-300 ${
               isLandingPage
                 ? isScrolled
@@ -176,7 +177,7 @@ function Navbar() {
             }`}
           >
             ISTUNetwork
-          </span>
+          </Link>
         </div>
 
         {/* Desktop Navigation */}
@@ -405,9 +406,9 @@ function Navbar() {
             {/* Header with close button */}
             <div className="flex justify-between items-center p-4 border-b border-white/20">
               <div className="logo">
-                <span className="text-2xl font-bold text-white">
+                <Link to="/" className="text-2xl font-bold text-white">
                   ISTUNetwork
-                </span>
+                </Link>
               </div>
               <button
                 className="flex flex-col gap-1 p-2"

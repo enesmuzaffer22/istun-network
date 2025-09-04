@@ -50,17 +50,17 @@ function HeroCards() {
         <HeroCard
           image={graduate}
           title="Küresel Network"
-          description="Mezunlarımızı bir araya getirerek küresel çapta bağlantılar kurmayı hedefliyoruz."
+          description="ISTUNetwork, mezunlarımızı bir araya getirerek küresel ölçekte güçlü bağlantılar kurmayı hedefler."
         />
         <HeroCard
           image={career}
           title="Kariyer Fırsatları"
-          description="Topluluğumuz, iş ve staj fırsatlarına erişim sağlayarak kariyerinizde size rehberlik eder."
+          description="ISTUNetwork, mezunlarımızı ve öğrencilerimizi iş dünyasına hazırlayan güçlü bir köprü görevi görür."
         />
         <HeroCard
           image={speaking}
           title="Kişisel Gelişim"
-          description="Seminerler, atölyeler ve mentorluk programlarıyla sürekli gelişim fırsatları sunuyoruz."
+          description="ISTUNetwork, yalnızca mezunlarımızın kariyer yolculuğunu değil, kişisel gelişimlerini de destekler."
         />
       </div>
     </div>

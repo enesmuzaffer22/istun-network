@@ -90,7 +90,7 @@ function AboutUsPage() {
                 </h2>
               </div>
               <p className="text-gray-700 leading-relaxed text-lg">
-                İSTÜNetwork olarak misyonumuz; öğrencilerimiz ve mezunlarımız
+                ISTUNetwork olarak misyonumuz; öğrencilerimiz ve mezunlarımız
                 arasında güçlü bağlar kurmak, kariyer fırsatları yaratmak, bilgi
                 ve deneyim paylaşımını teşvik etmektir.
               </p>
@@ -135,7 +135,7 @@ function AboutUsPage() {
               Değerlerimiz
             </h2>
             <p className="text-gray-600 max-w-3xl mx-auto text-lg">
-              İSTÜNetwork kültürünü besleyen temel ilkeler
+              ISTUNetwork kültürünü besleyen temel ilkeler
             </p>
           </div>
 
@@ -201,7 +201,7 @@ function AboutUsPage() {
               Sıkça Sorulan Sorular (SSS)
             </h2>
             <p className="text-gray-600 max-w-3xl mx-auto text-lg">
-              İSTÜNetwork hakkında merak ettiklerinize hızlı yanıtlar
+              ISTUNetwork hakkında merak ettiklerinize hızlı yanıtlar
             </p>
           </div>
 
@@ -263,7 +263,7 @@ function FAQAccordion() {
       a: "Evet, platform öncelikli olarak İstanbul Sağlık ve Teknoloji Üniversitesi Bilgisayar ve Yazılım Mühendisliği bölümlerinin öğrencileri ve mezunları için kurulmuştur.",
     },
     {
-      q: "İSTÜNetwork’e katılmanın bana en büyük katkısı ne olur?",
+      q: "ISTUNetwork’e katılmanın bana en büyük katkısı ne olur?",
       a: "Kariyer fırsatlarını yakalamanın yanı sıra, mezun–öğrenci dayanışması ile güçlü bir iletişim ağına dahil olur, topluluğun bir parçası olarak aidiyet duygusunu yaşarsınız.",
     },
   ];
