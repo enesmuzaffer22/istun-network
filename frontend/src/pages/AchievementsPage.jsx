@@ -158,7 +158,7 @@ function AchievementsPage() {
           </div>
 
           {/* Pagination Controls */}
-          <div className="flex items-center justify-center gap-3 mt-6">
+          <div className="flex items-center justify-center gap-3 mt-16">
             <button
               onClick={async () => {
                 if (page > 1 && !loading) {

@@ -191,7 +191,7 @@ function ActivityDetailPage() {
                   </h3>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-primary mb-2">
-                      {activity.impact}
+                      {activity.project_impact}
                     </div>
                   </div>
                 </div>
