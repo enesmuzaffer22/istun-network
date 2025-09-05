@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from "react";
 import API from "../utils/axios";
-import NewsFormModal from "../components/NewsFormModal";
+import AnnouncementFormModal from "../components/AnnouncementFormModal";
 
-function NewsListPage() {
-  const [news, setNews] = useState([]);
+function AnnouncementsListPage() {
+  const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedNews, setSelectedNews] = useState(null);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Haberleri getir
-  const fetchNews = async (page = 1) => {
+  // Duyuruları getir
+  const fetchAnnouncements = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await API.get(`/news?page=${page}`);
+      const response = await API.get(`/announcements?page=${page}`);
       const {
         data,
         page: responsePage,
@@ -24,28 +24,28 @@ function NewsListPage() {
         hasMore: responseHasMore,
       } = response.data;
 
-      setNews(data);
+      setAnnouncements(data);
       setCurrentPage(responsePage);
       setHasMore(responseHasMore);
       setTotalPages(Math.ceil(data.length / limit) + (responseHasMore ? 1 : 0));
       setError("");
     } catch (err) {
-      setError("Haberler yüklenirken hata oluştu.");
-      console.error("News fetch error:", err);
+      setError("Duyurular yüklenirken hata oluştu.");
+      console.error("Announcements fetch error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Sayfa yüklendiğinde haberleri getir
+  // Sayfa yüklendiğinde duyuruları getir
   useEffect(() => {
-    fetchNews();
+    fetchAnnouncements();
   }, []);
 
   // Sayfa değiştirme fonksiyonları
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
-      fetchNews(page);
+      fetchAnnouncements(page);
     }
   };
 
@@ -61,58 +61,49 @@ function NewsListPage() {
     }
   };
 
-  // Yeni haber oluştur
-  const handleCreateNews = () => {
-    setSelectedNews(null);
+  // Yeni duyuru oluştur
+  const handleCreateAnnouncement = () => {
+    setSelectedAnnouncement(null);
     setIsModalOpen(true);
   };
 
-  // Haberi düzenle
-  const handleEditNews = (newsItem) => {
-    setSelectedNews(newsItem);
+  // Duyuruyu düzenle
+  const handleEditAnnouncement = (announcement) => {
+    setSelectedAnnouncement(announcement);
     setIsModalOpen(true);
   };
 
-  // Haberi sil
-  const handleDeleteNews = async (newsId) => {
-    if (!window.confirm("Bu haberi silmek istediğinize emin misiniz?")) {
+  // Duyuruyu sil
+  const handleDeleteAnnouncement = async (announcementId) => {
+    if (!window.confirm("Bu duyuruyu silmek istediğinize emin misiniz?")) {
       return;
     }
 
     try {
-      await API.delete(`/news/${newsId}`);
-      await fetchNews(currentPage); // Listeyi yenile
+      await API.delete(`/announcements/${announcementId}`);
+      await fetchAnnouncements(currentPage); // Listeyi yenile
     } catch (err) {
-      setError("Haber silinirken hata oluştu.");
-      console.error("News delete error:", err);
+      setError("Duyuru silinirken hata oluştu.");
+      console.error("Announcement delete error:", err);
     }
   };
 
   // Modal'dan gelen kaydetme işlemi
-  const handleSaveNews = async (formData, newsId) => {
+  const handleSaveAnnouncement = async (formData, announcementId) => {
     try {
-      if (newsId) {
+      if (announcementId) {
         // Düzenleme - PUT request
-        const newsData = {
-          ...formData,
-          created_at: new Date().toISOString(),
-        };
-        await API.put(`/news/${newsId}`, newsData);
+        await API.put(`/announcements/${announcementId}`, formData);
       } else {
-        // Yeni oluşturma - POST request (FormData)
-        // FormData oluşturulması NewsFormModal içinde yapılacak
-        await API.post("/news", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        // Yeni oluşturma - POST request
+        await API.post("/announcements", formData);
       }
 
       setIsModalOpen(false);
-      await fetchNews(currentPage); // Listeyi yenile
+      await fetchAnnouncements(currentPage); // Listeyi yenile
     } catch (err) {
-      setError("Haber kaydedilirken hata oluştu.");
-      console.error("News save error:", err);
+      setError("Duyuru kaydedilirken hata oluştu.");
+      console.error("Announcement save error:", err);
     }
   };
 
@@ -142,13 +133,13 @@ function NewsListPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Haberler</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Duyurularımız</h1>
         <button
-          onClick={handleCreateNews}
+          onClick={handleCreateAnnouncement}
           className="bg-primary hover:bg-primary/70 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <i className="bi bi-plus-lg"></i>
-          Yeni Haber Oluştur
+          Yeni Duyuru Ekle
         </button>
       </div>
 
@@ -162,9 +153,6 @@ function NewsListPage() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Thumbnail
-              </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Başlık
               </th>
@@ -183,60 +171,45 @@ function NewsListPage() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {news.length === 0 ? (
+            {announcements.length === 0 ? (
               <tr>
-                <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
-                  Henüz haber bulunmuyor.
+                <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                  Henüz duyuru bulunmuyor.
                 </td>
               </tr>
             ) : (
-              news.map((newsItem) => (
-                <tr key={newsItem.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex-shrink-0 h-10 w-10">
-                      {newsItem.thumbnail_img_url ? (
-                        <img
-                          className="h-10 w-10 rounded-lg object-cover"
-                          src={newsItem.thumbnail_img_url}
-                          alt={newsItem.title}
-                        />
-                      ) : (
-                        <div className="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center">
-                          <i className="bi bi-image text-gray-400"></i>
-                        </div>
-                      )}
-                    </div>
-                  </td>
+              announcements.map((announcement) => (
+                <tr key={announcement.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900 max-w-xs">
-                      {newsItem.title}
+                      {announcement.title}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {newsItem.category || "Kategori Yok"}
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                      {announcement.category || "Kategori Yok"}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-gray-900 max-w-xs">
-                      {truncateContent(newsItem.content)}
+                      {truncateContent(announcement.content)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {formatDate(newsItem.created_at)}
+                      {formatDate(announcement.created_at)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
-                      onClick={() => handleEditNews(newsItem)}
+                      onClick={() => handleEditAnnouncement(announcement)}
                       className="text-blue-600 hover:text-blue-900 mr-4"
                       title="Düzenle"
                     >
                       <i className="bi bi-pencil"></i>
                     </button>
                     <button
-                      onClick={() => handleDeleteNews(newsItem.id)}
+                      onClick={() => handleDeleteAnnouncement(announcement.id)}
                       className="text-red-600 hover:text-red-900"
                       title="Sil"
                     >
@@ -251,7 +224,7 @@ function NewsListPage() {
       </div>
 
       {/* Sayfalama Kontrolleri */}
-      {news.length > 0 && (
+      {announcements.length > 0 && (
         <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4 rounded-lg shadow">
           <div className="flex-1 flex justify-between sm:hidden">
             <button
@@ -273,7 +246,10 @@ function NewsListPage() {
             <div>
               <p className="text-sm text-gray-700">
                 Sayfa <span className="font-medium">{currentPage}</span> -
-                <span className="font-medium"> {news.length} haber</span>
+                <span className="font-medium">
+                  {" "}
+                  {announcements.length} duyuru
+                </span>
               </p>
             </div>
             <div>
@@ -332,14 +308,14 @@ function NewsListPage() {
         </div>
       )}
 
-      <NewsFormModal
+      <AnnouncementFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={handleSaveNews}
-        newsItem={selectedNews}
+        onSave={handleSaveAnnouncement}
+        announcement={selectedAnnouncement}
       />
     </div>
   );
 }
 
-export default NewsListPage;
+export default AnnouncementsListPage;

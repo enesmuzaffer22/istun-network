@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from "react";
 import API from "../utils/axios";
-import NewsFormModal from "../components/NewsFormModal";
+import EventFormModal from "../components/EventFormModal";
 
-function NewsListPage() {
-  const [news, setNews] = useState([]);
+function EventsListPage() {
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedNews, setSelectedNews] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Haberleri getir
-  const fetchNews = async (page = 1) => {
+  // Etkinlikleri getir
+  const fetchEvents = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await API.get(`/news?page=${page}`);
+      const response = await API.get(`/events?page=${page}`);
       const {
         data,
         page: responsePage,
@@ -24,28 +24,33 @@ function NewsListPage() {
         hasMore: responseHasMore,
       } = response.data;
 
-      setNews(data);
+      setEvents(data);
       setCurrentPage(responsePage);
       setHasMore(responseHasMore);
-      setTotalPages(Math.ceil(data.length / limit) + (responseHasMore ? 1 : 0));
+
+      // Toplam sayfa sayısını doğru hesapla
+      // Eğer hasMore true ise, bir sonraki sayfa var demektir
+      // Eğer hasMore false ise, bu son sayfa demektir
+      setTotalPages(responseHasMore ? responsePage + 1 : responsePage);
+
       setError("");
     } catch (err) {
-      setError("Haberler yüklenirken hata oluştu.");
-      console.error("News fetch error:", err);
+      setError("Etkinlikler yüklenirken hata oluştu.");
+      console.error("Events fetch error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Sayfa yüklendiğinde haberleri getir
+  // Sayfa yüklendiğinde etkinlikleri getir
   useEffect(() => {
-    fetchNews();
+    fetchEvents();
   }, []);
 
   // Sayfa değiştirme fonksiyonları
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
-      fetchNews(page);
+      fetchEvents(page);
     }
   };
 
@@ -61,47 +66,47 @@ function NewsListPage() {
     }
   };
 
-  // Yeni haber oluştur
-  const handleCreateNews = () => {
-    setSelectedNews(null);
+  // Yeni etkinlik oluştur
+  const handleCreateEvent = () => {
+    setSelectedEvent(null);
     setIsModalOpen(true);
   };
 
-  // Haberi düzenle
-  const handleEditNews = (newsItem) => {
-    setSelectedNews(newsItem);
+  // Etkinliği düzenle
+  const handleEditEvent = (event) => {
+    setSelectedEvent(event);
     setIsModalOpen(true);
   };
 
-  // Haberi sil
-  const handleDeleteNews = async (newsId) => {
-    if (!window.confirm("Bu haberi silmek istediğinize emin misiniz?")) {
+  // Etkinliği sil
+  const handleDeleteEvent = async (eventId) => {
+    if (!window.confirm("Bu etkinliği silmek istediğinize emin misiniz?")) {
       return;
     }
 
     try {
-      await API.delete(`/news/${newsId}`);
-      await fetchNews(currentPage); // Listeyi yenile
+      await API.delete(`/events/${eventId}`);
+      await fetchEvents(currentPage); // Listeyi yenile
     } catch (err) {
-      setError("Haber silinirken hata oluştu.");
-      console.error("News delete error:", err);
+      setError("Etkinlik silinirken hata oluştu.");
+      console.error("Event delete error:", err);
     }
   };
 
   // Modal'dan gelen kaydetme işlemi
-  const handleSaveNews = async (formData, newsId) => {
+  const handleSaveEvent = async (formData, eventId) => {
     try {
-      if (newsId) {
+      if (eventId) {
         // Düzenleme - PUT request
-        const newsData = {
+        const eventData = {
           ...formData,
           created_at: new Date().toISOString(),
         };
-        await API.put(`/news/${newsId}`, newsData);
+        await API.put(`/events/${eventId}`, eventData);
       } else {
         // Yeni oluşturma - POST request (FormData)
-        // FormData oluşturulması NewsFormModal içinde yapılacak
-        await API.post("/news", formData, {
+        // FormData oluşturulması EventFormModal içinde yapılacak
+        await API.post("/events", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -109,10 +114,10 @@ function NewsListPage() {
       }
 
       setIsModalOpen(false);
-      await fetchNews(currentPage); // Listeyi yenile
+      await fetchEvents(currentPage); // Listeyi yenile
     } catch (err) {
-      setError("Haber kaydedilirken hata oluştu.");
-      console.error("News save error:", err);
+      setError("Etkinlik kaydedilirken hata oluştu.");
+      console.error("Event save error:", err);
     }
   };
 
@@ -122,6 +127,19 @@ function NewsListPage() {
       month: "long",
       day: "numeric",
     });
+  };
+
+  const formatDateTime = (dateString, timeString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const time = timeString ? ` ${timeString}` : "";
+    return (
+      date.toLocaleDateString("tr-TR", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }) + time
+    );
   };
 
   const truncateContent = (content, maxLength = 100) => {
@@ -142,13 +160,13 @@ function NewsListPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Haberler</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Etkinliklerimiz</h1>
         <button
-          onClick={handleCreateNews}
-          className="bg-primary hover:bg-primary/70 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          onClick={handleCreateEvent}
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <i className="bi bi-plus-lg"></i>
-          Yeni Haber Oluştur
+          Yeni Etkinlik Oluştur
         </button>
       </div>
 
@@ -163,7 +181,7 @@ function NewsListPage() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Thumbnail
+                Resim
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Başlık
@@ -172,7 +190,13 @@ function NewsListPage() {
                 Kategori
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                İçerik Özeti
+                Tarih & Saat
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Konum
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Kayıt Gerekli
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Oluşturma Tarihi
@@ -183,25 +207,25 @@ function NewsListPage() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {news.length === 0 ? (
+            {events.length === 0 ? (
               <tr>
-                <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
-                  Henüz haber bulunmuyor.
+                <td colSpan="8" className="px-6 py-4 text-center text-gray-500">
+                  Henüz etkinlik bulunmuyor.
                 </td>
               </tr>
             ) : (
-              news.map((newsItem) => (
-                <tr key={newsItem.id} className="hover:bg-gray-50">
+              events.map((event) => (
+                <tr key={event.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex-shrink-0 h-10 w-10">
-                      {newsItem.thumbnail_img_url ? (
+                    <div className="flex-shrink-0 h-16 w-20">
+                      {event.image_url ? (
                         <img
-                          className="h-10 w-10 rounded-lg object-cover"
-                          src={newsItem.thumbnail_img_url}
-                          alt={newsItem.title}
+                          className="h-16 w-20 rounded-lg object-cover"
+                          src={event.image_url}
+                          alt={event.title}
                         />
                       ) : (
-                        <div className="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center">
+                        <div className="h-16 w-20 rounded-lg bg-gray-200 flex items-center justify-center">
                           <i className="bi bi-image text-gray-400"></i>
                         </div>
                       )}
@@ -209,34 +233,53 @@ function NewsListPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900 max-w-xs">
-                      {newsItem.title}
+                      {event.title}
+                    </div>
+                    <div className="text-xs text-gray-500 max-w-xs">
+                      {truncateContent(event.description)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {newsItem.category || "Kategori Yok"}
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                      {event.category || "Kategori Yok"}
                     </span>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900 max-w-xs">
-                      {truncateContent(newsItem.content)}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {formatDateTime(event.event_date, event.time)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {formatDate(newsItem.created_at)}
+                      {event.location || "-"}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        event.registration_required
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {event.registration_required ? "Evet" : "Hayır"}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {formatDate(event.created_at)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
-                      onClick={() => handleEditNews(newsItem)}
+                      onClick={() => handleEditEvent(event)}
                       className="text-blue-600 hover:text-blue-900 mr-4"
                       title="Düzenle"
                     >
                       <i className="bi bi-pencil"></i>
                     </button>
                     <button
-                      onClick={() => handleDeleteNews(newsItem.id)}
+                      onClick={() => handleDeleteEvent(event.id)}
                       className="text-red-600 hover:text-red-900"
                       title="Sil"
                     >
@@ -251,7 +294,7 @@ function NewsListPage() {
       </div>
 
       {/* Sayfalama Kontrolleri */}
-      {news.length > 0 && (
+      {events.length > 0 && (
         <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4 rounded-lg shadow">
           <div className="flex-1 flex justify-between sm:hidden">
             <button
@@ -272,8 +315,9 @@ function NewsListPage() {
           <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-gray-700">
-                Sayfa <span className="font-medium">{currentPage}</span> -
-                <span className="font-medium"> {news.length} haber</span>
+                Sayfa <span className="font-medium">{currentPage}</span> /{" "}
+                <span className="font-medium">{totalPages}</span> -
+                <span className="font-medium"> {events.length} etkinlik</span>
               </p>
             </div>
             <div>
@@ -303,13 +347,16 @@ function NewsListPage() {
                     pageNum = currentPage - 2 + i;
                   }
 
+                  // Sayfa numarası totalPages'den büyük olamaz
+                  if (pageNum > totalPages) return null;
+
                   return (
                     <button
                       key={pageNum}
                       onClick={() => handlePageChange(pageNum)}
                       className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                         pageNum === currentPage
-                          ? "z-10 bg-primary border-primary text-white"
+                          ? "z-10 bg-red-600 border-red-600 text-white"
                           : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
                       }`}
                     >
@@ -332,14 +379,14 @@ function NewsListPage() {
         </div>
       )}
 
-      <NewsFormModal
+      <EventFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={handleSaveNews}
-        newsItem={selectedNews}
+        onSave={handleSaveEvent}
+        eventItem={selectedEvent}
       />
     </div>
   );
 }
 
-export default NewsListPage;
+export default EventsListPage;

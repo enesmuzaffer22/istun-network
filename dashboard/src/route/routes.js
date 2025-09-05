@@ -58,6 +58,48 @@ const routes = [
         isPrivate: true,
       },
 
+      // Başarılarımız
+      {
+        path: "achievements",
+        component: () => import("../pages/AchievementsListPage.jsx"),
+        isPrivate: true,
+      },
+
+      // Duyurularımız
+      {
+        path: "announcements",
+        component: () => import("../pages/AnnouncementsListPage.jsx"),
+        isPrivate: true,
+      },
+
+      // Etkinliklerimiz
+      {
+        path: "events",
+        component: () => import("../pages/EventsListPage.jsx"),
+        isPrivate: true,
+      },
+
+      // Köprü Projeleri
+      {
+        path: "bridgeprojects",
+        component: () => import("../pages/BridgeProjectsListPage.jsx"),
+        isPrivate: true,
+      },
+
+      // Köprü Projeleri Etki Skorları
+      {
+        path: "bridgeprojectsimpact",
+        component: () => import("../pages/BridgeProjectsImpactPage.jsx"),
+        isPrivate: true,
+      },
+
+      // Sosyal Etki Skorları
+      {
+        path: "socialimpactscores",
+        component: () => import("../pages/SocialImpactScoresPage.jsx"),
+        isPrivate: true,
+      },
+
       // Ayarlar
       {
         path: "settings",

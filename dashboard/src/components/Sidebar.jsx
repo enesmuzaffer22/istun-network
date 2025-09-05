@@ -9,6 +9,20 @@ const menu = [
   { name: "İş İlanları", icon: "bi-briefcase", path: "/jobs" }, // Yeni eklendi
   { name: "Haberler", icon: "bi-newspaper", path: "/news" }, // Yeni eklendi
   { name: "Yol Haritaları", icon: "bi-signpost-split", path: "/roadmaps" }, // Yeni eklendi
+  { name: "Başarılarımız", icon: "bi-trophy", path: "/achievements" }, // Yeni eklendi
+  { name: "Duyurularımız", icon: "bi-megaphone", path: "/announcements" }, // Yeni eklendi
+  { name: "Etkinliklerimiz", icon: "bi-calendar-event", path: "/events" }, // Yeni eklendi
+  { name: "Köprü Projeleri", icon: "bi-diagram-3", path: "/bridgeprojects" }, // Yeni eklendi
+  {
+    name: "Etki Skorları (Köprü Projeleri)",
+    icon: "bi-graph-up",
+    path: "/bridgeprojectsimpact",
+  }, // Yeni eklendi
+  {
+    name: "Sosyal Etki Skorları",
+    icon: "bi-heart-pulse",
+    path: "/socialimpactscores",
+  }, // Yeni eklendi
   { name: "Ayarlar", icon: "bi-gear", path: "/settings" },
   {
     name: "Bekleyen Talepler",

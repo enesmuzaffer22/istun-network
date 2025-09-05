@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from "react";
 import API from "../utils/axios";
-import NewsFormModal from "../components/NewsFormModal";
+import BridgeProjectFormModal from "../components/BridgeProjectFormModal";
 
-function NewsListPage() {
-  const [news, setNews] = useState([]);
+function BridgeProjectsListPage() {
+  const [bridgeProjects, setBridgeProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedNews, setSelectedNews] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Haberleri getir
-  const fetchNews = async (page = 1) => {
+  // Köprü Projelerini getir
+  const fetchBridgeProjects = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await API.get(`/news?page=${page}`);
+      const response = await API.get(`/bridgeprojects?page=${page}`);
       const {
         data,
         page: responsePage,
@@ -24,28 +24,31 @@ function NewsListPage() {
         hasMore: responseHasMore,
       } = response.data;
 
-      setNews(data);
+      setBridgeProjects(data);
       setCurrentPage(responsePage);
       setHasMore(responseHasMore);
-      setTotalPages(Math.ceil(data.length / limit) + (responseHasMore ? 1 : 0));
+
+      // Toplam sayfa sayısını doğru hesapla
+      setTotalPages(responseHasMore ? responsePage + 1 : responsePage);
+
       setError("");
     } catch (err) {
-      setError("Haberler yüklenirken hata oluştu.");
-      console.error("News fetch error:", err);
+      setError("Köprü projeleri yüklenirken hata oluştu.");
+      console.error("Bridge projects fetch error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Sayfa yüklendiğinde haberleri getir
+  // Sayfa yüklendiğinde köprü projelerini getir
   useEffect(() => {
-    fetchNews();
+    fetchBridgeProjects();
   }, []);
 
   // Sayfa değiştirme fonksiyonları
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
-      fetchNews(page);
+      fetchBridgeProjects(page);
     }
   };
 
@@ -61,47 +64,48 @@ function NewsListPage() {
     }
   };
 
-  // Yeni haber oluştur
-  const handleCreateNews = () => {
-    setSelectedNews(null);
+  // Yeni köprü projesi oluştur
+  const handleCreateProject = () => {
+    setSelectedProject(null);
     setIsModalOpen(true);
   };
 
-  // Haberi düzenle
-  const handleEditNews = (newsItem) => {
-    setSelectedNews(newsItem);
+  // Köprü projesini düzenle
+  const handleEditProject = (project) => {
+    setSelectedProject(project);
     setIsModalOpen(true);
   };
 
-  // Haberi sil
-  const handleDeleteNews = async (newsId) => {
-    if (!window.confirm("Bu haberi silmek istediğinize emin misiniz?")) {
+  // Köprü projesini sil
+  const handleDeleteProject = async (projectId) => {
+    if (
+      !window.confirm("Bu köprü projesini silmek istediğinize emin misiniz?")
+    ) {
       return;
     }
 
     try {
-      await API.delete(`/news/${newsId}`);
-      await fetchNews(currentPage); // Listeyi yenile
+      await API.delete(`/bridgeprojects/${projectId}`);
+      await fetchBridgeProjects(currentPage); // Listeyi yenile
     } catch (err) {
-      setError("Haber silinirken hata oluştu.");
-      console.error("News delete error:", err);
+      setError("Köprü projesi silinirken hata oluştu.");
+      console.error("Bridge project delete error:", err);
     }
   };
 
   // Modal'dan gelen kaydetme işlemi
-  const handleSaveNews = async (formData, newsId) => {
+  const handleSaveProject = async (formData, projectId) => {
     try {
-      if (newsId) {
+      if (projectId) {
         // Düzenleme - PUT request
-        const newsData = {
+        const projectData = {
           ...formData,
           created_at: new Date().toISOString(),
         };
-        await API.put(`/news/${newsId}`, newsData);
+        await API.put(`/bridgeprojects/${projectId}`, projectData);
       } else {
         // Yeni oluşturma - POST request (FormData)
-        // FormData oluşturulması NewsFormModal içinde yapılacak
-        await API.post("/news", formData, {
+        await API.post("/bridgeprojects", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -109,15 +113,25 @@ function NewsListPage() {
       }
 
       setIsModalOpen(false);
-      await fetchNews(currentPage); // Listeyi yenile
+      await fetchBridgeProjects(currentPage); // Listeyi yenile
     } catch (err) {
-      setError("Haber kaydedilirken hata oluştu.");
-      console.error("News save error:", err);
+      setError("Köprü projesi kaydedilirken hata oluştu.");
+      console.error("Bridge project save error:", err);
     }
   };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("tr-TR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const formatDateTime = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("tr-TR", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -142,13 +156,13 @@ function NewsListPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Haberler</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Köprü Projeleri</h1>
         <button
-          onClick={handleCreateNews}
-          className="bg-primary hover:bg-primary/70 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          onClick={handleCreateProject}
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <i className="bi bi-plus-lg"></i>
-          Yeni Haber Oluştur
+          Yeni Köprü Projesi Oluştur
         </button>
       </div>
 
@@ -163,16 +177,25 @@ function NewsListPage() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Thumbnail
+                Resim
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Başlık
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Kategori
+                Açıklama
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                İçerik Özeti
+                Etkinlik Tarihi
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Konum
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Katılımcı Sayısı
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Proje Değeri
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Oluşturma Tarihi
@@ -183,25 +206,25 @@ function NewsListPage() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {news.length === 0 ? (
+            {bridgeProjects.length === 0 ? (
               <tr>
-                <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
-                  Henüz haber bulunmuyor.
+                <td colSpan="9" className="px-6 py-4 text-center text-gray-500">
+                  Henüz köprü projesi bulunmuyor.
                 </td>
               </tr>
             ) : (
-              news.map((newsItem) => (
-                <tr key={newsItem.id} className="hover:bg-gray-50">
+              bridgeProjects.map((project) => (
+                <tr key={project.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex-shrink-0 h-10 w-10">
-                      {newsItem.thumbnail_img_url ? (
+                    <div className="flex-shrink-0 h-16 w-20">
+                      {project.image_url ? (
                         <img
-                          className="h-10 w-10 rounded-lg object-cover"
-                          src={newsItem.thumbnail_img_url}
-                          alt={newsItem.title}
+                          className="h-16 w-20 rounded-lg object-cover"
+                          src={project.image_url}
+                          alt={project.title}
                         />
                       ) : (
-                        <div className="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center">
+                        <div className="h-16 w-20 rounded-lg bg-gray-200 flex items-center justify-center">
                           <i className="bi bi-image text-gray-400"></i>
                         </div>
                       )}
@@ -209,34 +232,49 @@ function NewsListPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900 max-w-xs">
-                      {newsItem.title}
+                      {project.title}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {newsItem.category || "Kategori Yok"}
-                    </span>
-                  </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900 max-w-xs">
-                      {truncateContent(newsItem.content)}
+                    <div className="text-xs text-gray-500 max-w-xs">
+                      {truncateContent(project.description)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      {formatDate(newsItem.created_at)}
+                      {formatDateTime(project.event_date)}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {project.location || "-"}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                      {project.number_of_participants || 0}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900 max-w-xs">
+                      {truncateContent(project.project_impact, 30)}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {formatDate(project.created_at)}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
-                      onClick={() => handleEditNews(newsItem)}
+                      onClick={() => handleEditProject(project)}
                       className="text-blue-600 hover:text-blue-900 mr-4"
                       title="Düzenle"
                     >
                       <i className="bi bi-pencil"></i>
                     </button>
                     <button
-                      onClick={() => handleDeleteNews(newsItem.id)}
+                      onClick={() => handleDeleteProject(project.id)}
                       className="text-red-600 hover:text-red-900"
                       title="Sil"
                     >
@@ -251,7 +289,7 @@ function NewsListPage() {
       </div>
 
       {/* Sayfalama Kontrolleri */}
-      {news.length > 0 && (
+      {bridgeProjects.length > 0 && (
         <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4 rounded-lg shadow">
           <div className="flex-1 flex justify-between sm:hidden">
             <button
@@ -272,8 +310,12 @@ function NewsListPage() {
           <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-gray-700">
-                Sayfa <span className="font-medium">{currentPage}</span> -
-                <span className="font-medium"> {news.length} haber</span>
+                Sayfa <span className="font-medium">{currentPage}</span> /{" "}
+                <span className="font-medium">{totalPages}</span> -
+                <span className="font-medium">
+                  {" "}
+                  {bridgeProjects.length} proje
+                </span>
               </p>
             </div>
             <div>
@@ -303,13 +345,16 @@ function NewsListPage() {
                     pageNum = currentPage - 2 + i;
                   }
 
+                  // Sayfa numarası totalPages'den büyük olamaz
+                  if (pageNum > totalPages) return null;
+
                   return (
                     <button
                       key={pageNum}
                       onClick={() => handlePageChange(pageNum)}
                       className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                         pageNum === currentPage
-                          ? "z-10 bg-primary border-primary text-white"
+                          ? "z-10 bg-red-600 border-red-600 text-white"
                           : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
                       }`}
                     >
@@ -332,14 +377,14 @@ function NewsListPage() {
         </div>
       )}
 
-      <NewsFormModal
+      <BridgeProjectFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={handleSaveNews}
-        newsItem={selectedNews}
+        onSave={handleSaveProject}
+        projectItem={selectedProject}
       />
     </div>
   );
 }
 
-export default NewsListPage;
+export default BridgeProjectsListPage;
