@@ -9,7 +9,7 @@
 
 import express from "express";
 import { db, auth, admin } from "../firebase/firebase";
-import { protect, isAdmin } from "../middleware/authMiddleware";
+import { protect, isAdmin, isSuperAdmin } from "../middleware/authMiddleware";
 import { cache } from "../utils/cache";
 import { sendUserApprovedEmail, sendUserRejectedEmail } from "../utils/emailService";
 
@@ -255,7 +255,7 @@ router.put("/me", protect, async (req, res) => {
 router.get(
   "/",
   protect,
-  isAdmin,
+  isSuperAdmin,
   cacheMiddleware("users_list", 240),
   async (req, res) => {
     try {
@@ -438,7 +438,7 @@ router.get(
 //================================================================
 // 5. POST /api/users/:id/approve -> (Admin) Kullanıcı kaydını onaylar.
 //================================================================
-router.post("/:id/approve", protect, isAdmin, async (req, res) => {
+router.post("/:id/approve", protect, isSuperAdmin, async (req, res) => {
   try {
     const userId = req.params.id;
     const userRef = db.collection("users").doc(userId);
@@ -534,7 +534,7 @@ router.post("/:id/approve", protect, isAdmin, async (req, res) => {
 //================================================================
 // 6. POST /api/users/:id/reject -> (Admin) Kullanıcı kaydını reddeder.
 //================================================================
-router.post("/:id/reject", protect, isAdmin, async (req, res) => {
+router.post("/:id/reject", protect, isSuperAdmin, async (req, res) => {
   try {
     const userId = req.params.id;
     const userRef = db.collection("users").doc(userId);

@@ -2,7 +2,7 @@
 
 import express from "express";
 import { db } from "../firebase/firebase";
-import { protect, isAdmin } from "../middleware/authMiddleware";
+import { protect, isAdmin, isContentAdmin } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
@@ -40,7 +40,7 @@ const router = express.Router();
  */
 // POST http://localhost:5000/api/announcements
 // Duyuru oluştur
-router.post("/", protect, isAdmin, async (req, res) => {
+router.post("/", protect, isContentAdmin, async (req, res) => {
   try {
     const { title, content, created_at, category } = req.body;
 
@@ -186,7 +186,7 @@ router.get("/:id", async (req, res) => {
  */
 // PUT http://localhost:5000/api/announcements/{id}
 // Duyuru güncelle
-router.put("/:id", protect, isAdmin, async (req, res) => {
+router.put("/:id", protect, isContentAdmin, async (req, res) => {
   try {
     await db.collection("announcements").doc(req.params.id).update(req.body);
     res.json({ message: "Duyuru güncellendi." });
@@ -217,7 +217,7 @@ router.put("/:id", protect, isAdmin, async (req, res) => {
  */
 // DELETE http://localhost:5000/api/announcements/{id}
 // Duyuru sil
-router.delete("/:id", protect, isAdmin, async (req, res) => {
+router.delete("/:id", protect, isContentAdmin, async (req, res) => {
   try {
     await db.collection("announcements").doc(req.params.id).delete();
     res.json({ message: "Duyuru silindi." });

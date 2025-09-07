@@ -22,6 +22,7 @@ import bridgeprojectsRoutes from "./routes/bridgeprojects";
 import bridgeprojectsimpactRoutes from "./routes/bridgeprojectsimpact";
 import achievementsRoutes from "./routes/achievements";
 import socialimpactscoresRoutes from "./routes/socialimpactscores";
+import adminManagementRoutes from "./routes/adminManagement";
 
 dotenv.config();
 
@@ -30,7 +31,7 @@ const PORT = process.env.PORT || 5000;
 
 // Rate limit sabitleri
 const RATE_LIMIT_WINDOW_MS = 60_000; // 60 saniye
-const RATE_LIMIT_MAX = 20; // dakika başına 20 istek
+const RATE_LIMIT_MAX = 50; // dakika başına 20 istek
 
 // CORS ayarı
 app.use(
@@ -73,6 +74,7 @@ app.get("/", (req, res) => {
       bridgeprojectsimpact: "/api/bridgeprojectsimpact",
       achievements: "/api/achievements",
       socialimpactscores: "/api/socialimpactscores",
+      adminManagement: "/api/admin/management",
     },
   });
 });
@@ -101,6 +103,7 @@ app.use("/api/bridgeprojects", bridgeprojectsRoutes);
 app.use("/api/bridgeprojectsimpact", bridgeprojectsimpactRoutes);
 app.use("/api/achievements", achievementsRoutes);
 app.use("/api/socialimpactscores", socialimpactscoresRoutes);
+app.use("/api/admin/management", adminManagementRoutes);
 
 // Sunucu başlat
 app.listen(PORT, () => {

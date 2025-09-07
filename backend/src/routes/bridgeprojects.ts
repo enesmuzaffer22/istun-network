@@ -5,7 +5,7 @@ import { db } from "../firebase/firebase";
 import multer from "multer";
 import { admin } from "../firebase/firebase";
 import { v4 as uuidv4 } from "uuid";
-import { protect, isAdmin } from "../middleware/authMiddleware";
+import { protect, isAdmin, isContentAdmin } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
@@ -72,7 +72,7 @@ const upload = multer({ storage });
 
 // POST http://localhost:5000/api/bridgeprojects
 // Bridge Project oluştur (tek adımda dosya ve diğer alanlar)
-router.post("/", protect, isAdmin, upload.single("image"), async (req, res) => {
+router.post("/", protect, isContentAdmin, upload.single("image"), async (req, res) => {
   try {
     const {
       title,
@@ -344,7 +344,7 @@ router.get("/:id", async (req, res) => {
  */
 // PUT http://localhost:5000/api/bridgeprojects/{id}
 // Bridge Project güncelle
-router.put("/:id", protect, isAdmin, async (req, res) => {
+router.put("/:id", protect, isContentAdmin, async (req, res) => {
   try {
     const updateData = { ...req.body };
 
@@ -407,7 +407,7 @@ router.put("/:id", protect, isAdmin, async (req, res) => {
  */
 // DELETE http://localhost:5000/api/bridgeprojects/{id}
 // Bridge Project sil
-router.delete("/:id", protect, isAdmin, async (req, res) => {
+router.delete("/:id", protect, isContentAdmin, async (req, res) => {
   try {
     await db.collection("bridgeprojects").doc(req.params.id).delete();
     res.json({ message: "Bridge Project silindi." });

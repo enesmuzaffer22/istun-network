@@ -2,7 +2,7 @@
 
 import express from "express";
 import { db } from "../firebase/firebase";
-import { protect, isAdmin } from "../middleware/authMiddleware";
+import { protect, isAdmin, isContentAdmin } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
@@ -91,7 +91,7 @@ router.get("/", async (req, res) => {
  */
 // POST http://localhost:5000/api/bridgeprojectsimpact
 // Bridge Projects Impact verilerini oluştur (ilk kez)
-router.post("/", protect, isAdmin, async (req, res) => {
+router.post("/", protect, isContentAdmin, async (req, res) => {
   try {
     const {
       volunteer_student,
@@ -190,7 +190,7 @@ router.post("/", protect, isAdmin, async (req, res) => {
  */
 // PUT http://localhost:5000/api/bridgeprojectsimpact
 // Bridge Projects Impact verilerini güncelle
-router.put("/", protect, isAdmin, async (req, res) => {
+router.put("/", protect, isContentAdmin, async (req, res) => {
   try {
     const {
       volunteer_student,
@@ -291,7 +291,7 @@ router.put("/", protect, isAdmin, async (req, res) => {
  */
 // DELETE http://localhost:5000/api/bridgeprojectsimpact
 // Bridge Projects Impact verilerini sil (opsiyonel)
-router.delete("/", protect, isAdmin, async (req, res) => {
+router.delete("/", protect, isContentAdmin, async (req, res) => {
   try {
     const snapshot = await db.collection("bridgeprojectsimpact").limit(1).get();
 

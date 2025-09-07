@@ -1,7 +1,7 @@
 import express from "express";
 import axios from "axios";
 import { auth, db } from "../firebase/firebase";
-import { protect, isAdmin } from "../middleware/authMiddleware";
+import { protect, isAdmin, isSuperAdmin } from "../middleware/authMiddleware";
 import { sendUserApprovedEmail, sendUserRejectedEmail } from "../utils/emailService";
 
 const router = express.Router();
@@ -107,6 +107,7 @@ router.post("/login", async (req, res) => {
             return res.status(403).json({ message: "Admin yetkisi bulunmuyor." });
         }
 
+        // ✅ Admin rolünü de döndür
         res.json({
             message: "Giriş başarılı!",
             token: response.data.idToken,
@@ -114,6 +115,8 @@ router.post("/login", async (req, res) => {
             user: {
                 email: response.data.email,
                 localId: response.data.localId,
+                adminRole: decoded.adminRole || 'content_admin', // Fallback
+                admin: decoded.admin
             },
         });
     } catch (error: any) {
@@ -162,7 +165,7 @@ router.post("/login", async (req, res) => {
  *       500:
  *         description: Sunucu hatası
  */
-router.get("/pending-users", protect, isAdmin, async (req, res) => {
+router.get("/pending-users", protect, isSuperAdmin, async (req, res) => {
     try {
         const pendingUsersSnap = await db
             .collection("users")
@@ -205,7 +208,7 @@ router.get("/pending-users", protect, isAdmin, async (req, res) => {
  *       500:
  *         description: Sunucu hatası
  */
-router.post("/approve-user/:userId", protect, isAdmin, async (req, res) => {
+router.post("/approve-user/:userId", protect, isSuperAdmin, async (req, res) => {
     try {
         const { userId } = req.params;
 
@@ -286,7 +289,7 @@ router.post("/approve-user/:userId", protect, isAdmin, async (req, res) => {
  *       500:
  *         description: Sunucu hatası
  */
-router.post("/reject-user/:userId", protect, isAdmin, async (req, res) => {
+router.post("/reject-user/:userId", protect, isSuperAdmin, async (req, res) => {
     try {
         const { userId } = req.params;
         const { reason } = req.body;

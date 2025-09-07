@@ -2,7 +2,7 @@
 
 import express from "express";
 import { db } from "../firebase/firebase";
-import { protect, isAdmin } from "../middleware/authMiddleware";
+import { protect, isAdmin, isContentAdmin } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
@@ -44,7 +44,7 @@ const router = express.Router();
  */
 // POST http://localhost:5000/api/achievements
 // Başarı oluştur
-router.post("/", protect, isAdmin, async (req, res) => {
+router.post("/", protect, isContentAdmin, async (req, res) => {
   try {
     const { title, given_from, year, news_link, has_link } = req.body;
 
@@ -201,7 +201,7 @@ router.get("/:id", async (req, res) => {
  */
 // PUT http://localhost:5000/api/achievements/{id}
 // Başarı güncelle
-router.put("/:id", protect, isAdmin, async (req, res) => {
+router.put("/:id", protect, isContentAdmin, async (req, res) => {
   try {
     const updateData = { ...req.body };
 
@@ -262,7 +262,7 @@ router.put("/:id", protect, isAdmin, async (req, res) => {
  */
 // DELETE http://localhost:5000/api/achievements/{id}
 // Başarı sil
-router.delete("/:id", protect, isAdmin, async (req, res) => {
+router.delete("/:id", protect, isContentAdmin, async (req, res) => {
   try {
     await db.collection("achievements").doc(req.params.id).delete();
     res.json({ message: "Başarı silindi." });

@@ -11,7 +11,7 @@ import { db } from "../firebase/firebase";
 import multer from "multer";
 import { admin } from "../firebase/firebase";
 import { v4 as uuidv4 } from "uuid";
-import { protect, isAdmin } from "../middleware/authMiddleware";
+import { protect, isAdmin, isContentAdmin } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
@@ -95,7 +95,7 @@ const upload = multer({ storage });
 router.post(
   "/",
   protect,
-  isAdmin,
+  isContentAdmin,
   upload.fields([
     { name: "banner_img", maxCount: 1 },
     { name: "thumbnail_img", maxCount: 1 },
@@ -220,7 +220,7 @@ router.post(
 router.post(
   "/upload-image",
   protect,
-  isAdmin,
+  isContentAdmin,
   upload.single("image"),
   async (req, res) => {
     try {
@@ -435,7 +435,7 @@ router.get("/:id", async (req, res) => {
  */
 // PUT http://localhost:5000/api/news/{id}
 // Haber güncelle
-router.put("/:id", protect, isAdmin, async (req, res) => {
+router.put("/:id", protect, isContentAdmin, async (req, res) => {
   try {
     await db.collection("news").doc(req.params.id).update(req.body);
     res.json({ message: "Haber güncellendi." });
@@ -481,7 +481,7 @@ router.put("/:id", protect, isAdmin, async (req, res) => {
  */
 // DELETE http://localhost:5000/api/news/{id}
 // Haber sil
-router.delete("/:id", protect, isAdmin, async (req, res) => {
+router.delete("/:id", protect, isContentAdmin, async (req, res) => {
   try {
     await db.collection("news").doc(req.params.id).delete();
     res.json({ message: "Haber silindi." });

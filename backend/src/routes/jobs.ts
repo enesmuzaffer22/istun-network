@@ -9,7 +9,7 @@
 
 import express from "express";
 import { db, admin } from "../firebase/firebase";
-import { protect, isAdmin } from "../middleware/authMiddleware";
+import { protect, isAdmin, isContentAdmin } from "../middleware/authMiddleware";
 
 const router = express.Router();
 
@@ -84,7 +84,7 @@ const router = express.Router();
  */
 // ---- YENİ İŞ İLANI OLUŞTURMA (POST) ----
 // Bu bölümü, veritabanındaki yapıya uygun hale getirdik.
-router.post("/", protect, isAdmin, async (req, res) => {
+router.post("/", protect, isContentAdmin, async (req, res) => {
   try {
     const { title, employer, created_at, content, link } = req.body;
 
@@ -287,7 +287,7 @@ router.get("/:id", async (req, res) => {
  *               $ref: '#/components/schemas/Error'
  */
 // Diğer rotalar (PUT, DELETE, SUBMIT) zaten doğru çalışıyor.
-router.put("/:id", protect, isAdmin, async (req, res) => {
+router.put("/:id", protect, isContentAdmin, async (req, res) => {
   try {
     await db.collection("jobs").doc(req.params.id).update(req.body);
     res.json({ message: "İş ilanı güncellendi." });
@@ -331,7 +331,7 @@ router.put("/:id", protect, isAdmin, async (req, res) => {
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete("/:id", protect, isAdmin, async (req, res) => {
+router.delete("/:id", protect, isContentAdmin, async (req, res) => {
   try {
     await db.collection("jobs").doc(req.params.id).delete();
     res.json({ message: "İş ilanı silindi." });
