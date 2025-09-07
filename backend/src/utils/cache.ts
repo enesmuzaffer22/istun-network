@@ -7,7 +7,7 @@ export class MemoryCache {
         this.cache.set(key, { data: value, expiry });
     }
 
-    get(key: string): any | null {
+    get<T = any>(key: string): T | null {
         const item = this.cache.get(key);
         if (!item) return null;
 
@@ -16,7 +16,7 @@ export class MemoryCache {
             return null;
         }
 
-        return item.data;
+        return item.data as T;
     }
 
     delete(key: string): void {
@@ -26,6 +26,11 @@ export class MemoryCache {
     clear(): void {
         this.cache.clear();
     }
+
+    getAllKeys(): string[] {
+        return Array.from(this.cache.keys());
+    }
+
 }
 
 // Global cache instance

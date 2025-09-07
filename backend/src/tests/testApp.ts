@@ -8,6 +8,7 @@ import jobsRoutes from "../routes/jobs";
 import roadmapsRoutes from "../routes/roadmaps";
 import profileRoutes from "../routes/profile";
 import { MemoryCache } from "../utils/cache";
+import { progressiveRateLimitMiddleware } from "../middleware/progressiveRateLimitMiddleware";
 
 // Test için rate limiting'i daha gevşek yap
 const testLimiter = rateLimit({
@@ -24,6 +25,9 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Test için progressive rate limit'i de ekle
+app.use(progressiveRateLimitMiddleware);
 app.use(testLimiter);
 
 app.use("/api/auth", authRoutes);

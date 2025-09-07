@@ -67,7 +67,8 @@ const runAllTests = async () => {
         'profile.test.ts',
         'cache.test.ts',
         'fileUpload.test.ts',
-        'rateLimit.test.ts'
+        'rateLimit.test.ts',
+        'progressiveRateLimit.test.ts'
     ];
 
     const results: TestResult[] = [];
@@ -127,7 +128,7 @@ const runAllTests = async () => {
         '🔐 Authentication': results.filter(r => r.name.includes('auth')),
         '📰 Content Management': results.filter(r => ['news', 'jobs'].some(t => r.name.includes(t))),
         '👤 User Management': results.filter(r => r.name.includes('profile')),
-        '⚡ Performance': results.filter(r => ['cache', 'rateLimit'].some(t => r.name.includes(t))),
+        '⚡ Performance': results.filter(r => ['cache', 'rateLimit', 'progressiveRateLimit'].some(t => r.name.includes(t))),
         '📁 File Handling': results.filter(r => r.name.includes('fileUpload'))
     };
 

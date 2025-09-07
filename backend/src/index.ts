@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import rateLimit from "express-rate-limit";
+import { progressiveRateLimitMiddleware } from "./middleware/progressiveRateLimitMiddleware";
 
 // Firebase konfigürasyonu
 import "./firebase/firebase";
@@ -30,8 +31,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Rate limit sabitleri
-const RATE_LIMIT_WINDOW_MS = 60_000; // 60 saniye
-const RATE_LIMIT_MAX = 50; // dakika başına 20 istek
+const RATE_LIMIT_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000'); // 60 saniye
+const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '50'); // dakika başına 50 istek
 
 // CORS ayarı
 app.use(
@@ -44,6 +45,8 @@ app.use(express.json());
 
 // Rate limit ayarı
 app.set("trust proxy", 1);
+
+// Genel rate limit (tüm endpoint'ler için)
 const limiter = rateLimit({
   windowMs: RATE_LIMIT_WINDOW_MS,
   max: RATE_LIMIT_MAX,
@@ -54,6 +57,11 @@ const limiter = rateLimit({
   },
   skip: () => process.env.NODE_ENV === "test",
 });
+
+// Progressive rate limit (sadece public API'ler için)
+app.use(progressiveRateLimitMiddleware);
+
+// Genel rate limit (diğer endpoint'ler için)
 app.use(limiter);
 
 // Ana sayfa
