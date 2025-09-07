@@ -336,3 +336,4 @@ function SocialImpactScoresPage() {
 }
 
 export default SocialImpactScoresPage;
+

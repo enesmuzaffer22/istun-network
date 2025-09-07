@@ -49,7 +49,8 @@ const Sidebar = () => {
                 to={item.path}
                 // Tailwind class'ları için şablon değişmezlerini doğru kullandık
                 className={`flex items-center gap-3 px-4 py-2 rounded hover:bg-primary/10 transition text-gray-700 ${
-                  location.pathname === item.path
+                  location.pathname === item.path ||
+                  (location.pathname === "/" && item.path === "/jobs")
                     ? "bg-primary/10 text-primary font-semibold"
                     : ""
                 }`}
