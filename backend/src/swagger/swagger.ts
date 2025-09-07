@@ -405,6 +405,103 @@ const options = {
             },
           },
         },
+        AdminRole: {
+          type: "object",
+          properties: {
+            email: {
+              type: "string",
+              format: "email",
+              description: "Kullanıcının email adresi",
+            },
+            role: {
+              type: "string",
+              enum: ["super_admin", "content_admin"],
+              description: "Atanacak admin rolü",
+            },
+          },
+        },
+        AdminInfo: {
+          type: "object",
+          properties: {
+            id: {
+              type: "string",
+              description: "Admin ID'si",
+            },
+            name: {
+              type: "string",
+              description: "Admin adı",
+            },
+            surname: {
+              type: "string",
+              description: "Admin soyadı",
+            },
+            email: {
+              type: "string",
+              format: "email",
+              description: "Admin email adresi",
+            },
+            adminRole: {
+              type: "string",
+              enum: ["super_admin", "content_admin"],
+              description: "Admin rolü",
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              description: "Hesap oluşturma tarihi",
+            },
+          },
+        },
+        AdminList: {
+          type: "object",
+          properties: {
+            admins: {
+              type: "array",
+              items: {
+                $ref: "#/components/schemas/AdminInfo",
+              },
+              description: "Admin listesi",
+            },
+          },
+        },
+        AdminLoginResponse: {
+          type: "object",
+          properties: {
+            message: {
+              type: "string",
+              description: "Başarı mesajı",
+            },
+            token: {
+              type: "string",
+              description: "JWT token",
+            },
+            refreshToken: {
+              type: "string",
+              description: "Refresh token",
+            },
+            user: {
+              type: "object",
+              properties: {
+                email: {
+                  type: "string",
+                  format: "email",
+                },
+                localId: {
+                  type: "string",
+                },
+                adminRole: {
+                  type: "string",
+                  enum: ["super_admin", "content_admin"],
+                  description: "Admin rolü",
+                },
+                admin: {
+                  type: "boolean",
+                  description: "Admin yetkisi var mı?",
+                },
+              },
+            },
+          },
+        },
       },
     },
   },

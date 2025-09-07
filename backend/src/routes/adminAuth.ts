@@ -38,21 +38,7 @@ const router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 token:
- *                   type: string
- *                 refreshToken:
- *                   type: string
- *                 user:
- *                   type: object
- *                   properties:
- *                     email:
- *                       type: string
- *                     localId:
- *                       type: string
+ *               $ref: '#/components/schemas/AdminLoginResponse'
  *       400:
  *         description: Geçersiz veri
  *         content:

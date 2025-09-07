@@ -18,17 +18,7 @@ const router = express.Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required: [email, role]
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 description: Kullanıcının email adresi
- *               role:
- *                 type: string
- *                 enum: [super_admin, content_admin]
- *                 description: Atanacak admin rolü
+ *             $ref: '#/components/schemas/AdminRole'
  *     responses:
  *       200:
  *         description: Admin rolü başarıyla atandı
@@ -180,25 +170,7 @@ router.post("/remove-role", protect, isSuperAdmin, async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 admins:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       name:
- *                         type: string
- *                       surname:
- *                         type: string
- *                       email:
- *                         type: string
- *                       adminRole:
- *                         type: string
- *                       createdAt:
- *                         type: string
+git  *               $ref: '#/components/schemas/AdminList'
  *       403:
  *         description: Yetkisiz erişim
  *       500:
