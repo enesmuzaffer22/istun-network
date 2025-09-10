@@ -333,6 +333,19 @@ const ProfilePage = () => {
 
           {/* Content */}
           <div className="p-4 md:p-8">
+            {/* Bilgilendirme Mesajı */}
+            {isEditing && (
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-start">
+                  <i className="bi bi-info-circle text-blue-500 mr-3 mt-0.5"></i>
+                  <p className="text-blue-700 text-sm">
+                    Düzenlemiş olduğunuz bilgilerin güncellenmesi biraz zaman
+                    alabilir.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Ad */}
               <div>
