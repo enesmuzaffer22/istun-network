@@ -58,9 +58,10 @@ export const progressiveRateLimitMiddleware = (req: Request, res: Response, next
         return;
     }
 
-    // Rate limit headers ekle
+    // Rate limit headers ekle (dinamik limit)
+    const cfg = progressiveRateLimit.getConfig();
     res.set({
-        'X-RateLimit-Limit': '50',
+        'X-RateLimit-Limit': cfg.maxRequests.toString(),
         'X-RateLimit-Remaining': result.remaining.toString(),
         'X-RateLimit-Reset': new Date(result.resetTime).toISOString(),
     });

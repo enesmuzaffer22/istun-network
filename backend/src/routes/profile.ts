@@ -185,14 +185,24 @@ router.put("/me", protect, async (req, res) => {
     }
 
     // Cache'i temizle - kullanıcının kendi profili güncellendiği için
-    // Cache key format: user_me_{query}_{params}_{userId}
-    cache.delete(`user_me_{}_${userId}`);
+    // Birden fazla varyasyon (farklı query parametreleri) olabileceğinden tüm ilgili anahtarları temizle
+    const keys = cache.getAllKeys();
+    for (const k of keys) {
+      if (k.startsWith("user_me_") && k.endsWith(`_${userId}`)) {
+        cache.delete(k);
+      }
+    }
 
     // Ayrıca public profile cache'ini de temizle (eğer username değişmediyse)
     const userDocAfterUpdate = await db.collection("users").doc(userId).get();
     const updatedUserData = userDocAfterUpdate.data();
     if (updatedUserData?.username) {
-      cache.delete(`user_public_{}_${updatedUserData.username}_${userId}`);
+      const keys2 = cache.getAllKeys();
+      for (const k of keys2) {
+        if (k.startsWith("user_public_") && k.includes(`_${updatedUserData.username}_`)) {
+          cache.delete(k);
+        }
+      }
     }
 
     res.json({ message: "Profil başarıyla güncellendi." });

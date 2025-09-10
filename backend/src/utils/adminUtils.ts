@@ -11,6 +11,8 @@ export const setAdminRole = async (uid: string, role: 'super_admin' | 'content_a
             admin: true,
             adminRole: role
         });
+        // Mevcut oturumların yeni claim'leri alması için token'ları geçersiz kıl
+        try { await auth.revokeRefreshTokens(uid); } catch {}
         console.log(`Admin rolü atandı: ${uid} -> ${role}`);
         return true;
     } catch (error) {
@@ -29,6 +31,7 @@ export const removeAdminRole = async (uid: string) => {
             admin: false,
             adminRole: null
         });
+        try { await auth.revokeRefreshTokens(uid); } catch {}
         console.log(`Admin rolü kaldırıldı: ${uid}`);
         return true;
     } catch (error) {

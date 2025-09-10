@@ -93,7 +93,17 @@ router.post("/login", async (req, res) => {
             return res.status(403).json({ message: "Admin yetkisi bulunmuyor." });
         }
 
-        // ✅ Admin rolünü de döndür
+        // ✅ Admin rolünü de doğru şekilde döndür (fallback olarak Firebase'den güncel customClaims'i kontrol et)
+        let adminRole: string | null = (decoded.adminRole as string | undefined) || null;
+        if (!adminRole && decoded.admin && decoded.uid) {
+            try {
+                const freshUser = await auth.getUser(decoded.uid);
+                adminRole = (freshUser.customClaims?.adminRole as string | undefined) || null;
+            } catch {
+                // yoksay: dönerken sadece null bırak
+            }
+        }
+
         res.json({
             message: "Giriş başarılı!",
             token: response.data.idToken,
@@ -101,7 +111,7 @@ router.post("/login", async (req, res) => {
             user: {
                 email: response.data.email,
                 localId: response.data.localId,
-                adminRole: decoded.adminRole || 'content_admin', // Fallback
+                adminRole,
                 admin: decoded.admin
             },
         });

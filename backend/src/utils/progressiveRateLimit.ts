@@ -13,6 +13,7 @@ interface RateLimitConfig {
     maxRequests: number;
     banLevels: number[]; // Her seviye için ban süresi (milisaniye)
     maxBanLevel: number;
+    escalationWindowMs: number; // İhlal sayacının tutulduğu süre (milisaniye)
 }
 
 export class ProgressiveRateLimit {
@@ -35,6 +36,7 @@ export class ProgressiveRateLimit {
                 parseInt(process.env.BAN_LEVEL_6 || '86400000'), // 6. seviye: 1 gün ban
             ],
             maxBanLevel: parseInt(process.env.MAX_BAN_LEVEL || '6'),
+            escalationWindowMs: parseInt(process.env.BAN_ESCALATION_WINDOW_MS || '604800000'), // 7 gün
         };
 
         // Her 5 dakikada bir cache temizleme
@@ -42,6 +44,13 @@ export class ProgressiveRateLimit {
         this.cleanupInterval = setInterval(() => {
             this.cleanupExpiredEntries();
         }, cleanupIntervalMs);
+    }
+
+    /**
+     * Dışarıdan konfigürasyonun bazı alanlarını okumak için yardımcı
+     */
+    public getConfig(): Pick<RateLimitConfig, 'maxRequests' | 'windowMs'> {
+        return { maxRequests: this.config.maxRequests, windowMs: this.config.windowMs };
     }
 
     /**
@@ -206,17 +215,21 @@ export class ProgressiveRateLimit {
         message: string;
     } {
         const banKey = `ban:${ip}`;
-        const existingBan = this.cache.get<BanInfo>(banKey);
+        const violationsKey = `violations:${ip}`;
+        const existingViolations = this.cache.get<{ count: number; firstViolation: number; lastViolation: number }>(violationsKey);
 
-        let newLevel = 1;
-        let totalViolations = 1;
+        let violationCount = 1;
         let firstViolation = now;
+        let lastViolation = now;
 
-        if (existingBan) {
-            newLevel = Math.min(existingBan.level + 1, this.config.maxBanLevel);
-            totalViolations = existingBan.totalViolations + 1;
-            firstViolation = existingBan.firstViolation;
+        if (existingViolations) {
+            violationCount = Math.min(existingViolations.count + 1, this.config.maxBanLevel);
+            firstViolation = existingViolations.firstViolation;
+            lastViolation = now;
         }
+
+        // Ban seviyesi ihlal sayısına göre belirlenir
+        const newLevel = Math.min(violationCount, this.config.maxBanLevel);
 
         const banDuration = this.config.banLevels[newLevel];
         const banUntil = now + banDuration;
@@ -225,12 +238,15 @@ export class ProgressiveRateLimit {
             level: newLevel,
             banUntil,
             firstViolation,
-            lastViolation: now,
-            totalViolations,
+            lastViolation,
+            totalViolations: violationCount,
         };
 
         // Ban bilgisini cache'e kaydet
         this.cache.set(banKey, banInfo, Math.ceil(banDuration / 1000));
+
+        // İhlal sayacını escalation penceresi boyunca canlı tut
+        this.cache.set(violationsKey, { count: violationCount, firstViolation, lastViolation }, Math.ceil(this.config.escalationWindowMs / 1000));
 
         // Rate limit cache'ini temizle
         const rateKey = `rate:${ip}`;

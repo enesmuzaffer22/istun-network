@@ -195,7 +195,7 @@ router.post("/", protect, isContentAdmin, upload.single("image"), async (req, re
 router.post(
   "/upload-image",
   protect,
-  isAdmin,
+  isContentAdmin,
   upload.single("image"),
   async (req, res) => {
     try {
