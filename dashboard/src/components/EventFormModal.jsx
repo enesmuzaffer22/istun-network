@@ -43,36 +43,20 @@ function EventFormModal({ isOpen, onClose, onSave, eventItem }) {
     if (isEditing) {
       // Etiketleri düzgün şekilde parse et
       let parsedTags = [];
-      if (eventItem.tags && Array.isArray(eventItem.tags)) {
-        parsedTags = eventItem.tags
-          .map((tag) => {
-            // Eğer tag bir string ise ve JSON formatında ise parse et
-            if (typeof tag === "string") {
-              // JSON array formatında mı kontrol et
-              if (tag.startsWith("[") && tag.endsWith("]")) {
-                try {
-                  const parsed = JSON.parse(tag);
-                  return Array.isArray(parsed) ? parsed : [tag];
-                } catch (e) {
-                  return [tag];
-                }
-              }
-              // Virgülle ayrılmış string ise split et
-              else if (tag.includes(",")) {
-                return tag
-                  .split(",")
-                  .map((item) => item.trim())
-                  .filter((item) => item);
-              }
-              // Tek string ise direkt döndür
-              else {
-                return [tag.trim()];
-              }
-            }
-            return tag;
-          })
-          .flat()
-          .filter((tag) => tag && tag.trim()); // Boş değerleri filtrele
+      if (eventItem.tags) {
+        if (Array.isArray(eventItem.tags)) {
+          // Array formatı - sadece string olan ve boş olmayan elemanları al
+          parsedTags = eventItem.tags.filter(
+            (tag) => tag && typeof tag === "string" && tag.trim()
+          );
+        } else if (typeof eventItem.tags === "string") {
+          // String formatı - JSON parse etmeye çalış
+          try {
+            parsedTags = JSON.parse(eventItem.tags);
+          } catch {
+            parsedTags = [eventItem.tags];
+          }
+        }
       }
 
       setFormData({
@@ -93,6 +77,7 @@ function EventFormModal({ isOpen, onClose, onSave, eventItem }) {
         registration_link: eventItem.registration_link || "",
         has_registration_link: eventItem.has_registration_link || false,
         tags: parsedTags,
+        image_url: eventItem.image_url || "", // Mevcut resim URL'sini koru
       });
     } else {
       setFormData({
@@ -194,6 +179,10 @@ function EventFormModal({ isOpen, onClose, onSave, eventItem }) {
           ? new Date(formData.registration_deadline).toISOString()
           : "",
         created_at: new Date().toISOString(),
+        // Tags'i array olarak gönder
+        tags: formData.tags,
+        // Eğer yeni resim yüklendiğse image_url'i dahil et
+        ...(formData.image_url && { image_url: formData.image_url }),
       };
       onSave(eventData, eventItem.id);
     } else {
@@ -239,9 +228,11 @@ function EventFormModal({ isOpen, onClose, onSave, eventItem }) {
         formData.has_registration_link
       );
 
-      // Tags array'i JSON string olarak gönder
+      // Tags array'ini FormData'ya doğru şekilde ekle
       if (formData.tags.length > 0) {
-        formDataToSend.append("tags", JSON.stringify(formData.tags));
+        formData.tags.forEach((tag) => {
+          formDataToSend.append("tags", tag);
+        });
       }
 
       if (image) {

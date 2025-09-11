@@ -20,7 +20,6 @@ function EventsListPage() {
       const {
         data,
         page: responsePage,
-        limit,
         hasMore: responseHasMore,
       } = response.data;
 
@@ -240,9 +239,67 @@ function EventsListPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                      {event.category || "Kategori Yok"}
-                    </span>
+                    <div className="space-y-1">
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                        {event.category || "Kategori Yok"}
+                      </span>
+                      {/* Etiketleri göster */}
+                      {event.tags && (
+                        <div className="flex flex-wrap gap-1">
+                          {(() => {
+                            let tags = [];
+
+                            // Tags array'ini normalize et
+                            if (Array.isArray(event.tags)) {
+                              tags = event.tags.filter(
+                                (tag) =>
+                                  tag && typeof tag === "string" && tag.trim()
+                              );
+                            } else if (typeof event.tags === "string") {
+                              try {
+                                tags = JSON.parse(event.tags);
+                              } catch {
+                                tags = [event.tags];
+                              }
+                            }
+
+                            return Array.isArray(tags) && tags.length > 0
+                              ? tags.slice(0, 2).map((tag, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="inline-flex px-1.5 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700"
+                                  >
+                                    #{tag}
+                                  </span>
+                                ))
+                              : null;
+                          })()}
+                          {(() => {
+                            let tags = [];
+
+                            // Tags array'ini normalize et
+                            if (Array.isArray(event.tags)) {
+                              tags = event.tags.filter(
+                                (tag) =>
+                                  tag && typeof tag === "string" && tag.trim()
+                              );
+                            } else if (typeof event.tags === "string") {
+                              try {
+                                tags = JSON.parse(event.tags);
+                              } catch {
+                                tags = [event.tags];
+                              }
+                            }
+
+                            return Array.isArray(tags) && tags.length > 2 ? (
+                              <span className="inline-flex px-1.5 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
+                                +{tags.length - 2}
+                              </span>
+                            ) : null;
+                          })()}
+                        </div>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">

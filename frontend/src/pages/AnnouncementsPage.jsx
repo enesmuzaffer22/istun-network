@@ -19,10 +19,10 @@ const formatDate = (dateString) => {
 const AnnouncementCard = ({ announcement, onClick }) => {
   return (
     <div
-      className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden"
+      className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden flex flex-col h-full"
       onClick={onClick}
     >
-      <div className="p-6">
+      <div className="p-6 flex-1">
         {announcement.category && (
           <span className="bg-primary text-white px-3 py-1 rounded-full text-sm font-medium mb-4 inline-block">
             {announcement.category}
@@ -41,7 +41,7 @@ const AnnouncementCard = ({ announcement, onClick }) => {
         )}
       </div>
 
-      {/* Hover efekti için alt çizgi */}
+      {/* Hover efekti için alt çizgi - her zaman kartın en altında */}
       <div className="h-1 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
     </div>
   );
