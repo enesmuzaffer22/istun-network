@@ -8,9 +8,23 @@ import {
 import routes from "./route/routes";
 import { useAuthStore } from "./store";
 
-const PrivateRoute = ({ element: Element }) => {
+const PrivateRoute = ({
+  element: Element,
+  restrictedForContentAdmin = false,
+}) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  return isAuthenticated ? <Element /> : <Navigate to="/login" replace />;
+  const user = useAuthStore((state) => state.user);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Content admin için kısıtlı sayfalar kontrolü
+  if (restrictedForContentAdmin && user?.adminRole === "content_admin") {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Element />;
 };
 
 const PublicRoute = ({ element: Element }) => {
@@ -36,7 +50,12 @@ const App = () => {
                       path={child.path}
                       element={
                         <React.Suspense fallback={<div>Yükleniyor...</div>}>
-                          <PrivateRoute element={Element} />
+                          <PrivateRoute
+                            element={Element}
+                            restrictedForContentAdmin={
+                              child.restrictedForContentAdmin || false
+                            }
+                          />
                         </React.Suspense>
                       }
                     />

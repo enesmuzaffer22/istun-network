@@ -49,4 +49,20 @@ export const useAuthStore = create((set) => ({
     localStorage.setItem("authToken", newToken);
     set({ token: newToken });
   },
+
+  // Kullanıcı rolü kontrol fonksiyonları
+  getUserRole: () => {
+    const state = useAuthStore.getState();
+    return state.user?.adminRole || null;
+  },
+
+  isSuperAdmin: () => {
+    const state = useAuthStore.getState();
+    return state.user?.adminRole === "super_admin";
+  },
+
+  isContentAdmin: () => {
+    const state = useAuthStore.getState();
+    return state.user?.adminRole === "content_admin";
+  },
 }));

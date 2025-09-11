@@ -23,27 +23,73 @@ const menu = [
     icon: "bi-heart-pulse",
     path: "/socialimpactscores",
   }, // Yeni eklendi
-  { name: "Ayarlar", icon: "bi-gear", path: "/settings" },
   {
     name: "Bekleyen Talepler",
     icon: "bi-hourglass-split",
     path: "/pendingrequests",
   }, // ⏳ ikon
   { name: "Kullanıcılar", icon: "bi-person-lines-fill", path: "/userlist" }, // 👤 liste ikon
+  { name: "Yöneticiler", icon: "bi-person-gear", path: "/admin-management" }, // 👤 yönetici ikon
 ];
 
 const Sidebar = () => {
   const logout = useAuthStore((state) => state.logout);
+  const user = useAuthStore((state) => state.user);
   const location = useLocation();
+
+  // Role tabanlı menü filtreleme
+  const getFilteredMenu = () => {
+    // Eğer super_admin ise tüm menüyü göster
+    if (user?.adminRole === "super_admin") {
+      return menu;
+    }
+
+    // Eğer content_admin ise belirli menüleri gizle
+    if (user?.adminRole === "content_admin") {
+      const restrictedPaths = [
+        "/userlist",
+        "/admin-management",
+        "/pendingrequests",
+      ];
+      return menu.filter((item) => !restrictedPaths.includes(item.path));
+    }
+
+    // Varsayılan olarak tüm menüyü göster (güvenlik için)
+    return menu;
+  };
+
+  const filteredMenu = getFilteredMenu();
 
   return (
     <aside className="w-64 bg-white shadow-md h-screen flex flex-col">
-      <div className="p-6 text-2xl font-bold text-primary border-b">
-        Admin Paneli
+      <div className="p-6 border-b">
+        <div className="text-2xl font-bold text-primary">Admin Paneli</div>
+        {user && (
+          <div className="mt-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2">
+              <i className="bi bi-person-circle"></i>
+              <span>{user.email}</span>
+            </div>
+            <div className="flex items-center gap-2 mt-1">
+              <i
+                className={`bi ${
+                  user.adminRole === "super_admin"
+                    ? "bi-shield-fill-exclamation text-red-500"
+                    : "bi-pencil-square text-blue-500"
+                }`}
+              ></i>
+              <span className="text-xs font-medium">
+                {user.adminRole === "super_admin"
+                  ? "Süper Admin"
+                  : "İçerik Admin"}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
       <nav className="flex-1 p-4">
         <ul className="space-y-2">
-          {menu.map((item) => (
+          {filteredMenu.map((item) => (
             <li key={item.path}>
               <Link
                 to={item.path}

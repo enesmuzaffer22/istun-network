@@ -35,6 +35,7 @@ const routes = [
         path: "pendingrequests",
         component: () => import("../pages/PendingRequests.jsx"),
         isPrivate: true,
+        restrictedForContentAdmin: true,
       },
 
       // Kullanıcı Listesi
@@ -42,6 +43,15 @@ const routes = [
         path: "userlist",
         component: () => import("../pages/UserList.jsx"),
         isPrivate: true,
+        restrictedForContentAdmin: true,
+      },
+
+      // Yönetici Paneli
+      {
+        path: "admin-management",
+        component: () => import("../pages/AdminManagementPage.jsx"),
+        isPrivate: true,
+        restrictedForContentAdmin: true,
       },
 
       // İş İlanları
@@ -97,13 +107,6 @@ const routes = [
       {
         path: "socialimpactscores",
         component: () => import("../pages/SocialImpactScoresPage.jsx"),
-        isPrivate: true,
-      },
-
-      // Ayarlar
-      {
-        path: "settings",
-        component: () => import("../pages/Settings.jsx"),
         isPrivate: true,
       },
     ],
