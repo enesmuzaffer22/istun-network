@@ -416,29 +416,8 @@ function SocialImpactPage() {
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-20 bg-gradient-to-r from-primary to-red-600 text-white">
-        <div className="container mx-auto px-4 2xl:px-[120px] text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Sen de Sosyal Etkimize Katıl
-          </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Birlikte daha güçlüyüz. Sosyal sorumluluk projelerimize katılarak
-            topluma değer katmaya sen de başla.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-primary px-8 py-4 rounded-full font-semibold hover:bg-white/90 transition-colors">
-              Projelere Katıl
-            </button>
-            <button className="bg-transparent text-white px-8 py-4 rounded-full border border-white font-semibold hover:bg-white/10 transition-colors">
-              Daha Fazla Bilgi
-            </button>
-          </div>
-        </div>
-      </section>
-
       {/* Project Gallery Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4 2xl:px-[120px]">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">

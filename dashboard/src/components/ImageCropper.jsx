@@ -42,20 +42,29 @@ function ImageCropper({ isOpen, onClose, onCropComplete, aspectRatio, title }) {
     const canvas = document.createElement("canvas");
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
-    canvas.width = completedCrop.width;
-    canvas.height = completedCrop.height;
+
+    // Çözünürlüğü %40 azalt (0.6 ile çarp)
+    const cropWidth = completedCrop.width * scaleX * 0.6;
+    const cropHeight = completedCrop.height * scaleY * 0.6;
+
+    canvas.width = cropWidth;
+    canvas.height = cropHeight;
     const ctx = canvas.getContext("2d");
+
+    // Daha iyi kalite için imageSmoothingEnabled'ı ayarla
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
 
     ctx.drawImage(
       image,
       completedCrop.x * scaleX,
       completedCrop.y * scaleY,
-      completedCrop.width * scaleX,
-      completedCrop.height * scaleY,
+      completedCrop.width * scaleX, // Kaynak alan orijinal boyutta
+      completedCrop.height * scaleY, // Kaynak alan orijinal boyutta
       0,
       0,
-      completedCrop.width,
-      completedCrop.height
+      cropWidth, // Hedef alan %40 küçültülmüş
+      cropHeight // Hedef alan %40 küçültülmüş
     );
 
     return new Promise((resolve) => {
@@ -64,7 +73,7 @@ function ImageCropper({ isOpen, onClose, onCropComplete, aspectRatio, title }) {
           resolve(blob);
         },
         "image/jpeg",
-        0.9
+        0.85 // %85 kalite - dosya boyutu optimize edildi
       );
     });
   };

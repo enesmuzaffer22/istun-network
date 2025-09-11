@@ -41,7 +41,7 @@ function NewsCard({ title, content, imageUrl, createdAt, category }) {
         <div className="news-card-content-container flex-1 min-w-0">
           {/* Kategori Badge */}
           {category && (
-            <span className="inline-block bg-primary text-white text-xs font-medium px-3 py-1 rounded-full mb-3">
+            <span className="inline-block bg-primary text-white text-xs font-medium px-3 py-1 rounded-full mb-6">
               {category}
             </span>
           )}
@@ -49,9 +49,6 @@ function NewsCard({ title, content, imageUrl, createdAt, category }) {
           <h3 className="text-xl sm:text-2xl text-primary font-bold mb-2 line-clamp-2">
             {title}
           </h3>
-          <p className="text-gray-600 text-sm sm:text-base line-clamp-3 mb-2">
-            {content}
-          </p>
           {createdAt && (
             <div className="flex items-center gap-2 text-gray-500 text-xs sm:text-sm">
               <i className="bi bi-calendar3"></i>

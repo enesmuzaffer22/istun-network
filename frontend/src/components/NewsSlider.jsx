@@ -261,9 +261,6 @@ function NewsSlider() {
                   <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
                     {newsItem.title}
                   </h3>
-                  <p className="text-lg md:text-xl text-gray-200 max-w-3xl mx-auto line-clamp-3 leading-relaxed mb-4">
-                    {newsItem.content}
-                  </p>
                   {newsItem.created_at && (
                     <div className="flex items-center justify-center gap-2 text-gray-300 text-sm md:text-base mb-6">
                       <i className="bi bi-calendar3"></i>
