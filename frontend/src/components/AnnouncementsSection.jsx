@@ -190,7 +190,7 @@ function AnnouncementsSection() {
       <div className="flex justify-center mt-12">
         <button
           onClick={() => navigate("/duyurular")}
-          className="bg-primary hover:bg-red-700 text-white px-8 py-3 rounded-full font-medium transition-colors duration-200 flex items-center gap-2"
+          className="bg-primary hover:bg-red-700 text-white px-8 py-3 rounded-full font-medium transition-colors duration-200 flex items-center gap-2 cursor-pointer"
         >
           <span>Tüm Duyuruları Görüntüle</span>
           <i className="bi bi-arrow-right"></i>

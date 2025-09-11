@@ -228,7 +228,7 @@ const LoginPage = () => {
                   className={`w-full py-4 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 font-semibold text-lg shadow-lg flex items-center justify-center transition-all duration-200 ${
                     isLoading
                       ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-gradient-to-r from-primary to-red-600 text-white hover:from-red-700 hover:to-red-700 transform hover:scale-105"
+                      : "bg-gradient-to-r from-primary to-red-600 text-white hover:from-red-700 hover:to-red-700 transform hover:scale-105 cursor-pointer"
                   }`}
                 >
                   {isLoading ? (
@@ -245,6 +245,18 @@ const LoginPage = () => {
                 </button>
               </div>
 
+              {/* Forgot Password Link */}
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => navigate("/sifremi-unuttum")}
+                  className="text-sm text-gray-600 hover:text-primary transition-colors duration-200 font-medium cursor-pointer"
+                >
+                  <i className="bi bi-key mr-1"></i>
+                  Şifremi Unuttum
+                </button>
+              </div>
+
               {/* Register Link */}
               <div className="text-center pt-4 border-t border-gray-200">
                 <p className="text-gray-600 text-sm">
@@ -252,7 +264,7 @@ const LoginPage = () => {
                   <button
                     type="button"
                     onClick={() => navigate("/kayit-ol")}
-                    className="text-primary hover:text-red-700 font-medium transition-colors duration-200"
+                    className="text-primary hover:text-red-700 font-medium transition-colors duration-200 cursor-pointer"
                   >
                     Kayıt Ol
                   </button>

@@ -7,6 +7,7 @@ import EventsPage from "../pages/EventsPage";
 import EventDetailPage from "../pages/EventDetailPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ProfilePage from "../pages/ProfilePage";
 import AboutUsPage from "../pages/AboutUsPage";
 import SocialImpactPage from "../pages/SocialImpactPage";
@@ -38,6 +39,14 @@ export const RouteList = [
     element: (
       <PublicRoute>
         <RegisterPage />
+      </PublicRoute>
+    ),
+  },
+  {
+    path: "/sifremi-unuttum",
+    element: (
+      <PublicRoute>
+        <ForgotPasswordPage />
       </PublicRoute>
     ),
   },

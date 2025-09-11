@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import aboutUsImg from "../assets/img/about_us_section.jpg";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -128,7 +129,7 @@ function AboutUsSection() {
       </div>
       <img
         ref={imageRef}
-        src="https://picsum.photos/1280/960"
+        src={aboutUsImg}
         alt=""
         className="flex-auto xl:flex-3/5 h-[320px] xl:h-[480px] rounded-2xl object-cover"
       />
