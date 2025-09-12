@@ -673,6 +673,27 @@ const RegisterPage = () => {
                       KVKK kapsamında kişisel verileriniz güvenli şekilde
                       işlenecektir.
                     </p>
+                    <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-xs text-blue-700 mb-2">
+                        <i className="bi bi-info-circle mr-1"></i>
+                        <strong>KVKK Bilgilendirmesi:</strong>
+                      </p>
+                      <p className="text-xs text-blue-600 leading-relaxed mb-2">
+                        Kayıt formunda paylaştığınız kişisel verileriniz,
+                        mezunlar ve öğrenciler arasında iletişim sağlamak, iş ve
+                        staj ilanlarını paylaşmak, kariyer etkinlikleri
+                        düzenlemek ve üyelik doğrulaması yapmak amacıyla
+                        işlenecektir.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => window.open("/kvkk", "_blank")}
+                        className="cursor-pointer text-primary hover:text-red-700 text-xs font-medium underline transition-colors duration-200 flex items-center"
+                      >
+                        <i className="bi bi-arrow-up-right-square mr-1"></i>
+                        Detaylı KVKK Aydınlatma Metni için tıklayın
+                      </button>
+                    </div>
                   </div>
                 </div>
                 {errors.consent && (

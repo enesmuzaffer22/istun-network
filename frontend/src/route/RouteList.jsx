@@ -8,6 +8,7 @@ import EventDetailPage from "../pages/EventDetailPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
+import KVKKPage from "../pages/KVKKPage";
 import ProfilePage from "../pages/ProfilePage";
 import AboutUsPage from "../pages/AboutUsPage";
 import SocialImpactPage from "../pages/SocialImpactPage";
@@ -134,5 +135,9 @@ export const RouteList = [
   {
     path: "/basarilarimiz",
     element: <AchievementsPage />,
+  },
+  {
+    path: "/kvkk",
+    element: <KVKKPage />,
   },
 ];

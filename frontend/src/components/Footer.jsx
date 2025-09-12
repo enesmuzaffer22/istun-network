@@ -105,28 +105,12 @@ function Footer() {
                   </a>
                 </div>
                 <div>
-                  <a
-                    href="#"
+                  <Link
+                    to="/kvkk"
                     className="text-white/70 hover:text-white transition-colors duration-300 block py-1"
                   >
-                    İletişim
-                  </a>
-                </div>
-                <div>
-                  <a
-                    href="#"
-                    className="text-white/70 hover:text-white transition-colors duration-300 block py-1"
-                  >
-                    Gizlilik Politikası
-                  </a>
-                </div>
-                <div>
-                  <a
-                    href="#"
-                    className="text-white/70 hover:text-white transition-colors duration-300 block py-1"
-                  >
-                    Kullanım Şartları
-                  </a>
+                    KVKK
+                  </Link>
                 </div>
               </div>
             </div>
