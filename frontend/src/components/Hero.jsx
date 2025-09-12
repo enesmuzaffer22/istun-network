@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import heroVideo from "../assets/video/hero_video.mp4";
+
+// ScrollToPlugin'i kaydet
+gsap.registerPlugin(ScrollToPlugin);
 
 const heroPrimaryButtonStyles =
   "bg-white text-black px-8 py-3 rounded-full hover:bg-white/90 transition-colors cursor-pointer lg:w-auto w-full font-medium flex items-center justify-center gap-2";
@@ -16,9 +20,11 @@ function Hero() {
   const navigate = useNavigate();
 
   const scrollToContent = () => {
-    window.scrollTo({
-      top: window.innerHeight,
-      behavior: "smooth",
+    const viewportHeight = window.innerHeight;
+    gsap.to(window, {
+      duration: 1,
+      scrollTo: viewportHeight,
+      ease: "power2.inOut",
     });
   };
 
@@ -49,7 +55,7 @@ function Hero() {
   return (
     <div
       ref={heroRef}
-      className="relative w-full overflow-hidden h-screen bg-gradient-to-br from-red-600 via-red-700 to-red-900"
+      className="relative w-full overflow-hidden h-dvh bg-gradient-to-br from-red-600 via-red-700 to-red-900"
     >
       {/* Video Background */}
       <video
