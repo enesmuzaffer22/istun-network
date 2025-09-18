@@ -168,7 +168,8 @@ router.post("/", protect, isContentAdmin, upload.single("image"), async (req, re
  */
 // GET http://localhost:5000/api/roadmaps
 // Yol haritalarını listele (sayfalama ile - sayfa başına 9 öğe)
-router.get("/", async (req, res) => {
+// roadmaps.ts  
+router.get("/", protect, async (req, res) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = 9; // Sayfa başına 9 öğe

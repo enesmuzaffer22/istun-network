@@ -53,3 +53,33 @@ export const getAdminRole = async (uid: string) => {
         return null;
     }
 };
+
+
+
+
+/**
+ * Kullanıcının status bilgisini Custom Claims'e ekler
+ * @param uid - Kullanıcının Firebase UID'si
+ * @param status - Kullanıcı durumu ('pending' | 'approved' | 'rejected')
+ */
+export const setUserStatus = async (uid: string, status: 'pending' | 'approved' | 'rejected') => {
+    try {
+        // Mevcut custom claims'i al
+        const user = await auth.getUser(uid);
+        const currentClaims = user.customClaims || {};
+        
+        // Status'u ekleyerek claims'i güncelle
+        await auth.setCustomUserClaims(uid, {
+            ...currentClaims,
+            status: status
+        });
+        
+        // Mevcut oturumların yeni claim'leri alması için token'ları geçersiz kıl
+        try { await auth.revokeRefreshTokens(uid); } catch {}
+        console.log(`Kullanıcı status'u güncellendi: ${uid} -> ${status}`);
+        return true;
+    } catch (error) {
+        console.error('Status claim ayarlama hatası:', error);
+        return false;
+    }
+};

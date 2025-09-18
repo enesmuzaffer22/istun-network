@@ -12,6 +12,7 @@ import { db, auth, admin } from "../firebase/firebase";
 import { protect, isAdmin, isSuperAdmin } from "../middleware/authMiddleware";
 import { cache } from "../utils/cache";
 import { sendUserApprovedEmail, sendUserRejectedEmail } from "../utils/emailService";
+import { setUserStatus } from "../utils/adminUtils";
 
 const router = express.Router();
 
@@ -474,7 +475,8 @@ router.post("/:id/approve", protect, isSuperAdmin, async (req, res) => {
     await auth.updateUser(userId, {
       disabled: false,
     });
-
+    
+    await setUserStatus(userId, 'approved');
     // Cache'i temizle - kullanıcı listesi değişti
     // Tüm users_list cache'lerini temizle (farklı query parametreleri için)
     cache.clear(); // Geçici çözüm - tüm cache'i temizle
@@ -573,7 +575,7 @@ router.post("/:id/reject", protect, isSuperAdmin, async (req, res) => {
     await auth.updateUser(userId, {
       disabled: true,
     });
-
+    await setUserStatus(userId, 'rejected');
     // Cache'i temizle - kullanıcı listesi değişti
     // Tüm users_list cache'lerini temizle (farklı query parametreleri için)
     cache.clear(); // Geçici çözüm - tüm cache'i temizle

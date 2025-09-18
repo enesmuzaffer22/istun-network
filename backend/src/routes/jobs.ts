@@ -150,7 +150,7 @@ router.post("/", protect, isContentAdmin, async (req, res) => {
  */
 // ---- TÜM İŞ İLANLARINI GETİRME (GET) ----
 // İş ilanlarını listele (sayfalama ile - sayfa başına 12 öğe)
-router.get("/", async (req, res) => {
+router.get("/", protect, async (req, res) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = 12; // Sayfa başına 12 öğe
