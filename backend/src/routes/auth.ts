@@ -16,6 +16,7 @@ import * as dotenv from "dotenv";
 import multer from "multer";
 import { admin } from "../firebase/firebase";
 import { v4 as uuidv4 } from "uuid";
+import { validateDocumentFile } from "../utils/fileValidation";
 dotenv.config();
 const router = express.Router();
 
@@ -67,6 +68,11 @@ router.post("/upload-document", upload.single("document"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: "Dosya bulunamadı." });
+    }
+    if (!validateDocumentFile(req.file)) {
+      return res.status(400).json({ 
+        message: "Geçersiz dosya tipi. Sadece PDF, JPG, JPEG, PNG dosyaları kabul edilir." 
+      });
     }
     const bucket = admin.storage().bucket();
     const fileName = `student_docs/${uuidv4()}_${req.file.originalname}`;
@@ -196,7 +202,11 @@ router.post("/register", upload.single("document"), async (req, res) => {
         .status(400)
         .json({ message: "Öğrenci belgesi dosyası zorunlu." });
     }
-
+    if (!validateDocumentFile(req.file)) {
+      return res.status(400).json({ 
+        message: "Geçersiz dosya tipi. Sadece PDF, JPG, JPEG, PNG dosyaları kabul edilir." 
+      });
+    }
     // Zorunlu alanlar kontrolü
     if (
       !name ||
